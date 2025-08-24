@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoginLogController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
 
 // Public Route
@@ -32,7 +34,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/task-manager', [TaskController::class, 'showManager'])->name('task.manager');
 
     // Task CRUD (inline handled via task-manager blade)
-    Route::resource('tasks', TaskController::class)->except(['index', 'show']);
+    Route::resource('tasks', TaskController::class)->except(['show']);
+
+    // ============================
+    // Settings (All users)
+    // ============================
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+
+    // ============================
+    // User Management (Admin Only)
+    // ============================
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/settings/users', [UserManagementController::class, 'index'])->name('settings.users');
+        Route::post('/settings/users/{id}/block', [UserManagementController::class, 'block'])->name('settings.users.block');
+        Route::post('/settings/users/{id}/unblock', [UserManagementController::class, 'unblock'])->name('settings.users.unblock');
+    });
 });
 
 require __DIR__.'/auth.php';

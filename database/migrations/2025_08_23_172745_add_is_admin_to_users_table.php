@@ -10,22 +10,20 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('tasks', function (Blueprint $table) {
-        $table->id();
-        $table->string('title');
-        $table->text('description')->nullable();
-        $table->boolean('completed')->default(false);
-        $table->timestamps();
-    });
-}
-
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_admin')->default(0)->after('email'); 
+            // Adds is_admin column, default = 0 (normal user)
+        });
+    }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_admin');
+        });
     }
 };
