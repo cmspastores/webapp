@@ -11,7 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Register middleware alias
+        $middleware->alias([
+        'not_blocked' => \App\Http\Middleware\EnsureUserIsNotBlocked::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,              // ← alias admin middleware
+        ]);
+
+        // Apply middleware globally to all web routes
+        $middleware->web(append: [
+            \App\Http\Middleware\EnsureUserIsNotBlocked::class,
+            \App\Http\Middleware\AdminMiddleware::class,                         // ← apply to web group
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

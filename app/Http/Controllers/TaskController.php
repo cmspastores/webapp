@@ -8,6 +8,15 @@ use Illuminate\Http\Request;
 class TaskController extends Controller
 {
     /**
+     * Display a list of all tasks (tasks.index route).
+     */
+    public function index()
+    {
+        $tasks = Task::latest()->get();
+        return view('tasks.index', compact('tasks'));
+    }
+
+    /**
      * Display the task manager page with all tasks.
      */
     public function showManager()
