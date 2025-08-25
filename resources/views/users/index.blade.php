@@ -1,27 +1,23 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            User Management
+            Users
         </h2>
     </x-slot>
 
-     <div class="py-6 px-4 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <form method="GET" action="{{ route('settings.users') }}" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input type="text" name="name" value="{{ request('name') }}" placeholder="Filter by name"
-                   class="border px-3 py-2 rounded-md w-full">
-            <input type="text" name="email" value="{{ request('email') }}" placeholder="Filter by email"
-                   class="border px-3 py-2 rounded-md w-full">
-            <input type="date" name="from" value="{{ request('from') }}" class="border px-3 py-2 rounded-md w-full">
-            <input type="date" name="to" value="{{ request('to') }}" class="border px-3 py-2 rounded-md w-full">
-            <div class="md:col-span-4 flex gap-2">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md">Filter</button>
-                <a href="{{ route('settings.users') }}" class="bg-gray-300 px-4 py-2 rounded-md">Reset</a>
-            </div>
+    <div class="py-6 px-4 max-w-7xl mx-auto sm:px-6 lg:px-8">
+
+        <form method="GET" action="{{ route('index') }}" class="mb-6 flex gap-4">
+            <input type="text" name="name" placeholder="Name" value="{{ request('name') }}"
+                   class="border px-3 py-2 rounded-md">
+            <input type="text" name="email" placeholder="Email" value="{{ request('email') }}"
+                   class="border px-3 py-2 rounded-md">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Filter</button>
         </form>
 
         <table class="w-full border-collapse border border-gray-300">
-            <thead class="bg-gray-100">
-                <tr>
+            <thead>
+                <tr class="bg-gray-100">
                     <th class="border px-4 py-2">Name</th>
                     <th class="border px-4 py-2">Email</th>
                     <th class="border px-4 py-2">Created At</th>

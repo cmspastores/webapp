@@ -13,36 +13,27 @@
                 </a>
             </li>
 
-            <!-- Task Manager -->
-            <li>
-                <a href="{{ route('tasks.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('tasks.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Task Manager
-                </a>
-            </li>
-
-            <!-- Rooms -->
-            <li>
-                <a href="{{ route('tasks.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('rooms.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Rooms
-                </a>
-            </li>
-
             <!-- Room Types -->
             <li>
-                <a href="{{ route('tasks.index') }}"
+                <a href="{{ route('roomtypes.index') }}"
                    class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
                    {{ request()->routeIs('roomtypes.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
                    Room Types
                 </a>
             </li>
 
+            <!-- Room  -->
+            <li>
+                <a href="{{ route('roomtypes.index') }}"
+                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
+                   {{ request()->routeIs('roomtypes.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
+                   Room
+                </a>
+            </li>
+
             <!-- Customers -->
             <li>
-                <a href="{{ route('tasks.index') }}"
+                <a href="{{ route('roomtypes.index') }}"
                    class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
                    {{ request()->routeIs('customers.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
                    Customers
@@ -51,7 +42,7 @@
 
             <!-- Agreement Reg -->
             <li>
-                <a href="{{ route('tasks.index') }}"
+                <a href="{{ route('roomtypes.index') }}"
                    class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
                    {{ request()->routeIs('agreements.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
                    Agreement Reg
@@ -60,7 +51,7 @@
 
             <!-- Billing -->
             <li>
-                <a href="{{ route('tasks.index') }}"
+                <a href="{{ route('roomtypes.index') }}"
                    class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
                    {{ request()->routeIs('billing.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
                    Billing
@@ -69,7 +60,7 @@
 
             <!-- Charges -->
             <li>
-                <a href="{{ route('tasks.index') }}"
+                <a href="{{ route('roomtypes.index') }}"
                    class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
                    {{ request()->routeIs('charges.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
                    Charges

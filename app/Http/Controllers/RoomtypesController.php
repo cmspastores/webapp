@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
+use App\Models\Roomtypes;
 use Illuminate\Http\Request;
 
-class TaskController extends Controller
+class RoomtypesController extends Controller
 {
     /**
      * Display a list of all tasks (tasks.index route).
      */
     public function index()
     {
-        $tasks = Task::latest()->get();
-        return view('tasks.index', compact('tasks'));
+        $roomtypes = Roomtypes::latest()->get();
+        return view('roomtypes.index', compact('roomtypes'));
     }
 
     /**
@@ -21,8 +21,8 @@ class TaskController extends Controller
      */
     public function showManager()
     {
-        $tasks = Task::latest()->get();
-        return view('task-manager', compact('tasks'));
+        $roomtypes = Roomtypes::latest()->get();
+        return view('Roomtypes-manager', compact('roomtypes'));
     }
 
     /**
@@ -35,33 +35,33 @@ class TaskController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        Task::create($validated);
+        Roomtypes::create($validated);
 
-        return redirect()->route('task.manager')->with('success', 'Task created successfully.');
+        return redirect()->route('roomtypes.manager')->with('success', 'Roomtype created successfully.');
     }
 
     /**
      * Update an existing task from the task manager view.
      */
-    public function update(Request $request, Task $task)
+    public function update(Request $request, Roomtypes $roomtypes)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        $task->update($validated);
+        $roomtypes->update($validated);
 
-        return redirect()->route('task.manager')->with('success', 'Task updated successfully.');
+        return redirect()->route('roomtypes.manager')->with('success', 'Roomtype updated successfully.');
     }
 
     /**
      * Delete a task from the task manager view.
      */
-    public function destroy(Task $task)
+    public function destroy(Roomtypes $roomtypes)
     {
-        $task->delete();
+        $roomtypes->delete();
 
-        return redirect()->route('task.manager')->with('success', 'Task deleted successfully.');
+        return redirect()->route('roomtypes.manager')->with('success', 'roomtype deleted successfully.');
     }
 }

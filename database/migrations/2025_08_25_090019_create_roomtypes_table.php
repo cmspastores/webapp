@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
-            $table->id();
+        Schema::create('roomtypes', function (Blueprint $table) {
+            $table->id()->primary();
             $table->string('title');
             $table->text('description')->nullable();
             // $table->boolean('completed')->default(false);
@@ -19,6 +19,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('roomtypes');
     }
 };

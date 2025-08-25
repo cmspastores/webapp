@@ -1,4 +1,4 @@
- <x-app-layout>
+<x-app-layout>
     <x-slot name="header">
        <!-- <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             Task Manager
@@ -115,14 +115,14 @@
             cursor: pointer;
         }
 
-        .no-tasks {
+        .no-roomtypes {
             color: #64748b;
             margin-top: 20px;
             font-style: italic;
         }
     </style>
 
-    <div class="header-bar">Task Manager</div> 
+    <div class="header-bar">Roomtypes</div> 
 
     <div class="py-8 px-4 max-w-7xl mx-auto sm:px-6 lg:px-8">
         @if (session('success'))
@@ -132,7 +132,7 @@
         @endif
 
         {{-- 📝 Create Task Form --}}
-        <form action="{{ route('tasks.store') }}" method="POST">
+        <form action="{{ route('roomtypes.store') }}" method="POST">
             @csrf
             <div class="form-group">
                 <label for="title" class="form-label">Title</label>
@@ -148,7 +148,7 @@
         </form>
 
         {{-- 📋 Tasks Table --}}
-        @if ($tasks->count())
+        @if ($roomtypes->count())
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -159,21 +159,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($tasks as $task)
+                        @foreach ($roomtypes as $roomtypes)
                             <tr>
-                                <form action="{{ route('tasks.update', $task) }}" method="POST">
+                                <form action="{{ route('roomtypes.update', $roomtypes) }}" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <td>
-                                        <input type="text" name="title" value="{{ $task->title }}" required class="table-input">
+                                        <input type="text" name="title" value="{{ $roomtypes->title }}" required class="table-input">
                                     </td>
                                     <td>
-                                        <input type="text" name="description" value="{{ $task->description }}" class="table-input">
+                                        <input type="text" name="description" value="{{ $roomtypes->description }}" class="table-input">
                                     </td>
                                     <td class="action-buttons">
                                         <button type="submit" class="save-button">💾 Save</button>
                                 </form>
-                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Delete this task?');">
+                                <form action="{{ route('roomtypes.destroy', $roomtypes) }}" method="POST" onsubmit="return confirm('Delete this roomtype?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="delete-button">🗑️ Delete</button>
@@ -185,7 +185,7 @@
                 </table>
             </div>
         @else
-            <p class="no-tasks">No tasks yet.</p>
+            <p class="no-roomtypes">No roomtypes yet.</p>
         @endif
     </div>
 </x-app-layout>
