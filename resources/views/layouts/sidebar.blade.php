@@ -1,91 +1,44 @@
 <!-- Sidebar -->
-<aside class="w-64 bg-white dark:bg-gray-900 min-h-screen border-r border-gray-200 dark:border-gray-700 flex flex-col justify-between">
+<aside class="sidebar">
     <!-- Top Nav -->
-    <div class="p-4">
-        <h2 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Navigation</h2>
-        <ul class="space-y-2">
-            <!-- Dashboard -->
-            <li>
-                <a href="{{ route('dashboard') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('dashboard') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Dashboard
-                </a>
-            </li>
-
-            <!-- Room Types -->
-            <li>
-                <a href="{{ route('roomtypes.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('roomtypes.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Room Types
-                </a>
-            </li>
-
-            <!-- Room  -->
-            <li>
-                <a href="{{ route('roomtypes.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('roomtypes.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Room
-                </a>
-            </li>
-
-            <!-- Customers -->
-            <li>
-                <a href="{{ route('roomtypes.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('customers.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Customers
-                </a>
-            </li>
-
-            <!-- Agreement Reg -->
-            <li>
-                <a href="{{ route('roomtypes.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('agreements.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Agreement Reg
-                </a>
-            </li>
-
-            <!-- Billing -->
-            <li>
-                <a href="{{ route('roomtypes.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('billing.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Billing
-                </a>
-            </li>
-
-            <!-- Charges -->
-            <li>
-                <a href="{{ route('roomtypes.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('charges.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Charges
-                </a>
-            </li>
+    <div class="sidebar-top">
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a></li>
+            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('roomtypes.*') ? 'active' : '' }}">Room Types</a></li>
+            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('rooms.*') ? 'active' : '' }}">Room</a></li>
+            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('customers.*') ? 'active' : '' }}">Customers</a></li>
+            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('agreements.*') ? 'active' : '' }}">Agreement Reg</a></li>
+            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('billing.*') ? 'active' : '' }}">Billing</a></li>
+            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('charges.*') ? 'active' : '' }}">Charges</a></li>
         </ul>
     </div>
 
     <!-- Bottom Nav -->
-    <div class="p-4">
-        <ul>
-            <!-- Settings (admins only) -->
-            @if(auth()->user() && auth()->user()->is_admin)
-                <li class="px-4 py-2 text-gray-600 dark:text-gray-300 font-semibold">
-                    Admin Settings:
-                </li>
-                <!-- User Management -->
-                <li class="ml-4">
-                    <a href="{{ route('settings.users') }}"
-                        class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                        {{ request()->routeIs('settings.users') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                        User Management
-                    </a>
-                </li>
-            @endif
-        </ul>
+    <div class="sidebar-bottom">
+        @if(auth()->user() && auth()->user()->is_admin)
+            <p class="sidebar-label">Admin Settings:</p>
+            <ul>
+                <li><a href="{{ route('settings.users') }}" class="{{ request()->routeIs('settings.users') ? 'active' : '' }}">User Management</a></li>
+            </ul>
+        @endif
     </div>
 </aside>
+
+<!-- Sidebar Styles -->
+<style>
+/* ============================
+   Sidebar 🪴
+   ============================ */
+.sidebar { background:linear-gradient(180deg,#FFF5EC,#F7E1B5); border-right:2px solid #E6A574; min-height:100vh; display:flex; flex-direction:column; justify-content:space-between; width:16rem; color:#5C3A21; }
+.sidebar-top,.sidebar-bottom { padding:1rem; }
+.sidebar-top h2 { font-size:1.125rem; font-weight:700; color:#5C3A21; margin-bottom:1rem; }
+.sidebar ul { display:flex; flex-direction:column; gap:0.5rem; }
+.sidebar a { display:block; padding:0.5rem 1rem; border-radius:0.5rem; color:#5C3A21; text-decoration:none; transition:0.2s; background:transparent; }
+.sidebar a:hover { background:rgba(230,165,116,0.25); }
+.sidebar a.active { background:linear-gradient(to right,#F4C38C,#E6A574); color:#3A2C1F; font-weight:600; }
+.sidebar-label { padding:0.5rem 1rem; color:#8B4A2C; font-weight:600; }
+
+
+</style>
+

@@ -45,11 +45,6 @@
     button:hover{ background:linear-gradient(90deg,#C46A32,#D98348); transform:translateY(-1px); }
 </style>
 
-
-
-
-
-
 </head>
 
 <body>
