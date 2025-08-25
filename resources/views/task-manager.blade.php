@@ -122,7 +122,7 @@
         }
     </style>
 
-    <div class="header-bar">Task Manager</div> 
+    <div class="header-bar">Room Types</div> 
 
     <div class="py-8 px-4 max-w-7xl mx-auto sm:px-6 lg:px-8">
         @if (session('success'))
@@ -185,7 +185,7 @@
                 </table>
             </div>
         @else
-            <p class="no-tasks">No tasks yet.</p>
+            <p class="no-roomtypes">No tasks yet.</p>
         @endif
     </div>
 </x-app-layout>
