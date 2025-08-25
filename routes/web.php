@@ -30,19 +30,11 @@ Route::middleware(['auth'])->group(function () {
     // Login Logs View (optional)
     Route::get('/login-logs', [LoginLogController::class, 'index']);
 
-<<<<<<< HEAD
-    // Task Manager UI (custom page)
-    Route::get('/Roomtypes-manager', [RoomtypesController::class, 'showManager'])->name('roomtypes.manager');
-
-    // Task CRUD (inline handled via task-manager blade)
-    Route::resource('roomtypes', RoomtypesController::class)->except(['show']);
-=======
     // Room Types UI (custom page)
     Route::get('/Roomtypes', [RoomtypesController::class, 'showManager'])->name('roomtypes.manager');
 
     // Room Types CRUD (inline handled via task-manager blade)
     Route::resource('roomtypes', RoomTypesController::class)->except(['show']);
->>>>>>> 87780e9e574982e816c803ddc8071db391955004
 
     // ============================
     // Settings (All users)

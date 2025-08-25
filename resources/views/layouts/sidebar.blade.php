@@ -1,28 +1,6 @@
 <!-- Sidebar -->
 <aside class="sidebar">
     <!-- Top Nav -->
-<<<<<<< HEAD
-    <div class="p-4">
-        <h2 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Navigation</h2>
-        <ul class="space-y-2">
-            <!-- Dashboard -->
-            <li>
-                <a href="{{ route('dashboard') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('dashboard') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Dashboard
-                </a>
-            </li>
-
-            <!-- Task Manager -->
-            <li>
-                <a href="{{ route('roomtypes.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-black
-                   {{ request()->routeIs('roomtypes.*') ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                   Roomtypes
-                </a>
-            </li>
-=======
     <div class="sidebar-top">
         <h2>Navigation</h2>
         <ul>
@@ -33,7 +11,6 @@
             <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('agreements.*') ? 'active' : '' }}">Agreement Reg</a></li>
             <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('billing.*') ? 'active' : '' }}">Billing</a></li>
             <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('charges.*') ? 'active' : '' }}">Charges</a></li>
->>>>>>> 87780e9e574982e816c803ddc8071db391955004
         </ul>
     </div>
 
