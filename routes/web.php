@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoginLogController;
-use App\Http\Controllers\TaskController;
+use App\Http\Controllers\RoomtypesController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
@@ -31,10 +31,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/login-logs', [LoginLogController::class, 'index']);
 
     // Task Manager UI (custom page)
-    Route::get('/task-manager', [TaskController::class, 'showManager'])->name('task.manager');
+    Route::get('/Roomtypes-manager', [RoomtypesController::class, 'showManager'])->name('roomtypes.manager');
 
     // Task CRUD (inline handled via task-manager blade)
-    Route::resource('tasks', TaskController::class)->except(['show']);
+    Route::resource('roomtypes', RoomtypesController::class)->except(['show']);
 
     // ============================
     // Settings (All users)
