@@ -35,4 +35,6 @@ class UserManagementController extends Controller
         return redirect()->route('settings.users')
                          ->with('success', "User {$user->name} has been unblocked.");
     }
+
+    
 }
