@@ -110,7 +110,7 @@ Then list tables:
 ## Dashboard
 <img src="dashboard.png" width=500>
 
-## Dashboard
+## Room Type
 <img src="roomtypes.png" width=500>
 
 ## User Management
