@@ -45,6 +45,13 @@ class UserManagementController extends Controller
     public function block($id)
     {
         $user = User::findOrFail($id);
+
+        // 🚨 Prevent blocking admins
+        if ($user->is_admin) {
+            return redirect()->route('settings.users')
+                             ->with('error', "You cannot block an admin account.");
+        }
+
         $user->is_blocked = 1;
         $user->save();
 

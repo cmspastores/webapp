@@ -70,16 +70,20 @@
                             @endif
                         </td>
                         <td>
-                            @if(!$user->is_blocked)
-                            <form action="{{ url('/settings/users/'.$user->id.'/block') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="btn-action btn-block">Block</button>
-                            </form>
+                            @if($user->is_admin)
+                                <span class="text-gray-500">Admin</span>
                             @else
-                            <form action="{{ url('/settings/users/'.$user->id.'/unblock') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="btn-action btn-unblock">Unblock</button>
-                            </form>
+                                @if(!$user->is_blocked)
+                                    <form action="{{ url('/settings/users/'.$user->id.'/block') }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="btn-action btn-block">Block</button>
+                                    </form>
+                                @else
+                                    <form action="{{ url('/settings/users/'.$user->id.'/unblock') }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="btn-action btn-unblock">Unblock</button>
+                                    </form>
+                                @endif
                             @endif
                         </td>
                     </tr>
