@@ -34,9 +34,12 @@
 .sidebar-top,.sidebar-bottom { padding:1rem; }
 .sidebar-top h2 { font-size:1.125rem; font-weight:700; color:#5C3A21; margin-bottom:1rem; }
 .sidebar ul { display:flex; flex-direction:column; gap:0.5rem; }
-.sidebar a { display:block; padding:0.5rem 1rem; border-radius:0.5rem; color:#5C3A21; text-decoration:none; transition:0.2s; background:transparent; }
-.sidebar a:hover { background:rgba(230,165,116,0.25); }
-.sidebar a.active { background:linear-gradient(to right,#F4C38C,#E6A574); color:#3A2C1F; font-weight:600; }
+
+.sidebar a { display:block; padding:0.65rem 1rem; border-radius:0.6rem; color:#5C3A21; text-decoration:none; transition:0.2s; background:rgba(255,255,255,0.35); font-weight:500; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05); }
+.sidebar a:hover { background:linear-gradient(to right,#F7E1B5,#F4C38C); transform:translateX(4px); box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+.sidebar a.active { background:linear-gradient(to right,#F4C38C,#E6A574); color:#3A2C1F; font-weight:600; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+
+
 .sidebar-label { padding:0.5rem 1rem; color:#8B4A2C; font-weight:600; }
 
 

@@ -9,6 +9,7 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
         <!-- Styles / Scripts -->
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
@@ -20,23 +21,29 @@
         @endif
 
 
-</head>
-<!-- 🎨 Muted Sunset Tropical Theme for Welcome -->
-<style>
-    body{background:radial-gradient(circle at top left,#FFFDF8,#FAF9F7);color:#2C2C2C;font-family:'Figtree',sans-serif;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;padding-bottom:48px;}
-    header{width:100%;max-width:420px;text-align:center;margin-bottom:24px;font-size:14px;}
-    .welcome-box{background:linear-gradient(180deg,#FFFDFB 0%,#FFF9F5 50%,#FFF5EE 100%);border:2px solid #E6A574;border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,0.1);max-width:460px;width:100%;padding:32px;text-align:center;box-sizing:border-box;margin-bottom:24px;}
-    .welcome-box h1{font-size:1.5rem;font-weight:600;color:#5C3A21;margin-bottom:16px;}
-    .welcome-box p{font-size:1rem;color:#2C2C2C;margin-bottom:20px;}
-    .auth-links{display:flex;justify-content:center;gap:12px;margin-top:16px;}
-    .auth-links a{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFF;font-weight:600;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:0.2s;}
-    .auth-links a:hover{background:linear-gradient(90deg,#C46A32,#D98348);transform:translateY(-1px);}
-    .logo-container{margin-bottom:32px;}
-    .logo-container svg{width:160px;max-width:60%;height:auto;}
-    .about-box h2{font-size:1.2rem;font-weight:600;color:#D98348;margin-bottom:8px;margin-top:12px;}
-    .about-box p{font-size:0.95rem;line-height:1.5;color:#3C2F2F;margin-bottom:12px;}
-</style>
 
+<!-- 🎨 Muted Sunset Tropical Theme for Welcome -->
+
+    <style>
+        body{background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);color:#2C2C2C;font-family:'Figtree',sans-serif;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;padding-bottom:48px;}
+        header{width:100%;max-width:420px;text-align:center;margin-bottom:24px;font-size:14px;}
+        .welcome-box{background:linear-gradient(180deg,#FFF8F2 0%,#FFF2EA 50%,#FFE9DC 100%);border:2px solid #E6A574;border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,0.1);max-width:460px;width:100%;padding:32px;text-align:center;box-sizing:border-box;margin-bottom:24px;}
+        .welcome-box h1{font-size:1.5rem;font-weight:600;color:#5C3A21;margin-bottom:16px;}
+        .welcome-box p{font-size:1rem;line-height:1.65;color:#D98348;font-weight:600;letter-spacing:0.3px;margin-bottom:20px;}
+
+
+        .auth-links{display:flex;justify-content:center;gap:12px;margin-top:16px;}
+        .auth-links a{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFF;font-weight:600;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:0.2s;}
+        .auth-links a:hover{background:linear-gradient(90deg,#C46A32,#D98348);transform:translateY(-1px);}
+        .logo-container{margin-bottom:32px;}
+        .logo-container svg{width:160px;max-width:60%;height:auto;}
+        .about-box h2{font-size:1.3rem;font-weight:600;color:#D98348;margin-bottom:10px;margin-top:12px;letter-spacing:0.5px;}
+        .about-box p{font-size:1rem;line-height:1.65;color:#4A3C35;letter-spacing:0.3px;font-weight:600;margin-bottom:12px;}
+
+
+
+    </style>
+</head>
 <body>
     <!-- 🔺 Laravel Logo -->
     <div class="logo-container">
@@ -49,7 +56,6 @@
     <div class="welcome-box">
         <h1>Welcome to C5 Dormitel</h1>
         <p>Dormitel Management System</p>
-
         @if (Route::has('login'))
             <div class="auth-links">
                 @auth
@@ -66,10 +72,7 @@
 
     <!-- 📖 About Section -->
     <div class="welcome-box about-box">
-        <h2>📌 Project Title</h2>
-        <p><strong>C5 Dormitel Management System</strong></p>
-
-        <h2>🏨 Background of Org/Business</h2>
+        <h2>Background of Org/Business</h2>
         <p>
             C5 Dormitel is a Dormitory operational since August 2006, located in Davao City along Roxas Avenue.  
             The establishment offers a unique blend of dormitory-style accommodations within a hotel setting.  
@@ -79,6 +82,8 @@
         </p>
     </div>
 </body>
+</html>
+
 
 
 
