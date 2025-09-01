@@ -1,49 +1,66 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            User Management
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('User Management') }}
         </h2>
     </x-slot>
 
-    <div class="py-6 px-4 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <form method="GET" action="{{ route('settings.users') }}" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input type="text" name="name" value="{{ request('name') }}" placeholder="Filter by name"
-                   class="border px-3 py-2 rounded-md w-full">
-            <input type="text" name="email" value="{{ request('email') }}" placeholder="Filter by email"
-                   class="border px-3 py-2 rounded-md w-full">
-            <input type="date" name="from" value="{{ request('from') }}" class="border px-3 py-2 rounded-md w-full">
-            <input type="date" name="to" value="{{ request('to') }}" class="border px-3 py-2 rounded-md w-full">
-            <div class="md:col-span-4 flex gap-2">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md">Filter</button>
-                <a href="{{ route('settings.users') }}" class="bg-gray-300 px-4 py-2 rounded-md">Reset</a>
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @if(session('success'))
+                <div class="mb-4 p-4 bg-green-100 text-green-800 rounded-lg">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <table class="min-w-full border-collapse border border-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="border px-4 py-2">ID</th>
+                                <th class="border px-4 py-2">Name</th>
+                                <th class="border px-4 py-2">Email</th>
+                                <th class="border px-4 py-2">Status</th>
+                                <th class="border px-4 py-2">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($users as $user)
+                                <tr>
+                                    <td class="border px-4 py-2">{{ $user->id }}</td>
+                                    <td class="border px-4 py-2">{{ $user->name }}</td>
+                                    <td class="border px-4 py-2">{{ $user->email }}</td>
+                                    <td class="border px-4 py-2">
+                                        @if($user->is_blocked)
+                                            <span class="text-red-600 font-bold">Blocked</span>
+                                        @else
+                                            <span class="text-green-600 font-bold">Active</span>
+                                        @endif
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        @if(!$user->is_blocked)
+                                            <form action="{{ url('/settings/users/'.$user->id.'/block') }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                                                    Block
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ url('/settings/users/'.$user->id.'/unblock') }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+                                                    Unblock
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </form>
-
-        <table class="w-full border-collapse border border-gray-300">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="border px-4 py-2">Name</th>
-                    <th class="border px-4 py-2">Email</th>
-                    <th class="border px-4 py-2">Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($users as $user)
-                    <tr>
-                        <td class="border px-4 py-2">{{ $user->name }}</td>
-                        <td class="border px-4 py-2">{{ $user->email }}</td>
-                        <td class="border px-4 py-2">{{ $user->created_at->format('Y-m-d') }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="3" class="text-center py-4 text-gray-500">No users found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <div class="mt-4">
-            {{ $users->withQueryString()->links() }}
         </div>
     </div>
 </x-app-layout>

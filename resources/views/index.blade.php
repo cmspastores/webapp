@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Log Table</title>
+    <title>Logs Table</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-6">
+<body class="bg-[#FFF5EC] p-6">
     <div class="max-w-6xl mx-auto bg-white p-4 rounded shadow">
-        <h1 class="text-2xl font-bold mb-4">User Table Logs</h1>   
+        <h1 class="text-2xl font-bold mb-4 text-[#5C3A21]">Logs Table</h1>   
 
-        <table class="min-w-full bg-white border border-blue-200">
-            <thead class="bg-blue-200">
+        <table class="min-w-full bg-white border border-[#D97A4E] rounded-lg overflow-hidden">
+            <thead class="text-[#5C3A21]" style="background:linear-gradient(to right,#F4C38C,#E6A574);">
                 <tr>
-                    <th class="py-2 px-4 border-b">User ID</th>
-                    <th class="py-2 px-4 border-b">Email</th>
-                    <th class="py-2 px-4 border-b">Logged In At</th>
-                    <th class="py-2 px-4 border-b">Logged Out At</th>
+                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">User ID</th>
+                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Email</th>
+                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged In At</th>
+                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged Out At</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($logs as $log)
-                    <tr>
-                        <td class="py-2 px-4 border-b">{{ $log->user_id }}</td>
-                        <td class="py-2 px-4 border-b">{{ $log->email }}</td>
-                        <td class="py-2 px-4 border-b">{{ $log->logged_in_at }}</td>
-                        <td class="py-2 px-4 border-b">{{ $log->logged_out_at }}</td>
+                    <tr class="hover:bg-[#FFF4E1] transition">
+                        <td class="py-2 px-4 border-b border-[#D97A4E]">{{ $log->user_id }}</td>
+                        <td class="py-2 px-4 border-b border-[#D97A4E]">{{ $log->email }}</td>
+                        <td class="py-2 px-4 border-b border-[#D97A4E]">{{ $log->logged_in_at }}</td>
+                        <td class="py-2 px-4 border-b border-[#D97A4E]">{{ $log->logged_out_at }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="py-2 px-4 text-center">No logs yet.</td>
+                        <td colspan="4" class="py-2 px-4 text-center text-[#5C3A21]">No logs yet.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -8,25 +8,9 @@ use Illuminate\Http\Request;
 
 class LogController extends Controller
 {
-    // ✅ Show filtered logs
-    public function index(Request $request)
+    public function index()
     {
-        $logs = Log::with('user')
-            ->when($request->filled('email'), function ($query) use ($request) {
-                $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('email', 'like', '%' . $request->email . '%');
-                });
-            })
-            ->when($request->filled('from'), function ($query) use ($request) {
-                $query->whereDate('logged_in_at', '>=', $request->from);
-            })
-            ->when($request->filled('to'), function ($query) use ($request) {
-                $query->whereDate('logged_in_at', '<=', $request->to);
-            })
-            ->latest()
-            ->paginate(10)
-            ->appends($request->query());
-
+        $users = User::all();
         return view('settings.users', compact('users'));
     }
 
@@ -34,6 +18,13 @@ class LogController extends Controller
     public function block($id)
     {
         $user = User::findOrFail($id);
+
+        // 🚨 Prevent blocking admins
+        if ($user->is_admin) {
+            return redirect()->route('settings.users')
+                             ->with('error', "You cannot block an admin account.");
+        }
+
         $user->is_blocked = 1;
         $user->save();
 
