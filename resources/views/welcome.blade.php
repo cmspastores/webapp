@@ -23,22 +23,18 @@
 </head>
 <!-- 🎨 Muted Sunset Tropical Theme for Welcome -->
 <style>
-    body{ background:radial-gradient(circle at top left,#FFFDF8,#FAF9F7); color:#2C2C2C; font-family:'Figtree',sans-serif; margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; padding-bottom:48px; } /* ✅ bottom padding */
-    header{ width:100%; max-width:420px; text-align:center; margin-bottom:24px; font-size:14px; }
-
-    /* 📦 Welcome box styling */
-    .welcome-box{ background:linear-gradient(180deg,#FFFDFB 0%,#FFF9F5 50%,#FFF5EE 100%); border:2px solid #E6A574; border-radius:14px; box-shadow:0 8px 20px rgba(0,0,0,0.1); max-width:460px; width:100%; padding:32px; text-align:center; box-sizing:border-box; margin-bottom:24px; } /* 👈 added margin-bottom */
-    .welcome-box h1{ font-size:1.5rem; font-weight:600; color:#5C3A21; margin-bottom:16px; }
-    .welcome-box p{ font-size:1rem; color:#2C2C2C; margin-bottom:20px; }
-
-    /* 🔗 Auth links */
-    .auth-links{ display:flex; justify-content:center; gap:12px; margin-top:16px; }
-    .auth-links a{ background:linear-gradient(90deg,#D98348,#E6A574); color:#FFF; font-weight:600; padding:10px 20px; border-radius:10px; border:none; cursor:pointer; text-decoration:none; transition:0.2s; }
-    .auth-links a:hover{ background:linear-gradient(90deg,#C46A32,#D98348); transform:translateY(-1px); }
-
-    /* 🖼 Logo adjustments */
-    .logo-container{ margin-bottom:32px; } /* ✅ extra breathing space below logo */
-    .logo-container svg{ width:160px; max-width:60%; height:auto; }
+    body{background:radial-gradient(circle at top left,#FFFDF8,#FAF9F7);color:#2C2C2C;font-family:'Figtree',sans-serif;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;padding-bottom:48px;}
+    header{width:100%;max-width:420px;text-align:center;margin-bottom:24px;font-size:14px;}
+    .welcome-box{background:linear-gradient(180deg,#FFFDFB 0%,#FFF9F5 50%,#FFF5EE 100%);border:2px solid #E6A574;border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,0.1);max-width:460px;width:100%;padding:32px;text-align:center;box-sizing:border-box;margin-bottom:24px;}
+    .welcome-box h1{font-size:1.5rem;font-weight:600;color:#5C3A21;margin-bottom:16px;}
+    .welcome-box p{font-size:1rem;color:#2C2C2C;margin-bottom:20px;}
+    .auth-links{display:flex;justify-content:center;gap:12px;margin-top:16px;}
+    .auth-links a{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFF;font-weight:600;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:0.2s;}
+    .auth-links a:hover{background:linear-gradient(90deg,#C46A32,#D98348);transform:translateY(-1px);}
+    .logo-container{margin-bottom:32px;}
+    .logo-container svg{width:160px;max-width:60%;height:auto;}
+    .about-box h2{font-size:1.2rem;font-weight:600;color:#D98348;margin-bottom:8px;margin-top:12px;}
+    .about-box p{font-size:0.95rem;line-height:1.5;color:#3C2F2F;margin-bottom:12px;}
 </style>
 
 <body>
@@ -67,7 +63,23 @@
             </div>
         @endif
     </div>
+
+    <!-- 📖 About Section -->
+    <div class="welcome-box about-box">
+        <h2>📌 Project Title</h2>
+        <p><strong>C5 Dormitel Management System</strong></p>
+
+        <h2>🏨 Background of Org/Business</h2>
+        <p>
+            C5 Dormitel is a Dormitory operational since August 2006, located in Davao City along Roxas Avenue.  
+            The establishment offers a unique blend of dormitory-style accommodations within a hotel setting.  
+            It primarily caters to students, professionals, and tourists seeking affordable yet comfortable lodging.  
+            Its history ties to its founding as a budget-friendly alternative to traditional hotels, aiming to provide  
+            accessible, secure, and functional spaces in the city center.
+        </p>
+    </div>
 </body>
+
 
 
 
@@ -88,6 +100,11 @@
                     </svg>
 
 
+
+
+
+
+                    
                     
                     {{-- Light Mode 12 SVG --}}
                     <svg class="w-[448px] max-w-none relative -mt-[4.9rem] -ml-8 lg:ml-0 lg:-mt-[6.6rem] dark:hidden" viewBox="0 0 440 376" fill="none" xmlns="http://www.w3.org/2000/svg">
