@@ -17,6 +17,8 @@
         .btn-block:hover { background:#A62323; }
         .btn-unblock { background:#2E7D32; color:#FFF; }
         .btn-unblock:hover { background:#255D27; }
+        .btn-delete { background:#8B0000; color:#FFF; }
+        .btn-delete:hover { background:#660000; }
         .success-message { background:#E9F8F1; color:#256D47; border:1px solid #A7DCC0; border-radius:8px; padding:12px 16px; margin-bottom:16px; font-size:14px; }
         /* Filters styling */
         .filters { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
@@ -32,6 +34,10 @@
         <!-- ✅ Success message -->
         @if(session('success'))
         <div class="success-message">{{ session('success') }}</div>
+        @endif
+
+        @if(session('error'))
+        <div class="bg-red-100 text-red-800 p-2 rounded mb-3">{{ session('error') }}</div>
         @endif
 
         <!-- 🧩 Filters -->
@@ -69,17 +75,29 @@
                                 <span class="status-active">Active</span>
                             @endif
                         </td>
-                        <td>
-                            @if(!$user->is_blocked)
-                            <form action="{{ url('/settings/users/'.$user->id.'/block') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="btn-action btn-block">Block</button>
-                            </form>
+                        <td style="display:flex; gap:6px; flex-wrap:wrap;">
+                            @if($user->is_admin)
+                                <span class="text-gray-500">Admin</span>
                             @else
-                            <form action="{{ url('/settings/users/'.$user->id.'/unblock') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="btn-action btn-unblock">Unblock</button>
-                            </form>
+                                @if(!$user->is_blocked)
+                                    <form action="{{ url('/settings/users/'.$user->id.'/block') }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="btn-action btn-block">Block</button>
+                                    </form>
+                                @else
+                                    <form action="{{ url('/settings/users/'.$user->id.'/unblock') }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="btn-action btn-unblock">Unblock</button>
+                                    </form>
+                                @endif
+
+                                <!-- 🗑️ Delete Button -->
+                                <form action="{{ route('settings.users.destroy', $user->id) }}" method="POST" class="inline"
+                                      onsubmit="return confirm('Are you sure you want to delete {{ $user->name }}?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-action btn-delete">Delete</button>
+                                </form>
                             @endif
                         </td>
                     </tr>

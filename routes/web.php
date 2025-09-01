@@ -48,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/settings/users', [UserManagementController::class, 'index'])->name('settings.users');
         Route::post('/settings/users/{id}/block', [UserManagementController::class, 'block'])->name('settings.users.block');
         Route::post('/settings/users/{id}/unblock', [UserManagementController::class, 'unblock'])->name('settings.users.unblock');
+        Route::delete('/settings/users/{id}', [UserManagementController::class, 'destroy'])->name('settings.users.destroy');
     });
 });
 
