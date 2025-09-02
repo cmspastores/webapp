@@ -91,13 +91,7 @@
                                     </form>
                                 @endif
 
-                                <!-- 🗑️ Delete Button -->
-                                <form action="{{ route('settings.users.destroy', $user->id) }}" method="POST" class="inline"
-                                      onsubmit="return confirm('Are you sure you want to delete {{ $user->name }}?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action btn-delete">Delete</button>
-                                </form>
+                         
                             @endif
                         </td>
                     </tr>
