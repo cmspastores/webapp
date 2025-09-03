@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        
 
         <title>C5 Dormitel</title>
 
@@ -24,85 +25,64 @@
 
 <!-- 🎨 Muted Sunset Tropical Theme for Welcome -->
 
-    <style>
-        body{background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);color:#2C2C2C;font-family:'Figtree',sans-serif;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;padding-bottom:48px;}
-        header{width:100%;max-width:420px;text-align:center;margin-bottom:24px;font-size:14px;}
-        .welcome-box{background:linear-gradient(180deg,#FFF8F2 0%,#FFF2EA 50%,#FFE9DC 100%);border:2px solid #E6A574;border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,0.1);max-width:460px;width:100%;padding:32px;text-align:center;box-sizing:border-box;margin-bottom:24px;}
-        .welcome-box h1{font-size:1.5rem;font-weight:600;color:#5C3A21;margin-bottom:16px;}
-        .welcome-box p{font-size:1rem;line-height:1.65;color:#D98348;font-weight:600;letter-spacing:0.3px;margin-bottom:20px;}
-
-
-        .auth-links{display:flex;justify-content:center;gap:12px;margin-top:16px;}
-        .auth-links a{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFF;font-weight:600;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:0.2s;}
-        .auth-links a:hover{background:linear-gradient(90deg,#C46A32,#D98348);transform:translateY(-1px);}
-        .logo-container{margin-bottom:32px;}
-        .logo-container svg{width:160px;max-width:60%;height:auto;}
-        .about-box h2{font-size:1.3rem;font-weight:600;color:#D98348;margin-bottom:10px;margin-top:12px;letter-spacing:0.5px;}
-        .about-box p{font-size:1rem;line-height:1.65;color:#4A3C35;letter-spacing:0.3px;font-weight:600;margin-bottom:12px;}
-
-
-
-    </style>
-</head>
-<body>
-    <!-- 🔺 Laravel Logo -->
-    <div class="logo-container">
-        <svg class="text-[#D98348]" viewBox="0 0 438 104" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Your Laravel SVG paths go here -->
-        </svg>
-    </div>
-
-    <!-- 📦 Welcome box -->
-    <div class="welcome-box">
-        <h1>Welcome to C5 Dormitel</h1>
-        <p>Dormitel Management System</p>
-        @if (Route::has('login'))
-            <div class="auth-links">
-                @auth
-                    <a href="{{ url('/dashboard') }}">Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}">Log in</a>
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}">Register</a>
-                    @endif
-                @endauth
-            </div>
-        @endif
-    </div>
-
-    <!-- 📖 About Section -->
-    <div class="welcome-box about-box">
-        <h2>Background of Org/Business</h2>
-        <p>
-            C5 Dormitel is a Dormitory operational since August 2006, located in Davao City along Roxas Avenue.  
-            The establishment offers a unique blend of dormitory-style accommodations within a hotel setting.  
-            It primarily caters to students, professionals, and tourists seeking affordable yet comfortable lodging.  
-            Its history ties to its founding as a budget-friendly alternative to traditional hotels, aiming to provide  
-            accessible, secure, and functional spaces in the city center.
-        </p>
-    </div>
-</body>
-</html>
+<style>
+body{background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);color:#2C2C2C;font-family:'Figtree',sans-serif;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 24px 48px 24px;}
+header{width:100%;max-width:420px;text-align:center;margin-bottom:24px;font-size:14px;}
+.frame{border:3px solid #E6A574;border-radius:12px;background:#FFF8F2;padding:32px;width:100%;max-width:460px;box-sizing:border-box;margin-bottom:24px;text-align:center;}
+.image-box{border:3px solid #E6A574;border-radius:12px;overflow:hidden;margin-bottom:24px;display:flex;justify-content:center;align-items:center;}
+.image-box img{width:100%;border-radius:12px;border:3px solid #E6A574;box-shadow:0 6px 16px rgba(0,0,0,0.1);}
+.welcome-box{border:3px solid #E6A574;border-radius:12px;background:linear-gradient(180deg,#FFF8F2 0%,#FFF2EA 50%,#FFE9DC 100%);padding:32px;text-align:center;max-width:460px;width:100%;margin-bottom:24px;box-sizing:border-box;}
+.welcome-box h1{font-size:1.5rem;font-weight:600;color:#5C3A21;margin-bottom:16px;}
+.welcome-box p{font-size:1rem;line-height:1.65;color:#D98348;font-weight:600;letter-spacing:0.3px;margin-bottom:20px;}
+.auth-links{display:flex;justify-content:center;gap:12px;margin-top:16px;}
+.auth-links a{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFF;font-weight:600;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:0.2s;}
+.auth-links a:hover{background:linear-gradient(90deg,#C46A32,#D98348);transform:translateY(-1px);}
+.logo-container{margin-bottom:32px;}
+.logo-container svg{width:160px;max-width:60%;height:auto;}
+.about-box{border:3px solid #E6A574;border-radius:12px;background:#FFF8F2;padding:32px;text-align:left;max-width:460px;width:100%;margin-bottom:24px;box-sizing:border-box;}
+.about-box h2{font-size:1.3rem;font-weight:600;color:#D98348;margin-bottom:10px;margin-top:12px;letter-spacing:0.5px;}
+.about-box p{font-size:1rem;line-height:1.65;color:#4A3C35;letter-spacing:0.3px;font-weight:600;margin-bottom:12px;}
+</style>
 
 
 
+    <!-- Dormitel Photo -->
+<div class="welcome-box image-box frame-shadow">
+   <img src="{{ asset('images/c5background.jpg') }}" alt="C5 Dormitel Building">
+</div>
+
+<!-- Welcome box -->
+<div class="welcome-box frame-shadow">
+    <h1>Welcome to C5 Dormitel</h1>
+    <p>Dormitel Management System</p>
+    @if (Route::has('login'))
+        <div class="auth-links">
+            @auth
+                <a href="{{ url('/dashboard') }}">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}">Log in</a>
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}">Register</a>
+                @endif
+            @endauth
+        </div>
+    @endif
+</div>
+
+<!-- About Section -->
+<div class="welcome-box about-box frame-shadow">
+    <h2>Background of Org/Business</h2>
+    <p>
+        C5 Dormitel is a Dormitory operational since August 2006, located in Davao City along Roxas Avenue.  
+        The establishment offers a unique blend of dormitory-style accommodations within a hotel setting.  
+        It primarily caters to students, professionals, and tourists seeking affordable yet comfortable lodging.  
+        Its history ties to its founding as a budget-friendly alternative to traditional hotels, aiming to provide  
+        accessible, secure, and functional spaces in the city center.
+    </p>
+</div>
 
 
 
-
-                <div class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/376] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden">
-                    {{-- Laravel Logo --}}
-              
-                        <svg class="mx-auto w-40 text-[#D98348] dark:text-[#E6A574] transition-all translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-6" 
-                         viewBox="0 0 438 104" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-                        <path d="M110.256 41.6337C108.061 38.1275 104.945 35.3731 100.905 33.3681C96.8667 31.3647 92.8016 30.3618 88.7131 30.3618C83.4247 30.3618 78.5885 31.3389 74.201 33.2923C69.8111 35.2456 66.0474 37.928 62.9059 41.3333C59.7643 44.7401 57.3198 48.6726 55.5754 53.1293C53.8287 57.589 52.9572 62.274 52.9572 67.1813C52.9572 72.1925 53.8287 76.8995 55.5754 81.3069C57.3191 85.7173 59.7636 89.6241 62.9059 93.0293C66.0474 96.4361 69.8119 99.1155 74.201 101.069C78.5885 103.022 83.4247 103.999 88.7131 103.999C92.8016 103.999 96.8667 102.997 100.905 100.994C104.945 98.9911 108.061 96.2359 110.256 92.7282V102.195H126.563V32.1642H110.256V41.6337ZM108.76 75.7472C107.762 78.4531 106.366 80.8078 104.572 82.8112C102.776 84.8161 100.606 86.4183 98.0637 87.6206C95.5202 88.823 92.7004 89.4238 89.6103 89.4238C86.5178 89.4238 83.7252 88.823 81.2324 87.6206C78.7388 86.4183 76.5949 84.8161 74.7998 82.8112C73.004 80.8078 71.6319 78.4531 70.6856 75.7472C69.7356 73.0421 69.2644 70.1868 69.2644 67.1821C69.2644 64.1758 69.7356 61.3205 70.6856 58.6154C71.6319 55.9102 73.004 53.5571 74.7998 51.5522C76.5949 49.5495 78.738 47.9451 81.2324 46.7427C83.7252 45.5404 86.5178 44.9396 89.6103 44.9396C92.7012 44.9396 95.5202 45.5404 98.0637 46.7427C100.606 47.9451 102.776 49.5487 104.572 51.5522C106.367 53.5571 107.762 55.9102 108.76 58.6154C109.756 61.3205 110.256 64.1758 110.256 67.1821C110.256 70.1868 109.756 73.0421 108.76 75.7472Z" fill="currentColor" />
-                        <path d="M242.805 41.6337C240.611 38.1275 237.494 35.3731 233.455 33.3681C229.416 31.3647 225.351 30.3618 221.262 30.3618C215.974 30.3618 211.138 31.3389 206.75 33.2923C202.36 35.2456 198.597 37.928 195.455 41.3333C192.314 44.7401 189.869 48.6726 188.125 53.1293C186.378 57.589 185.507 62.274 185.507 67.1813C185.507 72.1925 186.378 76.8995 188.125 81.3069C189.868 85.7173 192.313 89.6241 195.455 93.0293C198.597 96.4361 202.361 99.1155 206.75 101.069C211.138 103.022 215.974 103.999 221.262 103.999C225.351 103.999 229.416 102.997 233.455 100.994C237.494 98.9911 240.611 96.2359 242.805 92.7282V102.195H259.112V32.1642H242.805V41.6337ZM241.31 75.7472C240.312 78.4531 238.916 80.8078 237.122 82.8112C235.326 84.8161 233.156 86.4183 230.614 87.6206C228.07 88.823 225.251 89.4238 222.16 89.4238C219.068 89.4238 216.275 88.823 213.782 87.6206C211.289 86.4183 209.145 84.8161 207.35 82.8112C205.554 80.8078 204.182 78.4531 203.236 75.7472C202.286 73.0421 201.814 70.1868 201.814 67.1821C201.814 64.1758 202.286 61.3205 203.236 58.6154C204.182 55.9102 205.554 53.5571 207.35 51.5522C209.145 49.5495 211.288 47.9451 213.782 46.7427C216.275 45.5404 219.068 44.9396 222.16 44.9396C225.251 44.9396 228.07 45.5404 230.614 46.7427C233.156 47.9451 235.326 49.5487 237.122 51.5522C238.917 53.5571 240.312 55.9102 241.31 58.6154C242.306 61.3205 242.806 64.1758 242.806 67.1821C242.805 70.1868 242.305 73.0421 241.31 75.7472Z" fill="currentColor" />
-                        <path d="M438 -3H421.694V102.197H438V-3Z" fill="currentColor" />
-                        <path d="M139.43 102.197H155.735V48.2834H183.712V32.1665H139.43V102.197Z" fill="currentColor" />
-                        <path d="M324.49 32.1665L303.995 85.794L283.498 32.1665H266.983L293.748 102.197H314.242L341.006 32.1665H324.49Z" fill="currentColor" />
-                        <path d="M376.571 30.3656C356.603 30.3656 340.797 46.8497 340.797 67.1828C340.797 89.6597 356.094 104 378.661 104C391.29 104 399.354 99.1488 409.206 88.5848L398.189 80.0226C398.183 80.031 389.874 90.9895 377.468 90.9895C363.048 90.9895 356.977 79.3111 356.977 73.269H411.075C413.917 50.1328 398.775 30.3656 376.571 30.3656ZM357.02 61.0967C357.145 59.7487 359.023 43.3761 376.442 43.3761C393.861 43.3761 395.978 59.7464 396.099 61.0967H357.02Z" fill="currentColor" />
-                    </svg>
 
 
 
@@ -111,7 +91,7 @@
 
                     
                     
-                    {{-- Light Mode 12 SVG --}}
+           <!-- LIGHT MODE >     {{-- Light Mode 12 SVG --}}
                     <svg class="w-[448px] max-w-none relative -mt-[4.9rem] -ml-8 lg:ml-0 lg:-mt-[6.6rem] dark:hidden" viewBox="0 0 440 376" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
                             <path d="M188.263 355.73L188.595 355.73C195.441 348.845 205.766 339.761 219.569 328.477C232.93 317.193 242.978 308.205 249.714 301.511C256.34 294.626 260.867 287.358 263.296 279.708C265.725 272.058 264.565 264.121 259.816 255.896C254.516 246.716 247.062 239.352 237.454 233.805C227.957 228.067 217.908 225.198 207.307 225.198C196.927 225.197 190.136 227.97 186.934 233.516C183.621 238.872 184.726 246.331 190.247 255.894L125.647 255.891C116.371 239.825 112.395 225.481 113.72 212.858C115.265 200.235 121.559 190.481 132.602 183.596C143.754 176.52 158.607 172.982 177.159 172.983C196.594 172.984 215.863 176.523 234.968 183.6C253.961 190.486 271.299 200.241 286.98 212.864C302.661 225.488 315.14 239.833 324.416 255.899C333.03 270.817 336.841 283.918 335.847 295.203C335.075 306.487 331.376 316.336 324.75 324.751C318.346 333.167 308.408 343.494 294.936 355.734L377.094 355.737L405.917 405.656L217.087 405.649L188.263 355.73Z" fill="black" />
@@ -178,8 +158,10 @@
                             <path d="M67.41 125.402L44.5515 125.401L15.5625 75.1953L101.364 75.1985L233.886 304.712L170.942 304.71L67.41 125.402Z" fill="#F0ACB8" />
                             <path d="M67.41 125.402L44.5515 125.401L15.5625 75.1953L101.364 75.1985L233.886 304.712L170.942 304.71L67.41 125.402Z" stroke="#1B1B18" stroke-width="1" />
                         </g>
-                    </svg>
-                    {{-- Dark Mode 12 SVG --}}
+                    </svg> --> 
+
+                    
+                  <!-- DARK MODE >   {{-- Dark Mode 12 SVG --}}
                     <svg class="w-[448px] max-w-none relative -mt-[4.9rem] -ml-8 lg:ml-0 lg:-mt-[6.6rem] hidden dark:block" viewBox="0 0 440 376" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
                             <path d="M188.263 355.73L188.595 355.73C195.441 348.845 205.766 339.761 219.569 328.477C232.93 317.193 242.978 308.205 249.714 301.511C256.34 294.626 260.867 287.358 263.296 279.708C265.725 272.058 264.565 264.121 259.816 255.896C254.516 246.716 247.062 239.352 237.454 233.805C227.957 228.067 217.908 225.198 207.307 225.198C196.927 225.197 190.136 227.97 186.934 233.516C183.621 238.872 184.726 246.331 190.247 255.894L125.647 255.891C116.371 239.825 112.395 225.481 113.72 212.858C115.265 200.235 121.559 190.481 132.602 183.596C143.754 176.52 158.607 172.982 177.159 172.983C196.594 172.984 215.863 176.523 234.968 183.6C253.961 190.486 271.299 200.241 286.98 212.864C302.661 225.488 315.14 239.833 324.416 255.899C333.03 270.817 336.841 283.918 335.847 295.203C335.075 306.487 331.376 316.336 324.75 324.751C318.346 333.167 308.408 343.494 294.936 355.734L377.094 355.737L405.917 405.656L217.087 405.649L188.263 355.73Z" fill="black"/>
@@ -244,14 +226,17 @@
                             <path d="M67.41 125.402L44.5515 125.401L15.5625 75.1953L101.364 75.1985L233.886 304.712L170.942 304.71L67.41 125.402Z" fill="#4B0600"/>
                             <path d="M67.41 125.402L44.5515 125.401L15.5625 75.1953L101.364 75.1985L233.886 304.712L170.942 304.71L67.41 125.402Z" stroke="#FF750F" stroke-width="1"/>
                         </g>
-                    </svg>
-                    <div class="absolute inset-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
+                    </svg>  --> 
+
+
+
+                 <!--   <div class="absolute inset-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
                 </div>
             </main>
-        </div>
+        </div> --> 
 
 
-
+{{--  Authentication check for showing extra spacing on logged-in users --}}
         
 {{-- @if (Route::has('login')) --}}
     @auth
