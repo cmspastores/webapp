@@ -26,8 +26,8 @@
                 <tr>
                     <th class="py-2 px-4 border-b border-[#D97A4E] text-left">User ID</th>
                     <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Email</th>
-                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged In At</th>
-                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged Out At</th>
+                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged In</th>
+                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged Out</th>
                 </tr>
             </thead>
             <tbody>

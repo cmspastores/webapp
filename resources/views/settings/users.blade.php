@@ -1,10 +1,14 @@
+
+
 <x-app-layout>
+
+
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">User Management</h2>
     </x-slot>
 
     <style>
-        /* 🌴 Tropical-themed User Table */
+        /*  User Table */
         .user-table-container { background:#FFF5EC; border:1px solid #E6CBB3; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); overflow:hidden; }
         .user-table { width:100%; border-collapse:collapse; background:#FFFDF9; color:#5C3A21; }
         .user-table thead { background:linear-gradient(to right,#A65E3F,#70432C); color:#FFF5EC; }

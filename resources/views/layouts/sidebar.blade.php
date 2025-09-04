@@ -1,5 +1,14 @@
+
 <!-- Sidebar -->
 <aside class="sidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+        <a href="{{ url('/') }}" class="sidebar-logo-link">
+            <img src="{{ asset('images/c5logo.png') }}" alt="C5 Logo" class="sidebar-logo-img">
+        </a>
+    </div>
+
     <!-- Top Nav -->
     <div class="sidebar-top">
         <h2>Navigation</h2>
@@ -23,25 +32,32 @@
             </ul>
         @endif
     </div>
+
 </aside>
 
 <!-- Sidebar Styles -->
 <style>
-/* ============================
-   Sidebar 🪴
-   ============================ */
-.sidebar { background:linear-gradient(180deg,#FFF5EC,#F7E1B5); border-right:2px solid #E6A574; min-height:100vh; display:flex; flex-direction:column; justify-content:space-between; width:16rem; color:#5C3A21; }
-.sidebar-top,.sidebar-bottom { padding:1rem; }
-.sidebar-top h2 { font-size:1.125rem; font-weight:700; color:#5C3A21; margin-bottom:1rem; }
-.sidebar ul { display:flex; flex-direction:column; gap:0.5rem; }
-
-.sidebar a { display:block; padding:0.65rem 1rem; border-radius:0.6rem; color:#5C3A21; text-decoration:none; transition:0.2s; background:rgba(255,255,255,0.35); font-weight:500; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05); }
-.sidebar a:hover { background:linear-gradient(to right,#F7E1B5,#F4C38C); transform:translateX(4px); box-shadow:0 2px 6px rgba(0,0,0,0.15); }
-.sidebar a.active { background:linear-gradient(to right,#F4C38C,#E6A574); color:#3A2C1F; font-weight:600; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
 
 
-.sidebar-label { padding:0.5rem 1rem; color:#8B4A2C; font-weight:600; }
+.sidebar{background:linear-gradient(180deg,#FFF5EC,#F7E1B5);border-right:2px solid #E6A574;min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;width:16rem;color:#5C3A21;box-sizing:border-box;}
+.sidebar-logo{display:flex;justify-content:center;align-items:center;padding:1rem 0;}
+.sidebar-logo-link{display:inline-block;cursor:pointer;text-decoration:none;border:none;background:none;padding:0;margin:0;line-height:0;}
+.sidebar-logo-link:focus,.sidebar-logo-link:active{outline:none;box-shadow:none;}
+.sidebar-logo-img{display:block;width:10rem;height:auto;transition:transform .3s ease,box-shadow .3s ease;}
+.sidebar-logo-img:hover { transform: scale(1.1); filter: drop-shadow(0 0 6px rgba(230,165,116,.7)); }
+
+
+.sidebar-top,.sidebar-bottom{padding:0 1rem;}
+.sidebar-top h2 { font: 1.25rem 'Figtree', sans-serif; font-weight: 900; color: #5C3A21; margin-bottom: .75rem; text-shadow: 0 0 1px #5C3A21, 0 0 1px #5C3A21; }
+
+.sidebar ul{display:flex;flex-direction:column;gap:.5rem;padding:0;margin:0;list-style:none;}
+.sidebar a:not(.sidebar-logo-link){display:flex;align-items:center;padding:.5rem 1rem;border-radius:.6rem;color:#5C3A21;text-decoration:none;transition:.2s;background:rgba(255,255,255,.35);font-weight:500;box-shadow:inset 0 1px 2px rgba(0,0,0,.05);}
+.sidebar a:not(.sidebar-logo-link):hover{background:linear-gradient(to right,#F7E1B5,#F4C38C);transform:translateX(4px);box-shadow:0 2px 6px rgba(0,0,0,.15);}
+.sidebar a:not(.sidebar-logo-link).active{background:linear-gradient(to right,#F4C38C,#E6A574);color:#3A2C1F;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+.sidebar-label{padding:.5rem 0;color:#8B4A2C;font-weight:600;}
+.sidebar-bottom{margin-top:auto;padding:1rem;}
+
+
 
 
 </style>
-
