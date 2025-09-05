@@ -34,8 +34,10 @@
     .mobile-nav a:hover { background:rgba(244,195,140,0.15); color:#F4C38C; }
     .nav-hamburger { background:transparent; border:none; color:#FFF5EC; padding:0.5rem; border-radius:0.375rem; transition:background 0.2s ease,color 0.2s ease; }
     .nav-hamburger:hover { background:rgba(255,245,236,0.12); color:#F4C38C; }
-    footer { background:linear-gradient(to right,#A65E3F,#70432C); border-top:1px solid #8B4A2C; text-align:center; padding:1rem; font-size:14px; color:#FFF5EC; box-shadow:0 -2px 6px rgba(0,0,0,0.1); }
+    
+    footer{background:linear-gradient(to right,#A65E3F,#70432C);border-top:1px solid #8B4A2C;text-align:center;padding:1rem;font-size:14px;font-weight:500;font-family:'Figtree',sans-serif;line-height:1.4;color:#FFF5EC;box-shadow:0 -2px 6px rgba(0,0,0,0.1);}
 
+    
   </style>
 </head>
 <body class="font-sans antialiased">
@@ -62,5 +64,15 @@
 
     </div>
   </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
 </body>
 </html>

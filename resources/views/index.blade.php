@@ -6,15 +6,28 @@
 </head>
 <body class="bg-[#FFF5EC] p-6">
     <div class="max-w-6xl mx-auto bg-white p-4 rounded shadow">
-        <h1 class="text-2xl font-bold mb-4 text-[#5C3A21]">Logs Table</h1>   
 
+        <!-- Header with title and logout button -->
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold text-[#5C3A21]">Logs Table</h1>
+            
+            <!-- Logout form (POST) -->
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="bg-[#D97A4E] text-white px-4 py-2 rounded hover:bg-[#E6A574] transition">
+                    Logout
+                </button>
+            </form>
+        </div>
+
+        <!-- Logs Table -->
         <table class="min-w-full bg-white border border-[#D97A4E] rounded-lg overflow-hidden">
             <thead class="text-[#5C3A21]" style="background:linear-gradient(to right,#F4C38C,#E6A574);">
                 <tr>
                     <th class="py-2 px-4 border-b border-[#D97A4E] text-left">User ID</th>
                     <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Email</th>
-                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged In At</th>
-                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged Out At</th>
+                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged In</th>
+                    <th class="py-2 px-4 border-b border-[#D97A4E] text-left">Logged Out</th>
                 </tr>
             </thead>
             <tbody>

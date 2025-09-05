@@ -1,4 +1,8 @@
+
+
 <x-app-layout>
+
+
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Room Types Management') }}
@@ -42,7 +46,7 @@
                 <textarea name="description" id="description" rows="3" class="form-textarea"></textarea>
             </div>
 
-            <button type="submit" class="form-button">✅ Confirm</button>
+            <button type="submit" class="form-button">Confirm</button>
         </form>
 
         {{-- 📋 Tasks Table --}}

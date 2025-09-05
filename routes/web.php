@@ -15,7 +15,7 @@ Route::get('/', function () {
 
 // Dashboard Route (with login logs)
 Route::get('/dashboard', function () {
-    $logs = LoginLog::latest()->paginate(10);
+    $logs = LoginLog::latest()->paginate(5);
     return view('dashboard', compact('logs'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -25,7 +25,8 @@ Route::middleware(['auth'])->group(function () {
     // Profile Management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy')->middleware('auth');
+
 
     // Login Logs View (optional)
     Route::get('/login-logs', [LoginLogController::class, 'index']);
@@ -48,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/settings/users', [UserManagementController::class, 'index'])->name('settings.users');
         Route::post('/settings/users/{id}/block', [UserManagementController::class, 'block'])->name('settings.users.block');
         Route::post('/settings/users/{id}/unblock', [UserManagementController::class, 'unblock'])->name('settings.users.unblock');
-        Route::delete('/settings/users/{id}', [UserManagementController::class, 'destroy'])->name('settings.users.destroy');
+
     });
 });
 

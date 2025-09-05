@@ -70,20 +70,6 @@ class UserManagementController extends Controller
                          ->with('success', "User {$user->name} has been unblocked.");
     }
 
-    // Delete a user
-    public function destroy($id)
-    {
-        $user = User::findOrFail($id);
-
-        // 🚨 Prevent deleting admins
-        if ($user->is_admin) {
-            return redirect()->route('settings.users')
-                             ->with('error', "You cannot delete an admin account.");
-        }
-
-        $user->delete(); // soft delete if model uses SoftDeletes, permanent otherwise
-
-        return redirect()->route('settings.users')
-                         ->with('success', "User {$user->name} has been deleted.");
-    }
+  
+    
 }

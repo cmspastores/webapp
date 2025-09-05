@@ -15,7 +15,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 
-<!-- 🎨 Muted Sunset Tropical Dormitel CSS with Enhanced Gradients -->
 <style>
     /* Body background: soft off-white with subtle warm radial glow */
     body{ background:radial-gradient(circle at top left,#FFFDF8,#FAF9F7); color:#2C2C2C; font-family:'Figtree',sans-serif; margin:0; }
