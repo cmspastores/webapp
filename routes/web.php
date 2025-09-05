@@ -15,7 +15,7 @@ Route::get('/', function () {
 
 // Dashboard Route (with login logs)
 Route::get('/dashboard', function () {
-    $logs = LoginLog::latest()->paginate(10);
+    $logs = LoginLog::latest()->paginate(5);
     return view('dashboard', compact('logs'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
