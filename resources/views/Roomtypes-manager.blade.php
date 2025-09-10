@@ -64,7 +64,6 @@
                                 <form action="{{ route('roomtypes.update', $roomtypes) }}" method="POST">
                                     @csrf
                                     @method('PUT')
-<<<<<<< HEAD
                                     <td>
                                         <input type="text" name="title" value="{{ $roomtypes->title }}" required class="table-input">
                                     </td>
@@ -75,14 +74,6 @@
                                         <button type="submit" class="save-button">💾 Save</button>
                                 </form>
                                 <form action="{{ route('roomtypes.destroy', $roomtypes) }}" method="POST" onsubmit="return confirm('Delete this Roomtype?');">
-=======
-                                    <td><input type="text" name="title" value="{{ $roomtypes->title }}" required class="table-input"></td>
-                                    <td><input type="text" name="description" value="{{ $roomtypes->description }}" class="table-input"></td>
-                                    <td class="action-buttons">
-                                        <button type="submit" class="save-button">💾 Save</button>
-                                </form>
-                                <form action="{{ route('roomtypes.destroy', $roomtypes) }}" method="POST" onsubmit="return confirm('Delete this roomtype?');">
->>>>>>> 87780e9e574982e816c803ddc8071db391955004
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="delete-button">🗑️ Delete</button>

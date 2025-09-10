@@ -1,5 +1,4 @@
 <?php
-<?php
 
 namespace App\Models;
 
@@ -10,12 +9,15 @@ class Customer extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'customer_id';
+
     protected $fillable = [
-        'customer_id',
-        'first_name'
+        'first_name',
         'last_name',
         'email',
         'phone',
         'address',
+        'created_at',
+        'updated_at',
     ];
 }

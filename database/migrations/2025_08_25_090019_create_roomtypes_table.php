@@ -9,8 +9,6 @@ return new class extends Migration {
     {
         Schema::create('roomtypes', function (Blueprint $table) {
 
-            $table->id();
-
             $table->id()->primary();
 
             $table->string('title');
