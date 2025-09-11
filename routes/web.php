@@ -40,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
     // Room Types CRUD (inline handled via task-manager blade)
     Route::resource('roomtypes', RoomTypesController::class)->except(['show']);
 
-    // Renter Management
+    // Renters Management
     Route::get('renters/create', [RentersController::class, 'create'])->name('renters.create');
     Route::post('renters', [RentersController::class, 'store'])->name('renters.store');
     Route::get('renters/{renter}', [RentersController::class, 'show'])->name('renters.show');

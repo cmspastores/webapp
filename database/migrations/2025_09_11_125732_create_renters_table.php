@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('renters', function (Blueprint $table) { // plural
+        Schema::create('renters', function (Blueprint $table) {
             $table->bigIncrements('renter_id'); // Custom PK
             $table->string('first_name');
             $table->string('last_name');
+            $table->date('dob')->nullable(); // Date of Birth
             $table->string('email')->unique();
             $table->string('phone')->nullable();
+            $table->string('emergency_contact')->nullable();
             $table->string('address')->nullable();
             $table->timestamps();
         });
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('renters'); // match 'up'
+        Schema::dropIfExists('renters');
     }
 };
