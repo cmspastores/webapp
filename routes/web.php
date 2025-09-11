@@ -29,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Login Logs View (optional)
-    Route::get('/login-logs', [LoginLogController::class, 'index']);
+    Route::get('/login-logs', [LoginLogController::class, 'logstable']);
 
     // Room Types UI (custom page)
     Route::get('/Roomtypes', [RoomtypesController::class, 'showManager'])->name('roomtypes.manager');

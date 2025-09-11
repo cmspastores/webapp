@@ -5,7 +5,7 @@
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Task Manager') }}
+            {{ __('Room Types Management') }}
         </h2>
     </x-slot> 
 
@@ -66,17 +66,8 @@
                                 <form action="{{ route('roomtypes.update', $roomtypes) }}" method="POST">
                                     @csrf
                                     @method('PUT')
-<<<<<<< HEAD
-                                    <td>
-                                        <input type="text" name="title" value="{{ $roomtypes->title }}" required class="table-input">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="description" value="{{ $roomtypes->description }}" class="table-input">
-                                    </td>
-=======
                                     <td><input type="text" name="title" value="{{ $roomtypes->title }}" required class="table-input"></td>
                                     <td><input type="text" name="description" value="{{ $roomtypes->description }}" class="table-input"></td>
->>>>>>> 87780e9e574982e816c803ddc8071db391955004
                                     <td class="action-buttons">
                                         <button type="submit" class="save-button">💾 Save</button>
                                 </form>
