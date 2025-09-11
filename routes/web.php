@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoginLogController;
 use App\Http\Controllers\RoomtypesController;
+
+use App\Http\Controllers\RentersController;
+
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
@@ -37,6 +40,19 @@ Route::middleware(['auth'])->group(function () {
     // Room Types CRUD (inline handled via task-manager blade)
     Route::resource('roomtypes', RoomTypesController::class)->except(['show']);
 
+    // Renter Management
+    Route::get('renters/create', [RentersController::class, 'create'])->name('renters.create');
+    Route::post('renters', [RentersController::class, 'store'])->name('renters.store');
+    Route::get('renters/{renter}', [RentersController::class, 'show'])->name('renters.show');
+    Route::get('renters/{renter}/edit', [RentersController::class, 'edit'])->name('renters.edit');
+    Route::put('renters/{renter}', [RentersController::class, 'update'])->name('renters.update');
+    Route::delete('renters/{renter}', [RentersController::class, 'destroy'])->name('renters.destroy');
+    Route::get('renters', [RentersController::class, 'index'])->name('renters.index');
+
+
+
+
+    
     // ============================
     // Settings (All users)
     // ============================
