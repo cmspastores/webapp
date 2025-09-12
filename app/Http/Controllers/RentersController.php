@@ -8,12 +8,26 @@ use Carbon\Carbon;
 
 class RentersController extends Controller
 {
-    // Display a listing of renters
-    public function index()
+    /**
+     * Display a listing of renters with optional search.
+     */
+    public function index(Request $request)
     {
-        $renters = Renters::orderBy('created_at', 'desc')->paginate(5);
+        $query = Renters::query();
 
-        // Format timestamps in app timezone for display
+        // Search filter (name, email, phone)
+        if ($search = $request->input('q')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $renters = $query->orderBy('created_at', 'desc')->paginate(5);
+
+        // Add formatted dates for display
         $renters->transform(function ($renter) {
             $renter->created_at_formatted = $renter->created_at
                 ? Carbon::parse($renter->created_at)->setTimezone(config('app.timezone'))->format('M d, Y g:i A')
@@ -27,13 +41,18 @@ class RentersController extends Controller
         return view('renter-manager', compact('renters'));
     }
 
-    // Show the form for creating a new renter (reuse same Blade)
-    public function create()
+    /**
+     * Show the form for creating a new renter.
+     * Reuses the index view but highlights the form.
+     */
+    public function create(Request $request)
     {
-        return $this->index(); // Reuse index logic
+        return $this->index($request);
     }
 
-    // Store a new renter
+    /**
+     * Store a newly created renter.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -51,12 +70,13 @@ class RentersController extends Controller
         return redirect()->route('renters.index')->with('success', 'Renter created successfully.');
     }
 
-    // Edit renter (show edit form in same Blade)
-    public function edit(Renters $renter)
+    /**
+     * Show the form for editing a renter.
+     */
+    public function edit(Renters $renter, Request $request)
     {
         $renters = Renters::orderBy('created_at', 'desc')->paginate(5);
 
-        // Format timestamps
         $renters->transform(function ($r) {
             $r->created_at_formatted = $r->created_at
                 ? Carbon::parse($r->created_at)->setTimezone(config('app.timezone'))->format('M d, Y g:i A')
@@ -70,7 +90,9 @@ class RentersController extends Controller
         return view('renter-manager', compact('renters', 'renter'));
     }
 
-    // Update renter
+    /**
+     * Update the specified renter.
+     */
     public function update(Request $request, Renters $renter)
     {
         $validated = $request->validate([
@@ -88,10 +110,13 @@ class RentersController extends Controller
         return redirect()->route('renters.index')->with('success', 'Renter updated successfully.');
     }
 
-    // Delete renter
+    /**
+     * Remove the specified renter.
+     */
     public function destroy(Renters $renter)
     {
         $renter->delete();
+
         return redirect()->route('renters.index')->with('success', 'Renter deleted successfully.');
     }
 }

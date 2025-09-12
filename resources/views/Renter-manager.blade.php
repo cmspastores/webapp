@@ -12,7 +12,16 @@
     <div class="container">
         {{-- Search / Refresh --}}
         <div id="search-refresh" class="search-refresh">
-            <input type="text" id="renter-search" placeholder="Search renters..." class="search-input">
+            <form method="GET" action="{{ route('renters.index') }}" class="search-container">
+                <select name="filter" class="search-filter">
+                    <option value="all" {{ request('filter') == 'all' ? 'selected' : '' }}>All</option>
+                    <option value="name" {{ request('filter') == 'name' ? 'selected' : '' }}>Name</option>
+                    <option value="email" {{ request('filter') == 'email' ? 'selected' : '' }}>Email</option>
+                    <option value="phone" {{ request('filter') == 'phone' ? 'selected' : '' }}>Phone</option>
+                </select>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Search renters..." class="search-input">
+                <button type="submit" class="btn-search">Search</button>
+            </form>
             <button id="btn-refresh" class="btn-refresh">Refresh List</button>
         </div>
 
@@ -54,11 +63,6 @@
                                         data-phone="{{ $renter->phone }}" 
                                         data-emergency="{{ $renter->emergency_contact }}"
                                         data-address="{{ $renter->address }}">Edit</button>
-                                <form action="{{ route('renters.destroy', $renter->renter_id) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn-delete" onclick="return confirm('Delete this renter?');">Delete</button>
-                                </form>
                             </td>
                         </tr>
                     @empty
@@ -118,11 +122,13 @@
         .btn-back:hover { background:#F4C38C; color:#5C3A21; }
         .btn-edit { background:#E6A574; color:#5C3A21; padding:4px 8px; border-radius:4px; font-size:13px; }
         .btn-edit:hover { background:#F4C38C; }
-        .btn-delete { background:#D97A4E; color:#FFF5EC; padding:4px 8px; border-radius:4px; font-size:13px; }
-        .btn-delete:hover { background:#F4C38C; color:#5C3A21; }
 
-        .search-refresh { display:flex; justify-content:space-between; margin-bottom:16px; }
-        .search-input { padding:6px 10px; border-radius:6px; border:1px solid #E6A574; width:30%; }
+        .search-refresh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+        .search-container{display:flex;gap:6px;align-items:center;}
+        .search-input,.search-filter{padding:6px 10px;border-radius:6px;border:1px solid #E6A574;}
+        .search-filter{background:#fff;font-family:'Figtree',sans-serif;}
+        .btn-search,.btn-refresh{background:#E6A574;color:#5C3A21;padding:6px 14px;border-radius:6px;border:none;font-family:'Figtree',sans-serif;font-weight:600;cursor:pointer;transition:0.2s;}
+        .btn-search:hover,.btn-refresh:hover{background:#F4C38C;}
 
         .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); }
         .table-card { overflow-x:auto; }
@@ -183,7 +189,8 @@
         });
 
         document.getElementById('btn-refresh').addEventListener('click', () => {
-            location.reload();
+            // Go directly to renters.index route, reset search & filter
+            window.location.href = "{{ route('renters.index') }}";
         });
     </script>
 </x-app-layout>

@@ -41,13 +41,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('roomtypes', RoomTypesController::class)->except(['show']);
 
     // Renters Management
-    Route::get('renters/create', [RentersController::class, 'create'])->name('renters.create');
-    Route::post('renters', [RentersController::class, 'store'])->name('renters.store');
-    Route::get('renters/{renter}', [RentersController::class, 'show'])->name('renters.show');
-    Route::get('renters/{renter}/edit', [RentersController::class, 'edit'])->name('renters.edit');
-    Route::put('renters/{renter}', [RentersController::class, 'update'])->name('renters.update');
-    Route::delete('renters/{renter}', [RentersController::class, 'destroy'])->name('renters.destroy');
-    Route::get('renters', [RentersController::class, 'index'])->name('renters.index');
+Route::get('renters', [RentersController::class, 'index'])->name('renters.index');
+Route::get('renters/create', [RentersController::class, 'create'])->name('renters.create');
+Route::post('renters', [RentersController::class, 'store'])->name('renters.store');
+Route::get('renters/{renter}/edit', [RentersController::class, 'edit'])->name('renters.edit');
+Route::put('renters/{renter}', [RentersController::class, 'update'])->name('renters.update');
 
 
 
