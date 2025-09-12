@@ -12,14 +12,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('renters', function (Blueprint $table) {
-            $table->bigIncrements('renter_id'); // Custom PK
+            $table->bigIncrements('renter_id'); // Internal PK (auto increment)
+            
+            // Public-facing renter code (clickable in UI)
+            $table->string('unique_id')->unique(); 
+            
+            // Names
             $table->string('first_name');
+            $table->string('middle_name')->nullable();
             $table->string('last_name');
-            $table->date('dob')->nullable(); // Date of Birth
+            $table->string('full_name'); // stored for faster queries/search
+            
+            // Personal details
+            $table->date('dob')->nullable(); 
+            
+            // Contact details
             $table->string('email')->unique();
             $table->string('phone')->nullable();
-            $table->string('emergency_contact')->nullable();
             $table->string('address')->nullable();
+            $table->string('emergency_contact')->nullable();
+            
             $table->timestamps();
         });
     }
