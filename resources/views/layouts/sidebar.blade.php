@@ -14,12 +14,11 @@
         <h2>Navigation</h2>
         <ul>
             <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a></li>
-            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('roomtypes.*') ? 'active' : '' }}">Room Types</a></li>
-            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('rooms.*') ? 'active' : '' }}">Room</a></li>
-            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('customers.*') ? 'active' : '' }}">Customers</a></li>
-            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('agreements.*') ? 'active' : '' }}">Agreement Registration</a></li>
-            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('billing.*') ? 'active' : '' }}">Billing</a></li>
-            <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('charges.*') ? 'active' : '' }}">Charges</a></li>
+            <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('rooms.*') ? 'active' : '' }}">Rooms</a></li>
+            <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('customers.*') ? 'active' : '' }}">Customers</a></li>
+            <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('agreements.*') ? 'active' : '' }}">Agreement Registration</a></li>
+            <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('billing.*') ? 'active' : '' }}">Billing</a></li>
+            <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('charges.*') ? 'active' : '' }}">Charges</a></li>
         </ul>
     </div>
 
@@ -29,6 +28,7 @@
             <p class="sidebar-label">Admin Settings:</p>
             <ul>
                 <li><a href="{{ route('settings.users') }}" class="{{ request()->routeIs('settings.users') ? 'active' : '' }}">User Management</a></li>
+                <li><a href="{{ route('roomtypes.index') }}" class="{{ request()->routeIs('roomtypes.*') ? 'active' : '' }}">Room Type Management</a></li>
             </ul>
         @endif
     </div>

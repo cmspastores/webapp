@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoginLogController;
-use App\Http\Controllers\RoomtypesController;
+use App\Http\Controllers\RoomsController;
+use App\Http\Controllers\RoomTypeController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
@@ -31,11 +32,11 @@ Route::middleware(['auth'])->group(function () {
     // Login Logs View (optional)
     Route::get('/login-logs', [LoginLogController::class, 'index']);
 
-    // Room Types UI (custom page)
-    Route::get('/Roomtypes', [RoomtypesController::class, 'showManager'])->name('roomtypes.manager');
+    //Rooms
+    Route::resource('rooms', RoomsController::class);
 
-    // Room Types CRUD (inline handled via task-manager blade)
-    Route::resource('roomtypes', RoomTypesController::class)->except(['show']);
+    //Roomtypes
+    Route::resource('roomtypes', RoomTypeController::class);
 
     // ============================
     // Settings (All users)

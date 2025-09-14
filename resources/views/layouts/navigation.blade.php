@@ -13,7 +13,7 @@
 
     <x-dropdown align="right" width="48">
         <x-slot name="trigger">
-            @if(request()->is('dashboard*') || request()->is('settings/users*') || request()->is('roomtypes*'))
+            @if(request()->is('dashboard*') || request()->is('settings/users*') || request()->is('rooms*'))
                 <button class="nav-user-btn navigation-gear">
                     <i class="fa-solid fa-gear text-neutral-100"></i>
                     <span>{{ Auth::user()->name }}</span>

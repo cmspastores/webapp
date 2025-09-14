@@ -57,7 +57,10 @@
       @endisset
 
       {{-- Page content --}}
-      <main class="flex-1">{{ $slot }}</main>
+      <main class="flex-1">
+        @yield('content') {{-- For RoomsController pages --}}
+        {{ $slot ?? '' }} {{-- For Jetstream/Breeze dashboard --}}
+      </main>
 
       {{-- Footer --}}
       <footer>© {{ date('Y') }} {{ config('app.name', 'C5 Dormitel') }}. All rights reserved.</footer>
