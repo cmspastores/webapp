@@ -21,7 +21,7 @@
 
     <div class="dashboard-container">
         <div class="log-table-container">
-            @include('index')
+            @include('logstable')
         </div>
 
         <div class="card">

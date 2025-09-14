@@ -15,7 +15,7 @@
         <ul>
             <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a></li>
             <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('rooms.*') ? 'active' : '' }}">Rooms</a></li>
-            <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('customers.*') ? 'active' : '' }}">Customers</a></li>
+            <li><a href="{{ route('renters.index') }}" class="{{ request()->routeIs('renter.*') ? 'active' : '' }}">Renters</a></li>
             <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('agreements.*') ? 'active' : '' }}">Agreement Registration</a></li>
             <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('billing.*') ? 'active' : '' }}">Billing</a></li>
             <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('charges.*') ? 'active' : '' }}">Charges</a></li>

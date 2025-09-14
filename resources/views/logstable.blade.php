@@ -14,9 +14,7 @@
             <!-- Logout form (POST) -->
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="bg-[#D97A4E] text-white px-4 py-2 rounded hover:bg-[#E6A574] transition">
-                    Logout
-                </button>
+               
             </form>
         </div>
 
@@ -35,8 +33,21 @@
                     <tr class="hover:bg-[#FFF4E1] transition">
                         <td class="py-2 px-4 border-b border-[#D97A4E]">{{ $log->user_id }}</td>
                         <td class="py-2 px-4 border-b border-[#D97A4E]">{{ $log->email }}</td>
-                        <td class="py-2 px-4 border-b border-[#D97A4E]">{{ $log->logged_in_at }}</td>
-                        <td class="py-2 px-4 border-b border-[#D97A4E]">{{ $log->logged_out_at }}</td>
+
+                        <!-- NEW: formatted with Carbon for timestap -->
+                        <td class="py-2 px-4 border-b border-[#D97A4E]" title="{{ $log->logged_in_at }}">
+                            {{ $log->logged_in_at ? \Carbon\Carbon::parse($log->logged_in_at)->setTimezone(config('app.timezone'))->format('M d, Y g:i A') : '' }}
+
+
+                        </td>
+
+                        
+                        <!-- NEW: formatted with Carbon for timestap-->
+                        <td class="py-2 px-4 border-b border-[#D97A4E]" title="{{ $log->logged_out_at }}">
+                           {{ $log->logged_out_at ? \Carbon\Carbon::parse($log->logged_out_at)->timezone(config('app.timezone'))->format('M d, Y g:i A') : '' }}
+
+
+                        </td>
                     </tr>
                 @empty
                     <tr>

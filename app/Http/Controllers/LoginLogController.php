@@ -9,7 +9,7 @@ class LoginLogController extends Controller
 {
     public function index()
     {
-        $logs = LoginLog::latest()->paginate(10); // paginated list
-        return view('login_logs.index', compact('logs'));
+        $logs = LoginLog::latest()->paginate(5); // paginated list
+        return view('logstable', compact('logs'));
     }
 }
