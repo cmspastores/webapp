@@ -22,6 +22,33 @@
                     </a>
                 </div>
 
+                {{-- 🔎 Search + Filter Form --}}
+                <form method="GET" action="{{ route('rooms.index') }}" class="mb-4 flex flex-wrap gap-2">
+                    <input type="text"
+                           name="search"
+                           class="border border-gray-300 rounded px-3 py-2 w-48"
+                           placeholder="Search by Room #"
+                           value="{{ $search ?? '' }}">
+
+                    <select name="room_type_id" class="border border-gray-300 rounded px-3 py-2">
+                        <option value="">-- All Room Types --</option>
+                        @foreach($roomTypes as $type)
+                            <option value="{{ $type->id }}"
+                                {{ ($selectedRoomType ?? '') == $type->id ? 'selected' : '' }}>
+                                {{ $type->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Search
+                    </button>
+                    <a href="{{ route('rooms.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                        Reset
+                    </a>
+                </form>
+                {{-- 🔎 End Search + Filter Form --}}
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full border border-gray-300 text-sm">
                         <thead class="bg-gray-100 text-gray-700">

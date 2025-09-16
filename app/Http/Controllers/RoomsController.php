@@ -12,11 +12,29 @@ class RoomsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // eager load roomType to avoid N+1 queries
-        $rooms = Room::with('roomType')->get();
-        return view('rooms.index', compact('rooms'));
+        $query = Room::with('roomType');
+
+        // Search by room number
+        if ($request->filled('search')) {
+            $query->where('room_number', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by room type
+        if ($request->filled('room_type_id')) {
+            $query->where('room_type_id', $request->room_type_id);
+        }
+
+        // You can add pagination if you like
+        $rooms = $query->get();
+
+        // For filter dropdown
+        $roomTypes = RoomType::all();
+
+        return view('rooms.index', compact('rooms', 'roomTypes'))
+            ->with('search', $request->search)
+            ->with('selectedRoomType', $request->room_type_id);
     }
 
     /**
