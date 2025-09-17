@@ -42,6 +42,10 @@ class RoomsController extends Controller
      */
     public function create()
     {
+        if (!auth()->user()->is_admin) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $roomTypes = RoomType::all(); // for dropdown
         return view('rooms.create', compact('roomTypes'));
     }
@@ -51,6 +55,10 @@ class RoomsController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth()->user()->is_admin) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $validated = $request->validate([
             'room_number'          => 'required|string|max:50|unique:rooms,room_number',
             'room_type_id'         => 'nullable|exists:room_types,id',
@@ -92,6 +100,10 @@ class RoomsController extends Controller
      */
     public function update(Request $request, Room $room)
     {
+        if (!auth()->user()->is_admin) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $validated = $request->validate([
             'room_number'          => 'required|string|max:50|unique:rooms,room_number,' . $room->id,
             'room_type_id'         => 'nullable|exists:room_types,id',
@@ -137,6 +149,10 @@ class RoomsController extends Controller
      */
     public function destroy(Room $room)
     {
+        if (!auth()->user()->is_admin) {
+            abort(403, 'Unauthorized action.');
+        }
+
         foreach (['image1', 'image2', 'image3'] as $field) {
             if ($room->$field) {
                 Storage::disk('public')->delete($room->$field);

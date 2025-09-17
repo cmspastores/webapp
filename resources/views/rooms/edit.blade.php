@@ -193,9 +193,12 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Save Changes
-                        </button>
+                        @if(auth()->user()->is_admin)
+                            <button type="submit"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Save Changes
+                            </button>
+                        @endif
                         <a href="{{ route('rooms.index') }}" 
                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
                             Back
