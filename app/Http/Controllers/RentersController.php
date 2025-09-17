@@ -138,4 +138,16 @@ class RentersController extends Controller
 
         return redirect()->route('renters.index')->with('success', 'Renter updated successfully.');
     }
+    /**
+     * Soft delete a renter (does not remove from database).
+     *
+     * @param Renters $renter
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(Renters $renter)
+    {
+        $renter->delete(); // Soft delete: sets deleted_at, does not remove record
+        return redirect()->route('renters.index')->with('success', 'Renter deleted (soft delete).');
+    }   
+
 }
