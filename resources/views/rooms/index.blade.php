@@ -75,7 +75,7 @@
                                         <div class="flex gap-2">
                                             <a href="{{ route('rooms.edit', $room) }}"
                                                class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-xs">
-                                                Edit
+                                                View
                                             </a>
                                             <form action="{{ route('rooms.destroy', $room) }}" method="POST"
                                                   onsubmit="return confirm('Are you sure you want to delete this room?')">

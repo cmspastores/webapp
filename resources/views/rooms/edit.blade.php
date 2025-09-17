@@ -174,13 +174,31 @@
                         <input type="hidden" name="remove_image3" id="remove_image3" value="0">
                     </div>
 
+                    {{-- OCCUPANT NAME (readonly) --}}
+                    <div class="mb-4">
+                        <label for="occupant_name" class="block text-sm font-medium text-gray-700">Occupant</label>
+                        <input type="text" id="occupant_name" 
+                            value="{{ $room->occupant_name ?? '—' }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 text-gray-700 cursor-not-allowed"
+                            readonly>
+                    </div>
+
+                    {{-- START DATE (readonly) --}}
+                    <div class="mb-4">
+                        <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input type="text" id="start_date" 
+                            value="{{ $room->start_date ? \Carbon\Carbon::parse($room->start_date)->format('M d, Y') : '—' }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 text-gray-700 cursor-not-allowed"
+                            readonly>
+                    </div>
+
                     <div class="flex gap-2">
                         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Update
+                            Save Changes
                         </button>
                         <a href="{{ route('rooms.index') }}" 
                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
-                            Cancel
+                            Back
                         </a>
                     </div>
                 </form>
