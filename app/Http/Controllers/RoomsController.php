@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Storage;
 
 class RoomsController extends Controller
 {
+    private function authorizeAdmin()
+    {
+        if (!auth()->user() || !auth()->user()->is_admin) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -42,6 +49,8 @@ class RoomsController extends Controller
      */
     public function create()
     {
+        $this->authorizeAdmin();
+
         $roomTypes = RoomType::all(); // for dropdown
         return view('rooms.create', compact('roomTypes'));
     }
@@ -51,6 +60,8 @@ class RoomsController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorizeAdmin();
+
         $validated = $request->validate([
             'room_number'          => 'required|string|max:50|unique:rooms,room_number',
             'room_type_id'         => 'nullable|exists:room_types,id',
@@ -92,6 +103,8 @@ class RoomsController extends Controller
      */
     public function update(Request $request, Room $room)
     {
+        $this->authorizeAdmin();
+
         $validated = $request->validate([
             'room_number'          => 'required|string|max:50|unique:rooms,room_number,' . $room->id,
             'room_type_id'         => 'nullable|exists:room_types,id',
@@ -137,6 +150,8 @@ class RoomsController extends Controller
      */
     public function destroy(Room $room)
     {
+        $this->authorizeAdmin();
+
         foreach (['image1', 'image2', 'image3'] as $field) {
             if ($room->$field) {
                 Storage::disk('public')->delete($room->$field);

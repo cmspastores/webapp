@@ -73,7 +73,9 @@
             </div>
             <div class="header-buttons">
                 <a href="{{ route('rooms.index') }}" class="btn btn-refresh">Refresh List</a>
-                <a href="{{ route('rooms.create') }}" class="btn btn-new">+ Add Room</a>
+                @if(auth()->user() && auth()->user()->is_admin)
+                    <a href="{{ route('rooms.create') }}" class="btn btn-new">+ Add Room</a>
+                @endif
             </div>
         </div>
         {{-- End Search + Filter + Refresh --}}
@@ -111,12 +113,17 @@
                                 <td>{{ $room->start_date ?? '—' }}</td>
                                 <td style="white-space:nowrap;">
                                     <div style="display:flex;gap:6px;">
+                                        {{-- Always visible: View --}}
                                         <a href="{{ route('rooms.edit', $room) }}" class="btn btn-yellow" style="font-size:13px;padding:4px 8px;">View</a>
-                                        <form action="{{ route('rooms.destroy', $room) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this room?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-red" style="font-size:13px;padding:4px 8px;">Delete</button>
-                                        </form>
+
+                                        {{-- Only admin: Edit + Delete --}}
+                                        @if(auth()->user() && auth()->user()->is_admin)
+                                            <form action="{{ route('rooms.destroy', $room) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this room?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-red" style="font-size:13px;padding:4px 8px;">Delete</button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
