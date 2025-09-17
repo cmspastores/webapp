@@ -32,21 +32,25 @@ Route::middleware(['auth'])->group(function () {
     // Login Logs View (optional)
     Route::get('/login-logs', [LoginLogController::class, 'logstable']);
 
-    //Rooms
+    // Rooms Management
     Route::resource('rooms', RoomsController::class);
 
-    //Roomtypes
+    // Room Types Management
     Route::resource('roomtypes', RoomTypeController::class);
 
     // ============================
     // Renters Management
     // ============================
-    Route::get('renters', [RentersController::class, 'index'])->name('renters.index');
-    Route::get('renters/create', [RentersController::class, 'create'])->name('renters.create');
-    Route::post('renters', [RentersController::class, 'store'])->name('renters.store');
-    Route::get('renters/{renter}', [RentersController::class, 'show'])->name('renters.show'); // ✅ Added
-    Route::get('renters/{renter}/edit', [RentersController::class, 'edit'])->name('renters.edit');
-    Route::put('renters/{renter}', [RentersController::class, 'update'])->name('renters.update');
+    // Full RESTful routes, including destroy
+    Route::resource('renters', RentersController::class);
+    // This defines:
+    // GET /renters -> index (renters.index)
+    // GET /renters/create -> create (renters.create)
+    // POST /renters -> store (renters.store)
+    // GET /renters/{renter} -> show (renters.show)
+    // GET /renters/{renter}/edit -> edit (renters.edit)
+    // PUT /renters/{renter} -> update (renters.update)
+    // DELETE /renters/{renter} -> destroy (renters.destroy) ✅
 
     // ============================
     // Settings (All users)

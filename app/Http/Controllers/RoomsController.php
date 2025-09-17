@@ -26,8 +26,8 @@ class RoomsController extends Controller
             $query->where('room_type_id', $request->room_type_id);
         }
 
-        // You can add pagination if you like
-        $rooms = $query->get();
+        // Paginate results, 5 per page
+         $rooms = $query->paginate(5)->withQueryString(); 
 
         // For filter dropdown
         $roomTypes = RoomType::all();

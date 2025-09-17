@@ -1,130 +1,99 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Add New Room
-        </h2>
-    </x-slot>
-
-    <div class="py-6">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-
-                <form action="{{ route('rooms.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                    @csrf
-
-                    <div>
-                        <label for="room_number" class="block text-sm font-medium text-gray-700">Room Number</label>
-                        <input type="text" name="room_number" id="room_number"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                                      focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm
-                                      @error('room_number') border-red-500 @enderror"
-                               value="{{ old('room_number') }}" required>
-                        @error('room_number')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="room_type_id" class="block text-sm font-medium text-gray-700">Room Type</label>
-                        <select name="room_type_id" id="room_type_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                                       focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm
-                                       @error('room_type_id') border-red-500 @enderror">
-                            <option value="">No Room Type</option>
-                            @forelse($roomTypes as $type)
-                                <option value="{{ $type->id }}" {{ old('room_type_id') == $type->id ? 'selected' : '' }}>
-                                    {{ $type->name }}
-                                </option>
-                            @empty
-                                <option value="" disabled>(No room types available)</option>
-                            @endforelse
-                        </select>
-                        @error('room_type_id')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="room_price" class="block text-sm font-medium text-gray-700">Room Price</label>
-                        <input type="number" step="0.01" name="room_price" id="room_price"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                                      focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm
-                                      @error('room_price') border-red-500 @enderror"
-                               value="{{ old('room_price') }}" required>
-                        @error('room_price')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- NEW FIELD --}}
-                    <div>
-                        <label for="number_of_occupants" class="block text-sm font-medium text-gray-700">Number of Occupants</label>
-                        <input type="number" name="number_of_occupants" id="number_of_occupants"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm
-                                      focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm
-                                      @error('number_of_occupants') border-red-500 @enderror"
-                               value="{{ old('number_of_occupants') }}">
-                        @error('number_of_occupants')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- IMAGES --}}
-                    <div>
-                        <label for="image1" class="block text-sm font-medium text-gray-700">Image 1 (optional)</label>
-                        <input type="file" name="image1" id="image1"
-                            class="mt-1 block w-full text-sm text-gray-700
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-md file:border-0
-                                    file:text-sm file:font-semibold
-                                    file:bg-indigo-50 file:text-indigo-700
-                                    hover:file:bg-indigo-100" accept="image/*">
-                        @error('image1')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="image2" class="block text-sm font-medium text-gray-700">Image 2 (optional)</label>
-                        <input type="file" name="image2" id="image2"
-                            class="mt-1 block w-full text-sm text-gray-700
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-md file:border-0
-                                    file:text-sm file:font-semibold
-                                    file:bg-indigo-50 file:text-indigo-700
-                                    hover:file:bg-indigo-100" accept="image/*">
-                        @error('image2')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="image3" class="block text-sm font-medium text-gray-700">Image 3 (optional)</label>
-                        <input type="file" name="image3" id="image3"
-                            class="mt-1 block w-full text-sm text-gray-700
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-md file:border-0
-                                    file:text-sm file:font-semibold
-                                    file:bg-indigo-50 file:text-indigo-700
-                                    hover:file:bg-indigo-100" accept="image/*">
-                        @error('image3')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button type="submit"
-                                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                            Save
-                        </button>
-                        <a href="{{ route('rooms.index') }}"
-                           class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-                            Cancel
-                        </a>
-                    </div>
-                </form>
-
+        <div class="header-container">
+            <h2 class="header-title">Add New Room</h2>
+            <div class="header-buttons">
+                <a href="{{ route('rooms.index') }}" class="btn-back">← Back to List</a>
             </div>
         </div>
+    </x-slot>
+
+    <div class="container">
+        <div class="card form-card">
+            <form action="{{ route('rooms.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <div class="form-grid">
+                    {{-- Room Number --}}
+                    <div>
+                        <label for="room_number">Room #</label>
+                        <input type="text" name="room_number" id="room_number" value="{{ old('room_number') }}" required>
+                        @error('room_number')<div class="error">{{ $message }}</div>@enderror
+                    </div>
+
+                    {{-- Room Type --}}
+                    <div>
+                        <label for="room_type_id">Room Type</label>
+                        <select name="room_type_id" id="room_type_id">
+                            <option value="">No Room Type</option>
+                            @forelse($roomTypes as $type)
+                                <option value="{{ $type->id }}" {{ old('room_type_id')==$type->id?'selected':'' }}>{{ $type->name }}</option>
+                            @empty
+                                <option disabled>(No room types)</option>
+                            @endforelse
+                        </select>
+                        @error('room_type_id')<div class="error">{{ $message }}</div>@enderror
+                    </div>
+
+                    {{-- Room Price --}}
+                    <div>
+                        <label for="room_price">Price</label>
+                        <input type="number" step="0.01" name="room_price" id="room_price" value="{{ old('room_price') }}" required>
+                        @error('room_price')<div class="error">{{ $message }}</div>@enderror
+                    </div>
+
+                    {{-- Number of Occupants --}}
+                    <div>
+                        <label for="number_of_occupants">Occupants</label>
+                        <input type="number" name="number_of_occupants" id="number_of_occupants" value="{{ old('number_of_occupants') }}">
+                        @error('number_of_occupants')<div class="error">{{ $message }}</div>@enderror
+                    </div>
+
+                    {{-- Room Images --}}
+                    @foreach(['image1','image2','image3'] as $img)
+                        <div class="full-width">
+                            <label>{{ ucfirst($img) }} (optional)</label>
+                            <input type="file" name="{{ $img }}" class="file-input" accept="image/*">
+                            @error($img)<div class="error">{{ $message }}</div>@enderror
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- Form Actions --}}
+                <div style="margin-top:12px; display:flex; gap:8px;">
+                    <button type="submit" class="btn-confirm">Save</button>
+                    <a href="{{ route('rooms.index') }}" class="btn-back">Cancel</a>
+                </div>
+
+            </form>
+        </div>
     </div>
+
+    <!-- 🔹 CSS Section -->
+    <style>
+        /* Containers */
+        .container { max-width:1200px; margin:0 auto; padding:16px; }
+        .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .header-title { font-family:'Figtree',sans-serif; font-weight:900; font-size:24px; color:#5C3A21; }
+        .header-buttons { display:flex; gap:10px; }
+
+        /* Card/Form */
+        .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif; }
+        .form-card .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+        .form-card input, .form-card select { padding:6px 10px; border-radius:6px; border:1px solid #E6A574; font-family:'Figtree',sans-serif; }
+        .full-width { grid-column: span 2; }
+
+        /* Buttons */
+        .btn-confirm { background:#E6A574; color:#5C3A21; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s; }
+        .btn-confirm:hover { background:#F4C38C; }
+        .btn-back { background:#D97A4E; color:#FFF5EC; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s; }
+        .btn-back:hover { background:#F4C38C; color:#5C3A21; }
+
+        /* File Inputs */
+        .file-input { border:none; background:#FFF3DF; color:#5C4A32; font-weight:500; padding:6px 8px; border-radius:6px; cursor:pointer; }
+
+        /* Error Messages */
+        .error { color:#e07b7b; font-size:12px; margin-top:4px; }
+    </style>
 </x-app-layout>
+

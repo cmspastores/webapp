@@ -1,69 +1,85 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Room Types
-        </h2>
+        <div class="header-container">
+            <h2 class="rooms-header">Room Types</h2>
+            <div class="header-buttons">
+                <a href="{{ route('roomtypes.create') }}" class="btn-new">+ Add Room Type</a>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 rounded shadow-sm">
+    <!-- 🔹 CSS Section -->
+    <style>
+        .container { max-width:1200px; margin:0 auto; padding:16px; }
+        .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .rooms-header { font-family:'Figtree',sans-serif; font-weight:900; font-size:24px; color:#5C3A21; line-height:1.2; }
+        .header-buttons { display:flex; gap:10px; }
+        .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif; }
+        .table-wrapper { overflow-x:auto; }
+        table { width:100%; min-width:400px; border-collapse:collapse; font-size:14px; }
+        th, td { border:1px solid #D97A4E; padding:6px 10px; text-align:left; white-space:nowrap; }
+        th { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; font-weight:700; }
+        td.ellipsis { max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        tr:hover { background:#FFF4E1; }
+        .btn { padding:6px 14px; border:none; border-radius:8px; cursor:pointer; font-weight:600; text-decoration:none; transition:0.2s; font-family:'Figtree',sans-serif; }
+        
+        /* 🔹 Updated Add Room Type button */
+        .btn-new { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:12px; padding:8px 18px; box-shadow:0 4px 10px rgba(0,0,0,0.15); transition:0.3s all; display:inline-block; }
+        .btn-new:hover { background:linear-gradient(90deg,#F4C38C,#E6A574); transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,0.2); color:#5C3A21; }
 
-                @if(session('success'))
-                    <div class="mb-4 px-4 py-2 bg-green-100 text-green-700 rounded">
-                        {{ session('success') }}
-                    </div>
-                @endif
+        .btn-new,.btn-refresh,.btn-search { background:#E6A574; color:#5C3A21; border-radius:8px; }
+        .btn-new:hover,.btn-refresh:hover,.btn-search:hover { background:#F4C38C; }
+        .btn-edit { background:#F4C38C; color:#5C3A21; padding:4px 8px; border-radius:6px; font-size:13px; }
+        .btn-edit:hover { opacity:0.9; }
+        .btn-delete { background:#EF4444; color:white; padding:4px 8px; border-radius:6px; font-size:13px; }
+        .btn-delete:hover { opacity:0.9; }
 
-                <div class="flex justify-end mb-3">
-                    <a href="{{ route('roomtypes.create') }}"
-                       class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        + Add Room Type
-                    </a>
-                </div>
+        .pagination { margin-top:12px; display:flex; gap:4px; justify-content:center; flex-wrap:wrap; }
+        .pagination a, .pagination span { padding:4px 8px; border-radius:6px; border:1px solid #E6A574; text-decoration:none; color:#5C3A21; font-family:'Figtree',sans-serif; }
+        .pagination a:hover { background:#F4C38C; color:#5C3A21; }
+        .pagination .active { background:#E6A574; color:#FFF; border:none; }
+    </style>
 
-                <table class="w-full border border-gray-300 text-sm">
-                    <thead class="bg-gray-100">
+    <div class="container">
+        <div class="card">
+            @if(session('success'))
+                <div style="margin-bottom:12px;padding:6px 10px;background:#D1FAE5;color:#065F46;border-radius:6px;">{{ session('success') }}</div>
+            @endif
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
                         <tr>
-                            <th class="px-4 py-2 border">ID</th>
-                            <th class="px-4 py-2 border">Name</th>
-                            <th class="px-4 py-2 border w-40">Actions</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($roomTypes as $type)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-2 border">{{ $type->id }}</td>
-                                <td class="px-4 py-2 border">{{ $type->name }}</td>
-                                <td class="px-4 py-2 border">
-                                    <div class="flex gap-2">
-                                        <a href="{{ route('roomtypes.edit', $type) }}"
-                                           class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-xs">
-                                            Edit
-                                        </a>
-                                        <form action="{{ route('roomtypes.destroy', $type) }}" method="POST"
-                                              onsubmit="return confirm('Delete this room type?')">
+                            <tr>
+                                <td>{{ $type->id }}</td>
+                                <td class="ellipsis">{{ $type->name }}</td>
+                                <td style="white-space:nowrap;">
+                                    <div style="display:flex;gap:6px;">
+                                        <a href="{{ route('roomtypes.edit', $type) }}" class="btn btn-edit">Edit</a>
+                                        <form action="{{ route('roomtypes.destroy', $type) }}" method="POST" class="inline" onsubmit="return confirm('Delete this room type?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
-                                                Delete
-                                            </button>
+                                            <button type="submit" class="btn btn-delete">Delete</button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="px-4 py-2 text-center text-gray-500">
-                                    No room types found.
-                                </td>
+                                <td colspan="3" style="text-align:center;color:#6B7280;">No room types found.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
 
-                <div class="mt-4">
+                <div class="pagination">
                     {{ $roomTypes->links() }}
                 </div>
             </div>
