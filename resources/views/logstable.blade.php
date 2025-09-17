@@ -14,9 +14,7 @@
             <!-- Logout form (POST) -->
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="bg-[#D97A4E] text-white px-4 py-2 rounded hover:bg-[#E6A574] transition">
-                    Logout
-                </button>
+               
             </form>
         </div>
 

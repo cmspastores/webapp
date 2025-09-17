@@ -12,6 +12,14 @@
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+
+          <!-- Favicons -->
+          <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon.png') }}">
+          <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon.png') }}">
+          <link rel="apple-touch-icon" href="{{ asset('images/favicon.png') }}">
+          <meta name="theme-color" content="#E6A574">
+
+
         <!-- Styles / Scripts -->
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -31,11 +39,19 @@ body{font-family:'Figtree',sans-serif;color:#2C2C2C;background:radial-gradient(c
 a{text-decoration:none;transition:0.2s;}
 button,a{cursor:pointer;}
 
+
 /* Layout */
 header,footer{width:100%;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:16px 32px;}
 header .logo, footer .logo{font-weight:700;font-size:1.3rem;}
-header nav a{margin-left:16px;padding:8px 16px;border-radius:6px;background:rgba(255,255,255,0.2);color:#fff;font-weight:600;}
-header nav a:hover{background:rgba(255,255,255,0.4);}
+
+/* Navigation + Logout buttons: pastel background with warm text */
+header nav a, header nav .nav-logout{margin-left:12px; padding:8px 18px; border-radius:8px; background:#FFFDFB; color:#D98348; font-weight:600; border:2px solid #D98348; box-shadow:0 2px 6px rgba(0,0,0,0.1); transition:all 0.25s ease; display:inline-block;}
+header nav a:hover, header nav .nav-logout:hover{background:linear-gradient(90deg,#D98348,#E6A574); color:#FFFDFB; transform:translateY(-2px) scale(1.03); box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+header nav a:active, header nav .nav-logout:active{transform:translateY(0) scale(0.98); box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+
+/* Ensure logout form displays inline */
+header nav form{display:inline;}
+
 
 main{max-width:1200px;margin:0 auto;padding:32px;display:flex;flex-direction:column;align-items:center;}
 .hero{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:40px;}
@@ -64,6 +80,10 @@ footer p{font-size:0.9rem;color:#fff;margin-top:8px;}
         @if (Route::has('login'))
             @auth
                 <a href="{{ url('/dashboard') }}">Dashboard</a>
+                <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="nav-logout">Log Out</button>
+                </form>
             @else
                 <a href="{{ route('login') }}">Log In</a>
                 @if (Route::has('register'))

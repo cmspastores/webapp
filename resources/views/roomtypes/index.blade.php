@@ -1,89 +1,88 @@
-
-
 <x-app-layout>
-
-
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Room Types Management') }}
-        </h2>
-    </x-slot> 
+        <div class="header-container">
+            <h2 class="rooms-header">Room Types</h2>
+            <div class="header-buttons">
+                <a href="{{ route('roomtypes.create') }}" class="btn-new">+ Add Room Type</a>
+            </div>
+        </div>
+    </x-slot>
 
+    <!-- 🔹 CSS Section -->
     <style>
-        .success-message{background:#FFF9F5;color:#2C2C2C;padding:12px 16px;border:2px solid #E6A574;border-radius:8px;margin-bottom:24px;}
-        .form-group{margin-bottom:16px;}
-        .form-label{display:block;margin-bottom:6px;color:#5C3A21;font-size:15px;font-weight:500;}
-        .form-input,.form-textarea{width:100%;padding:10px 14px;border:1px solid #E6A574;border-radius:8px;background:#FFFDFB;color:#2C2C2C;font-size:15px;}
-        .form-button{padding:10px 18px;background:linear-gradient(to right,#D98348,#E6A574);border:none;color:#FFF;font-weight:600;font-size:14px;border-radius:8px;cursor:pointer;}
-        .form-button:hover{background:linear-gradient(to right,#C46A35,#D98348);}
-        table{width:100%;border-collapse:collapse;margin-top:20px;background:#FFFDFB;color:#2C2C2C;border:1px solid #E6A574;}
-        thead{background:#D98348;color:#FFF;}
-        th,td{padding:12px;border:1px solid #E6A574;text-align:left;}
-        .table-input{width:100%;padding:8px 10px;background:#FFF9F5;border:1px solid #E6A574;border-radius:6px;color:#2C2C2C;}
-        .action-buttons{display:flex;gap:10px;}
-        .save-button{color:#2E7D32;font-weight:bold;background:none;border:none;cursor:pointer;}
-        .delete-button{color:#C2410C;font-weight:bold;background:none;border:none;cursor:pointer;}
-        .no-roomtypes{color:#8B5E3C;margin-top:20px;font-style:italic;}
+        .container { max-width:1200px; margin:0 auto; padding:16px; }
+        .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .rooms-header { font-family:'Figtree',sans-serif; font-weight:900; font-size:24px; color:#5C3A21; line-height:1.2; }
+        .header-buttons { display:flex; gap:10px; }
+        .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif; }
+        .table-wrapper { overflow-x:auto; }
+        table { width:100%; min-width:400px; border-collapse:collapse; font-size:14px; }
+        th, td { border:1px solid #D97A4E; padding:6px 10px; text-align:left; white-space:nowrap; }
+        th { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; font-weight:700; }
+        td.ellipsis { max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        tr:hover { background:#FFF4E1; }
+        .btn { padding:6px 14px; border:none; border-radius:8px; cursor:pointer; font-weight:600; text-decoration:none; transition:0.2s; font-family:'Figtree',sans-serif; }
+        
+        /* 🔹 Updated Add Room Type button */
+        .btn-new { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:12px; padding:8px 18px; box-shadow:0 4px 10px rgba(0,0,0,0.15); transition:0.3s all; display:inline-block; }
+        .btn-new:hover { background:linear-gradient(90deg,#F4C38C,#E6A574); transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,0.2); color:#5C3A21; }
+
+        .btn-new,.btn-refresh,.btn-search { background:#E6A574; color:#5C3A21; border-radius:8px; }
+        .btn-new:hover,.btn-refresh:hover,.btn-search:hover { background:#F4C38C; }
+        .btn-edit { background:#F4C38C; color:#5C3A21; padding:4px 8px; border-radius:6px; font-size:13px; }
+        .btn-edit:hover { opacity:0.9; }
+        .btn-delete { background:#EF4444; color:white; padding:4px 8px; border-radius:6px; font-size:13px; }
+        .btn-delete:hover { opacity:0.9; }
+
+        .pagination { margin-top:12px; display:flex; gap:4px; justify-content:center; flex-wrap:wrap; }
+        .pagination a, .pagination span { padding:4px 8px; border-radius:6px; border:1px solid #E6A574; text-decoration:none; color:#5C3A21; font-family:'Figtree',sans-serif; }
+        .pagination a:hover { background:#F4C38C; color:#5C3A21; }
+        .pagination .active { background:#E6A574; color:#FFF; border:none; }
     </style>
 
-    <div class="py-8 px-4 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        @if (session('success'))
-            <div class="success-message">
-                {{ session('success') }}
-            </div>
-        @endif
+    <div class="container">
+        <div class="card">
+            @if(session('success'))
+                <div style="margin-bottom:12px;padding:6px 10px;background:#D1FAE5;color:#065F46;border-radius:6px;">{{ session('success') }}</div>
+            @endif
 
-        {{-- Create Task Form --}}
-        <form action="{{ route('roomtypes.store') }}" method="POST">
-            @csrf
-            <div class="form-group">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" name="title" id="title" required class="form-input">
-            </div>
-
-            <div class="form-group">
-                <label for="description" class="form-label">Description</label>
-                <textarea name="description" id="description" rows="3" class="form-textarea"></textarea>
-            </div>
-
-            <button type="submit" class="form-button">Confirm</button>
-        </form>
-
-        {{-- 📋 Tasks Table --}}
-        @if ($roomtypes->count())
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th>Title</th>
-                            <th>Description</th>
+                            <th>ID</th>
+                            <th>Name</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($roomtypes as $roomtypes)
+                        @forelse($roomTypes as $type)
                             <tr>
-                                <form action="{{ route('roomtypes.update', $roomtypes) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <td><input type="text" name="title" value="{{ $roomtypes->title }}" required class="table-input"></td>
-                                    <td><input type="text" name="description" value="{{ $roomtypes->description }}" class="table-input"></td>
-                                    <td class="action-buttons">
-                                        <button type="submit" class="save-button">💾 Save</button>
-                                </form>
-                                <form action="{{ route('roomtypes.destroy', $roomtypes) }}" method="POST" onsubmit="return confirm('Delete this roomtype?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="delete-button">🗑️ Delete</button>
-                                </form>
-                                    </td>
+                                <td>{{ $type->id }}</td>
+                                <td class="ellipsis">{{ $type->name }}</td>
+                                <td style="white-space:nowrap;">
+                                    <div style="display:flex;gap:6px;">
+                                        <a href="{{ route('roomtypes.edit', $type) }}" class="btn btn-edit">Edit</a>
+                                        <form action="{{ route('roomtypes.destroy', $type) }}" method="POST" class="inline" onsubmit="return confirm('Delete this room type?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-delete">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="3" style="text-align:center;color:#6B7280;">No room types found.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
+
+                <div class="pagination">
+                    {{ $roomTypes->links() }}
+                </div>
             </div>
-        @else
-            <p class="no-roomtypes">No roomtypes yet.</p>
-        @endif
+        </div>
     </div>
 </x-app-layout>
