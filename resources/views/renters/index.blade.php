@@ -69,7 +69,7 @@
                 </tbody>
             </table>
 
-            <!-- ✅ Custom pagination (no Tailwind) -->
+            <!-- Custom pagination -->
             <div class="pagination">
                 @if ($renters->lastPage() > 1)
                     <a href="{{ $renters->url(1) }}" class="{{ ($renters->currentPage() == 1) ? 'disabled' : '' }}">« First</a>
@@ -87,44 +87,70 @@
 
     </div>
 
-    <!-- 🔹 CSS -->
+    <!-- 🔹 Full CSS -->
     <style>
-        .container { max-width:1200px; margin:0 auto; padding:16px; }
+        /* Container & Header */
+        .container { max-width:1200px; margin:0 auto; padding:16px; font-family:'Figtree',sans-serif; }
         .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-        .header-title { font-family:'Figtree',sans-serif; font-weight:900; font-size:24px; color:#5C3A21; }
+        .header-title { font-weight:900; font-size:24px; color:#5C3A21; }
         .header-buttons { display:flex; gap:10px; }
-        .btn-new, .btn-refresh, .btn-back, .btn-edit, .btn-delete, .btn-search { font-family:'Figtree',sans-serif; font-weight:600; border:none; cursor:pointer; transition:0.2s; }
-        .btn-new { background:#E6A574; color:#5C3A21; padding:6px 14px; border-radius:6px; }
+
+        /* Buttons */
+        .btn-new, .btn-refresh, .btn-back, .btn-edit, .btn-delete, .btn-search {
+            font-family:'Figtree',sans-serif;
+            font-weight:600;
+            border:none;
+            cursor:pointer;
+            transition:0.2s;
+            border-radius:6px;
+            padding:8px 16px;
+        }
+        .btn-new { background:#E6A574; color:#5C3A21; }
         .btn-new:hover { background:#F4C38C; }
-        .btn-refresh { background:#E6A574; color:#5C3A21; padding:6px 14px; border-radius:6px; }
+        .btn-refresh { background:#E6A574; color:#5C3A21; }
         .btn-refresh:hover { background:#F4C38C; }
-        .btn-back { background:#D97A4E; color:#FFF5EC; padding:6px 14px; border-radius:6px; }
+        .btn-back { background:#D97A4E; color:#FFF5EC; }
         .btn-back:hover { background:#F4C38C; color:#5C3A21; }
-        .btn-edit { background:#E6A574; color:#5C3A21; padding:4px 8px; border-radius:4px; font-size:13px; }
+        .btn-edit { background:#E6A574; color:#5C3A21; font-size:13px; padding:4px 8px; }
         .btn-edit:hover { background:#F4C38C; }
-        .btn-delete { background:#EF4444; color:white; padding:4px 8px; border-radius:4px; font-size:13px; margin-left:4px; }
+        .btn-delete { background:#EF4444; color:white; font-size:13px; padding:4px 8px; margin-left:4px; }
         .btn-delete:hover { opacity:0.9; }
-        .inline-form { display:inline; }
-        .text-link { color:#D97A4E; text-decoration:underline; font-weight:600; cursor:pointer; }
-        .search-refresh { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap: 12px; }
+        .btn-search { background:#E6A574; color:#5C3A21; }
+        .btn-search:hover { background:#F4C38C; }
+
+        /* Search + Filter Form */
+        .search-refresh { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+        .search-container { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+        .search-input, .search-filter {
+            padding:8px 12px;
+            border-radius:6px;
+            border:1px solid #E6A574;
+            font-family:'Figtree',sans-serif;
+            font-size:14px;
+        }
+        .search-filter { background:#fff; }
+
         .refresh-new-container { display:flex; gap:6px; }
-        .search-container { display:flex; gap:6px; align-items:center; }
-        .search-input, .search-filter { padding:6px 10px; border-radius:6px; border:1px solid #E6A574; }
-        .search-filter { background:#fff; font-family:'Figtree',sans-serif; }
-        .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); }
+
+        /* Cards & Tables */
+        .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); margin-bottom:16px; }
         .table-card { overflow-x:auto; }
         .renter-table { width:100%; border-collapse:collapse; }
         .renter-table th, .renter-table td { border:1px solid #D97A4E; padding:6px 10px; text-align:left; }
         .renter-table th { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; font-weight:700; }
         .renter-table tr:hover { background:#FFF4E1; }
-        .hidden { display:none; }
 
-        /* Custom pagination */
+        /* Pagination */
         .pagination { margin-top:16px; display:flex; justify-content:center; flex-wrap:wrap; gap:4px; }
         .pagination a { padding:6px 12px; border-radius:6px; border:1px solid #E6A574; color:#5C3A21; text-decoration:none; font-weight:600; transition:0.2s; }
         .pagination a:hover { background:#F4C38C; }
         .pagination a.active { background:#E6A574; color:#FFF5EC; border-color:#E6A574; }
         .pagination a.disabled { opacity:0.5; pointer-events:none; }
+
+        /* Misc */
+        .inline-form { display:inline; }
+        .text-link { color:#D97A4E; text-decoration:underline; font-weight:600; cursor:pointer; }
+        .text-center { text-align:center; }
     </style>
 
     <!-- 🔹 JS -->
