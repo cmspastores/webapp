@@ -99,43 +99,54 @@ Then list tables:
 
 ## SCREENSHOTS
 
+## Landing Page
+<img src="public/screenshots/landingpage.png" width=500>
+
 
 ## Log In Form
-<img src="signin.png" width=500>
+<img src="public/screenshots/signin.png" width=500>
 
 ## Sign In Form
-<img src="login.png" width=500>
+<img src="public/screenshots/login.png" width=500>
 
 
 ## Dashboard
-<img src="dashboard.png" width=500>
+<img src="public/screenshots/dashboard.png" width=500>
 
-## Room Type
-<img src="roomtypes.png" width=500>
+## Renters
+<img src="public/screenshots/renters.png" width=500>
+
+## Rooms
+<img src="public/screenshots/rooms.png" width=500>
 
 ## User Management
-<img src="usermanagement.png" width=500>
+<img src="public/screenshots/usermanagement.png" width=500>
+
+## Room Type
+<img src="public/screenshots/roomtypes.png" width=500>
+
+
 
 
 
 
 ## Laravel Setup
-<img src="laravel setup.png" width=500>
+<img src="public/screenshots/laravel setup.png" width=500>
 
 ## Laravel & Vite Version
-<img src="laravel & vite.png" width=500>
+<img src="public/screenshots/laravel & vite.png" width=500>
 
 ## Laravel PHP & Composer
-<img src="php & composer.png" width=500>
+<img src="public/screenshots/php & composer.png" width=500>
 
 ## Laravel & Vite
-<img src="laravel & vite.png" width=500>
+<img src="public/screenshots/laravel & vite.png" width=500>
 
 ## PHP & Composer
-<img src="php & composer.png" width=500>
+<img src="public/screenshots/php & composer.png" width=500>
 
 ## MySQL
-<img src="mysql.png" width=500>
+<img src="public/screenshots/mysql.png" width=500>
 
 
 
