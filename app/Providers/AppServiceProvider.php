@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,9 +20,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Force Laravel + Carbon to use Asia/Manila timezone
-        config(['app.timezone' => 'Asia/Manila']);
-        date_default_timezone_set(config('app.timezone'));
-        Carbon::setLocale(config('app.locale'));
+        // ✅ Enforce Asia/Manila timezone across the app
+        $timezone = config('app.timezone', 'Asia/Manila');
+        date_default_timezone_set($timezone);
+
+        // ✅ Make sure Carbon respects the timezone + locale
+        Carbon::setLocale(config('app.locale', 'en'));
+        Carbon::now($timezone);
     }
 }
