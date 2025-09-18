@@ -5,27 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Renters;
 use Illuminate\Http\Request;
 
-/**
- * Class RentersController
- *
- * Handles CRUD operations for renters in the Dormitel Management System.
- * Features include search, pagination, creating, editing, and updating renter records.
- *
- * @package App\Http\Controllers
- */
 class RentersController extends Controller
 {
     /**
-     * Display a listing of renters with optional search filter.
-     *
-     * @param Request $request
-     * @return \Illuminate\View\View
+     * Display a paginated list of renters with optional search/filter.
      */
     public function index(Request $request)
     {
         $query = Renters::query();
 
-        // 🔍 Apply search filter (matches name, email, phone, or unique_id)
+        // 🔍 Search across multiple fields
         if ($search = $request->input('q')) {
             $query->where(function ($q) use ($search) {
                 $q->where('full_name', 'like', "%{$search}%")
@@ -37,34 +26,25 @@ class RentersController extends Controller
             });
         }
 
-        // 📑 Get renters list with newest first + paginate (5 per page)
-        $renters = $query->orderBy('created_at', 'desc')->paginate(5);
+        // ✅ Paginate 10 per page and preserve search/filter queries
+        $renters = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
-        return view('renter-manager', compact('renters'));
+        return view('renters.index', compact('renters'));
     }
 
     /**
-     * Show the form for creating a new renter.
-     *
-     * (Reuses the index view with renter form included.)
-     *
-     * @param Request $request
-     * @return \Illuminate\View\View
+     * Show form to create a new renter.
      */
-    public function create(Request $request)
+    public function create()
     {
-        return $this->index($request);
+        return view('renters.create');
     }
 
     /**
-     * Store a newly created renter in the database.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Store a new renter in the database.
      */
     public function store(Request $request)
     {
-        // ✅ Validate renter input
         $validated = $request->validate([
             'first_name'        => 'required|string|max:255',
             'last_name'         => 'required|string|max:255',
@@ -75,9 +55,8 @@ class RentersController extends Controller
             'emergency_contact' => 'nullable|string|max:255',
         ]);
 
-        // ⚡ Auto-generate full_name + unique_id for renter record
         $validated['full_name'] = $validated['first_name'] . ' ' . $validated['last_name'];
-        $validated['unique_id'] = strtoupper(bin2hex(random_bytes(4))); // Example: "D3F4A2B1"
+        $validated['unique_id'] = strtoupper(bin2hex(random_bytes(4)));
 
         Renters::create($validated);
 
@@ -85,42 +64,26 @@ class RentersController extends Controller
     }
 
     /**
-     * Display a single renter’s details.
-     *
-     * @param Renters $renter
-     * @return \Illuminate\View\View
+     * Display a specific renter.
      */
     public function show(Renters $renter)
     {
-        return view('renters.show', compact('renter'));
+        return view('renters.view', compact('renter'));
     }
 
     /**
-     * Show the form for editing a renter.
-     *
-     * (Also fetches renters list to keep the manager view consistent.)
-     *
-     * @param Renters $renter
-     * @param Request $request
-     * @return \Illuminate\View\View
+     * Show form to edit an existing renter.
      */
-    public function edit(Renters $renter, Request $request)
+    public function edit(Renters $renter)
     {
-        $renters = Renters::orderBy('created_at', 'desc')->paginate(5);
-
-        return view('renter-manager', compact('renters', 'renter'));
+        return view('renters.edit', compact('renter'));
     }
 
     /**
-     * Update an existing renter in the database.
-     *
-     * @param Request $request
-     * @param Renters $renter
-     * @return \Illuminate\Http\RedirectResponse
+     * Update a renter's information in the database.
      */
     public function update(Request $request, Renters $renter)
     {
-        // ✅ Validate renter input
         $validated = $request->validate([
             'first_name'        => 'required|string|max:255',
             'last_name'         => 'required|string|max:255',
@@ -131,11 +94,20 @@ class RentersController extends Controller
             'address'           => 'nullable|string|max:255',
         ]);
 
-        // ⚡ Keep full_name updated automatically
         $validated['full_name'] = $validated['first_name'] . ' ' . $validated['last_name'];
 
         $renter->update($validated);
 
         return redirect()->route('renters.index')->with('success', 'Renter updated successfully.');
+    }
+
+    /**
+     * Delete a renter from the database.
+     */
+    public function destroy(Renters $renter)
+    {
+        $renter->delete();
+
+        return redirect()->route('renters.index')->with('success', 'Renter deleted successfully.');
     }
 }

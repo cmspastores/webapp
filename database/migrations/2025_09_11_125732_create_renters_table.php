@@ -19,7 +19,6 @@ return new class extends Migration
             
             // Names
             $table->string('first_name');
-            $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->string('full_name'); // stored for faster queries/search
             
@@ -31,6 +30,9 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->string('emergency_contact')->nullable();
+
+            // Room number (nullable for now to avoid errors)
+            $table->string('room_number')->nullable();
             
             $table->timestamps();
         });
