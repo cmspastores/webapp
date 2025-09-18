@@ -82,7 +82,9 @@
 
                 <!-- Form Actions -->
                 <div class="form-actions">
-                    <button type="submit" class="btn-confirm">Save Changes</button>
+                    @if(auth()->user() && auth()->user()->is_admin)
+                        <button type="submit" class="btn-confirm">Save Changes</button>
+                    @endif
                     <a href="{{ route('rooms.index') }}" class="btn-back">Back</a>
                 </div>
             </form>
