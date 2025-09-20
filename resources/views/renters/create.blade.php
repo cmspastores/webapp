@@ -20,6 +20,9 @@
                 <input type="text" name="phone" placeholder="Contact Number">
                 <input type="text" name="emergency_contact" placeholder="Emergency Contact">
                 <input type="text" name="address" placeholder="Address" class="full-width">
+                <input type="text" name="guardian_name" placeholder="Guardian Name">
+                <input type="text" name="guardian_phone" placeholder="Guardian Phone">
+                <input type="email" name="guardian_email" placeholder="Guardian Email">
             </div>
             <button type="submit" class="btn-confirm">Confirm</button>
         </form>

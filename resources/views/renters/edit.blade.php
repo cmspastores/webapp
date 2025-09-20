@@ -21,6 +21,9 @@
                 <input type="text" name="phone" value="{{ $renter->phone }}" placeholder="Contact Number">
                 <input type="text" name="emergency_contact" value="{{ $renter->emergency_contact }}" placeholder="Emergency Contact">
                 <input type="text" name="address" value="{{ $renter->address }}" placeholder="Address" class="full-width">
+                <input type="text" name="guardian_name" value="{{ $renter->guardian_name }}" placeholder="Guardian Name">
+                <input type="text" name="guardian_phone" value="{{ $renter->guardian_phone }}" placeholder="Guardian Phone">
+                <input type="email" name="guardian_email" value="{{ $renter->guardian_email }}" placeholder="Guardian Email">
             </div>
             <button type="submit" class="btn-confirm">Update</button>
         </form>

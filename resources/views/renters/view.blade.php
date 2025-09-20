@@ -17,6 +17,9 @@
         <p><strong>Phone:</strong> {{ $renter->phone ?? '-' }}</p>
         <p><strong>Emergency Contact:</strong> {{ $renter->emergency_contact ?? '-' }}</p>
         <p><strong>Address:</strong> {{ $renter->address ?? '-' }}</p>
+        <p><strong>Guardian Name:</strong> {{ $renter->guardian_name ?? '-' }}</p>
+        <p><strong>Guardian Phone:</strong> {{ $renter->guardian_phone ?? '-' }}</p>
+        <p><strong>Guardian Email:</strong> {{ $renter->guardian_email ?? '-' }}</p>
         <p><strong>Date Created:</strong> {{ $renter->created_at_formatted }}</p>
     </div>
 </div>

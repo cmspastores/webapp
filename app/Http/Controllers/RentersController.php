@@ -53,6 +53,9 @@ class RentersController extends Controller
             'phone'             => 'nullable|string|max:20',
             'address'           => 'nullable|string|max:255',
             'emergency_contact' => 'nullable|string|max:255',
+            'guardian_name'     => 'nullable|string|max:255',
+            'guardian_phone'    => 'nullable|string|max:20',
+            'guardian_email'    => 'nullable|email|max:255',
         ]);
 
         $validated['full_name'] = $validated['first_name'] . ' ' . $validated['last_name'];
@@ -92,6 +95,9 @@ class RentersController extends Controller
             'dob'               => 'nullable|date',
             'emergency_contact' => 'nullable|string|max:255',
             'address'           => 'nullable|string|max:255',
+            'guardian_name'     => 'nullable|string|max:255',
+            'guardian_phone'    => 'nullable|string|max:20',
+            'guardian_email'    => 'nullable|email|max:255',
         ]);
 
         $validated['full_name'] = $validated['first_name'] . ' ' . $validated['last_name'];
