@@ -90,15 +90,7 @@
         .refresh-new-container { display:flex; gap:6px; }
 
         /* Buttons */
-        .btn-new, .btn-refresh, .btn-search, .btn-edit, .btn-delete {
-            font-family:'Figtree',sans-serif;
-            font-weight:600;
-            border:none;
-            cursor:pointer;
-            transition:0.2s;
-            border-radius:6px;
-            padding:8px 16px;
-        }
+        .btn-new, .btn-refresh, .btn-search, .btn-edit, .btn-delete { font-family:'Figtree',sans-serif; font-weight:600; border:none; cursor:pointer; transition:0.2s; border-radius:6px; padding:8px 16px; }
         .btn-new { background:#E6A574; color:#5C3A21; }
         .btn-new:hover { background:#F4C38C; }
         .btn-refresh { background:#E6A574; color:#5C3A21; }

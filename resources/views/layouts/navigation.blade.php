@@ -10,9 +10,7 @@
                     <i class="fa-solid fa-caret-down"></i>
                 </button>
                 <div class="nav-dropdown-content">
-                    <!-- Profile link -->
-                    <a href="{{ route('profile.edit') }}">Profile</a>
-                    <!-- Logout form -->
+                    <a href="{{ route('profile.edit') }}" class="nav-link">Profile</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="logout-btn">Log Out</button>
@@ -21,14 +19,14 @@
             </div>
         </div>
 
-        <!-- Hamburger for mobile (not really needed but included for completeness) -->
-        <button class="nav-hamburger hidden" onclick="toggleMobileNav()">
+        <!-- Hamburger for mobile -->
+        <button class="nav-hamburger" onclick="toggleMobileNav()">
             <i class="fa-solid fa-bars"></i>
         </button>
     </div>
 
-    <!-- Mobile menu (hidden, included for completeness) -->
-    <div id="mobile-nav" class="mobile-nav hidden">
+    <!-- Mobile menu -->
+    <div id="mobile-nav" class="mobile-nav">
         <a href="{{ route('profile.edit') }}" class="mobile-nav-link">Profile</a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
@@ -45,29 +43,25 @@
 
 /* User dropdown */
 .nav-user-dropdown { position:relative; }
-
 .nav-user-btn { display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:6px; border:none; background:linear-gradient(135deg,#E6955A,#F0A67C); color:#5C3A21; cursor:pointer; font-weight:600; transition:0.3s background,0.3s transform,0.3s color; }
-
 .nav-user-btn:hover { background:linear-gradient(135deg,#F0B078,#F5C191); transform:scale(1.05); color:#3E2C1B; }
-
-
-
 .nav-dropdown-content { display:none; position:absolute; top:100%; left:50%; transform:translateX(-50%); background:#FFF8F0; border:1px solid #E6A574; border-radius:8px; min-width:140px; box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:100; }
-
-.nav-dropdown-content a, .nav-dropdown-content button { display:block; width:100%; text-align:left; padding:8px 12px; background:transparent; border:none; cursor:pointer; color:#5C3A21; text-decoration:none; font-weight:500; }
+.nav-dropdown-content a, .nav-dropdown-content button { display:block; width:100%; text-align:left; padding:8px 12px; background:transparent; border:none; cursor:pointer; color:#5C3A21; text-decoration:none; font-weight:600; }
 .nav-dropdown-content a:hover, .nav-dropdown-content button:hover { background:#E6A574; color:#FFF5EC; }
 .nav-user-dropdown:hover .nav-dropdown-content { display:block; }
 
+/* Force Profile text to match Log Out */
+.nav-dropdown-content a:link, .nav-dropdown-content a:visited, .mobile-nav-link:link, .mobile-nav-link:visited { color:#5C3A21 !important; text-decoration:none !important; }
+
 /* Hamburger (mobile) */
-.nav-hamburger { display:none; border:none; background:transparent; font-size:20px; cursor:pointer; color:#5C3A21; }
+.nav-hamburger { display:none; border:none; background:transparent; font-size:22px; cursor:pointer; color:#5C3A21; }
 
 /* Mobile menu */
-.mobile-nav { display:flex; flex-direction:column; background:#FFF5EC; border-top:1px solid #E6A574; }
-.mobile-nav-link { padding:10px 16px; border-bottom:1px solid #E6A574; color:#5C3A21; text-decoration:none; font-weight:600; }
+.mobile-nav { display:flex; flex-direction:column; background:#FFF5EC; border-top:1px solid #E6A574; max-height:0; overflow:hidden; opacity:0; transition:max-height 0.3s ease, opacity 0.3s ease; }
+.mobile-nav.show { max-height:200px; opacity:1; }
+.mobile-nav-link { padding:10px 16px; border-bottom:1px solid #E6A574; color:#5C3A21; text-decoration:none; font-weight:600; display:block; text-align:left; }
 .mobile-nav-link:hover, .mobile-nav-link.active { background:#E6A574; color:#FFF5EC; }
-
-/* Hidden class */
-.hidden { display:none; }
+.mobile-nav-link.logout-btn { background:transparent; border:none; cursor:pointer; }
 
 /* Responsive */
 @media (max-width:768px) { .nav-right { display:none; } .nav-hamburger { display:block; } }
@@ -75,9 +69,5 @@
 
 <!-- NAVIGATION JS -->
 <script>
-/* Toggle mobile menu */
-function toggleMobileNav() {
-    const mobileNav = document.getElementById('mobile-nav');
-    mobileNav.classList.toggle('hidden');
-}
+function toggleMobileNav() { const mobileNav=document.getElementById('mobile-nav'); mobileNav.classList.toggle('show'); }
 </script>

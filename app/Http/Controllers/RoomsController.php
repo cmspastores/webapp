@@ -6,12 +6,13 @@ use App\Models\Room;
 use App\Models\RoomType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class RoomsController extends Controller
 {
     private function authorizeAdmin()
     {
-        if (!auth()->user() || !auth()->user()->is_admin) {
+        if (!Auth::user() || !Auth::user()->is_admin) {
             abort(403, 'Unauthorized action.');
         }
     }
