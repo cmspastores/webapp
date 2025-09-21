@@ -26,6 +26,8 @@
             <div class="refresh-new-container">
                 <button id="btn-refresh" class="btn-refresh">Refresh List</button>
                 <a href="{{ route('renters.create') }}" class="btn-new">+ New Renter</a>
+                <a href="{{ route('renters.deleted') }}" class="btn-new" style="background:#D97A4E; color:white;">🗑️ View Deleted</a>
+
             </div>
         </div>
 

@@ -36,7 +36,8 @@ return new class extends Migration
 
             // Room number (nullable for now to avoid errors)
             $table->string('room_number')->nullable();
-            
+            $table->softDeletes(); // this adds deleted_at
+
             $table->timestamps();
         });
     }

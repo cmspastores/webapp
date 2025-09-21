@@ -42,7 +42,11 @@ Route::middleware(['auth'])->group(function () {
     // Renters Management
     // ============================
     // Full RESTful routes, including destroy
+    Route::get('/renters/deleted', [RentersController::class, 'deleted'])->name('renters.deleted');
+    Route::put('/renters/{renter}/restore', [RentersController::class, 'restore'])->name('renters.restore');
+
     Route::resource('renters', RentersController::class);
+
     // This defines:
     // GET /renters -> index (renters.index)
     // GET /renters/create -> create (renters.create)

@@ -116,4 +116,41 @@ class RentersController extends Controller
 
         return redirect()->route('renters.index')->with('success', 'Renter deleted successfully.');
     }
+
+    public function deleted(Request $request)
+    {
+        $query = Renters::onlyTrashed(); // get soft-deleted only
+
+        if ($request->has('q')) {
+            $q = $request->q;
+            $filter = $request->filter ?? 'all';
+
+            $query->where(function ($subQuery) use ($q, $filter) {
+                if ($filter === 'name') {
+                    $subQuery->where('full_name', 'like', "%$q%");
+                } elseif ($filter === 'email') {
+                    $subQuery->where('email', 'like', "%$q%");
+                } elseif ($filter === 'phone') {
+                    $subQuery->where('phone', 'like', "%$q%");
+                } else {
+                    $subQuery->where('full_name', 'like', "%$q%")
+                            ->orWhere('email', 'like', "%$q%")
+                            ->orWhere('phone', 'like', "%$q%");
+                }
+            });
+        }
+
+        $renters = $query->orderBy('deleted_at', 'desc')->paginate(10)->withQueryString();
+
+        return view('renters.deleted', compact('renters'));
+
+        
+    }
+    public function restore($id)
+    {
+        $renter = Renter::onlyTrashed()->findOrFail($id);
+        $renter->restore();
+
+        return redirect()->route('renters.deleted')->with('success', 'Renter restored successfully.');
+    }
 }
