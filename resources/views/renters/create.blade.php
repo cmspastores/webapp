@@ -45,7 +45,5 @@
 .full-width { grid-column: span 2; }
 </style>
 
-<script>
-// No extra JS needed for simple create form
-</script>
+
 </x-app-layout>

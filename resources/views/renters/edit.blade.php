@@ -46,7 +46,5 @@
 .full-width { grid-column: span 2; }
 </style>
 
-<script>
-// No extra JS needed; edit form prefilled by Blade
-</script>
+
 </x-app-layout>
