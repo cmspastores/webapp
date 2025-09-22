@@ -20,10 +20,7 @@ return new class extends Migration
             $table->string('occupant_name')->nullable(); // for now, just string. Later can be linked to Customers
             $table->date('start_date')->nullable();
 
-            // Add these new image columns
-            $table->string('image1')->nullable();
-            $table->string('image2')->nullable();
-            $table->string('image3')->nullable();
+            $table->string('image')->nullable();
 
             $table->timestamps();
         });

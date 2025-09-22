@@ -16,9 +16,7 @@ class Room extends Model
         'number_of_occupants',
         'occupant_name',
         'start_date',
-        'image1',
-        'image2',
-        'image3',
+        'image',
     ];
 
     /**

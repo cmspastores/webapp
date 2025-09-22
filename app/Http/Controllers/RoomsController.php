@@ -55,9 +55,7 @@ class RoomsController extends Controller
             'room_type_id' => 'nullable|exists:room_types,id',
             'room_price' => 'required|numeric|min:0',
             'number_of_occupants' => 'nullable|integer|min:0',
-            'image1' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'image2' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'image3' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $room = new Room();
@@ -66,10 +64,8 @@ class RoomsController extends Controller
         $room->room_price = $validated['room_price'];
         $room->number_of_occupants = $validated['number_of_occupants'] ?? null;
 
-        foreach (['image1','image2','image3'] as $field) {
-            if ($request->hasFile($field)) {
-                $room->$field = $request->file($field)->store('rooms','public');
-            }
+        if ($request->hasFile('image')) {
+            $room->image = $request->file('image')->store('rooms', 'public');
         }
 
         $room->save();
@@ -92,24 +88,23 @@ class RoomsController extends Controller
             'room_type_id' => 'nullable|exists:room_types,id',
             'room_price' => 'required|numeric|min:0',
             'number_of_occupants' => 'nullable|integer|min:0',
-            'image1' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'image2' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'image3' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        foreach (['image1','image2','image3'] as $field) {
-            if ($request->filled("remove_$field") && $request->input("remove_$field") === "1") {
-                if ($room->$field) {
-                    Storage::disk('public')->delete($room->$field);
-                }
-                $room->$field = null;
+        // Handle image removal
+        if ($request->filled('remove_image') && $request->input('remove_image') === "1") {
+            if ($room->image) {
+                Storage::disk('public')->delete($room->image);
             }
-            if ($request->hasFile($field)) {
-                if ($room->$field) {
-                    Storage::disk('public')->delete($room->$field);
-                }
-                $room->$field = $request->file($field)->store('rooms','public');
+            $room->image = null;
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            if ($room->image) {
+                Storage::disk('public')->delete($room->image);
             }
+            $room->image = $request->file('image')->store('rooms', 'public');
         }
 
         $room->room_number = $validated['room_number'];
@@ -126,10 +121,9 @@ class RoomsController extends Controller
     {
         $this->authorizeAdmin();
 
-        foreach (['image1','image2','image3'] as $field) {
-            if ($room->$field) Storage::disk('public')->delete($room->$field);
+        if ($room->image) {
+            Storage::disk('public')->delete($room->image);
         }
-
         $room->delete();
 
         return redirect()->route('rooms.index')->with('success','Room deleted successfully.');

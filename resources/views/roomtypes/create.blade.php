@@ -24,7 +24,7 @@
             <form action="{{ route('roomtypes.store') }}" method="POST">
                 @csrf
                 <div>
-                    <label for="name">Type Name</label>
+                    <label for="name">Type Name (eg. Dorm - Single)</label>
                     <input type="text" name="name" id="name" value="{{ old('name') }}" required>
                     @error('name')<div class="error">{{ $message }}</div>@enderror
                 </div>

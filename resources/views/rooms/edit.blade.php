@@ -27,14 +27,23 @@
                     <!-- Room Type -->
                     <div>
                         <label for="room_type_id">Room Type</label>
-                        <select name="room_type_id" id="room_type_id">
-                            <option value="">No Room Type</option>
-                            @forelse($roomTypes as $type)
-                                <option value="{{ $type->id }}" {{ (old('room_type_id', $room->room_type_id) == $type->id)?'selected':'' }}>{{ $type->name }}</option>
-                            @empty
-                                <option disabled>(No room types)</option>
-                            @endforelse
-                        </select>
+                        <div class="roomtype-row">
+                            <select name="room_type_id" id="room_type_id">
+                                <option value="">No Room Type</option>
+                                @forelse($roomTypes as $type)
+                                    <option value="{{ $type->id }}" {{ (old('room_type_id', $room->room_type_id) == $type->id)?'selected':'' }}>
+                                        {{ $type->name }}
+                                    </option>
+                                @empty
+                                    <option disabled>(No room types)</option>
+                                @endforelse
+                            </select>
+
+                            <!-- Button beside dropdown -->
+                            @if(auth()->user() && auth()->user()->is_admin)
+                                <a href="{{ route('roomtypes.index') }}" class="btn-back">Edit</a>
+                            @endif
+                        </div>
                         @error('room_type_id')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
@@ -52,32 +61,34 @@
                         @error('number_of_occupants')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
-                    <!-- Images -->
-                    @foreach(['image1','image2','image3'] as $img)
-                        <div class="full-width">
-                            <label>{{ ucfirst($img) }} (optional)</label>
-                            <div class="img-wrapper">
-                                <!-- Existing Image -->
-                                @if($room->$img)
-                                    <img id="current_{{ $img }}" src="{{ asset('storage/'.$room->$img) }}" class="img-preview">
-                                    <button type="button" onclick="removeExistingImage('{{ $img }}')" class="btn-back small-btn">Remove</button>
-                                @endif
-
-                                <!-- New File Input -->
-                                <input type="file" name="{{ $img }}" class="file-input" accept="image/*" onchange="previewImage(this,'preview_{{ $img }}')">
-
-                                <!-- Preview of Newly Chosen File -->
-                                <div id="preview_{{ $img }}_wrapper" class="img-wrapper" style="display:none;">
-                                    <img id="preview_{{ $img }}" class="img-preview">
-                                    <button type="button" onclick="removeNewImage('{{ $img }}','preview_{{ $img }}_wrapper')" class="btn-back small-btn">Remove</button>
+                    <!-- Image -->
+                    <div class="full-width">
+                        <label>Room Image (optional)</label>
+                        <div class="img-wrapper">
+                            <!-- Existing Image -->
+                            @if($room->image)
+                                <div id="current_image_wrapper" class="img-wrapper">
+                                    <img id="current_image" src="{{ asset('storage/'.$room->image) }}" class="img-preview">
+                                    <button type="button" onclick="removeExistingImage('image')" class="btn-back small-btn">Remove</button>
                                 </div>
+                            @endif
 
-                                <!-- Hidden Input -->
-                                <input type="hidden" name="remove_{{ $img }}" id="remove_{{ $img }}" value="0">
-                                @error($img)<div class="error">{{ $message }}</div>@enderror
+                            <!-- New File Input -->
+                            <div id="file_input_wrapper" style="{{ $room->image ? 'display:none;' : '' }}">
+                                <input type="file" name="image" class="file-input" accept="image/*" onchange="previewImage(this,'preview_image')">
                             </div>
+
+                            <!-- Preview of Newly Chosen File -->
+                            <div id="preview_image_wrapper" class="img-wrapper" style="display:none;">
+                                <img id="preview_image" class="img-preview">
+                                <button type="button" onclick="removeNewImage('image','preview_image_wrapper')" class="btn-back small-btn">Remove</button>
+                            </div>
+
+                            <!-- Hidden Input -->
+                            <input type="hidden" name="remove_image" id="remove_image" value="0">
+                            @error('image')<div class="error">{{ $message }}</div>@enderror
                         </div>
-                    @endforeach
+                    </div>
                 </div>
 
                 <!-- Form Actions -->
@@ -100,14 +111,20 @@
                 document.getElementById(id+'_wrapper').style.display = 'flex';
             }
         }
+
         function removeNewImage(inputId, wrapperId) {
             document.getElementsByName(inputId)[0].value = '';
             document.getElementById(wrapperId).style.display = 'none';
+            // Show file input again
+            document.getElementById('file_input_wrapper').style.display = 'block';
         }
+
         function removeExistingImage(field) {
             document.getElementById('remove_'+field).value = '1';
-            const current = document.getElementById('current_'+field);
-            if(current) current.remove();
+            const currentWrapper = document.getElementById('current_'+field+'_wrapper');
+            if(currentWrapper) currentWrapper.remove();
+            // Show file input
+            document.getElementById('file_input_wrapper').style.display = 'block';
         }
     </script>
 </x-app-layout>
@@ -118,6 +135,8 @@
     .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
     .header-title { font-family:'Figtree',sans-serif; font-weight:900; font-size:24px; color:#5C3A21; }
     .header-buttons { display:flex; gap:10px; }
+
+    .roomtype-row { display: flex; gap: 8px; align-items: center;}
 
     .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif; }
     .form-card .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
@@ -132,7 +151,7 @@
     .btn-back.small-btn { padding:2px 6px; font-size:12px; }
 
     .file-input { border:none; background:#FFF3DF; color:#5C4A32; font-weight:500; padding:6px 8px; border-radius:6px; cursor:pointer; }
-    .img-preview { width:80px; height:80px; object-fit:cover; border-radius:6px; margin-right:8px; }
+    .img-preview { width:200px; height:200px; object-fit:cover; border-radius:10px; margin-right:8px; border: 2px solid #E6A574}
     .img-wrapper { display:flex; align-items:center; gap:4px; margin-bottom:4px; }
     .error { color:#e07b7b; font-size:12px; margin-top:4px; }
 
