@@ -148,7 +148,7 @@ class RentersController extends Controller
     }
     public function restore($id)
     {
-        $renter = Renter::onlyTrashed()->findOrFail($id);
+        $renter = Renters::onlyTrashed()->findOrFail($id);
         $renter->restore();
 
         return redirect()->route('renters.deleted')->with('success', 'Renter restored successfully.');
