@@ -29,7 +29,6 @@
             </style>
         @endif
 
-
 <style>
 /* 🔹 Reset & Base */
 *{margin:0;padding:0;box-sizing:border-box} /* Reset margins/padding */
