@@ -33,44 +33,38 @@
 
 <!-- 🎨 Professional Sunset-Tropical Theme -->
 <style>
-/* Reset & base */
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Figtree',sans-serif;color:#2C2C2C;background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);line-height:1.6;}
-a{text-decoration:none;transition:0.2s;}
-button,a{cursor:pointer;}
-
-
-/* Layout */
-header,footer{width:100%;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:16px 32px;}
-header .logo, footer .logo{font-weight:700;font-size:1.3rem;}
-
-/* Navigation + Logout buttons: pastel background with warm text */
-header nav a, header nav .nav-logout{margin-left:12px; padding:8px 18px; border-radius:8px; background:#FFFDFB; color:#D98348; font-weight:600; border:2px solid #D98348; box-shadow:0 2px 6px rgba(0,0,0,0.1); transition:all 0.25s ease; display:inline-block;}
-header nav a:hover, header nav .nav-logout:hover{background:linear-gradient(90deg,#D98348,#E6A574); color:#FFFDFB; transform:translateY(-2px) scale(1.03); box-shadow:0 4px 10px rgba(0,0,0,0.2);}
-header nav a:active, header nav .nav-logout:active{transform:translateY(0) scale(0.98); box-shadow:0 1px 3px rgba(0,0,0,0.15);}
-
-/* Ensure logout form displays inline */
-header nav form{display:inline;}
-
-
-main{max-width:1200px;margin:0 auto;padding:32px;display:flex;flex-direction:column;align-items:center;}
-.hero{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:40px;}
-.hero img{width:100%;max-width:800px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.1);}
-.hero h1{font-size:2rem;color:#5C3A21;margin:20px 0 10px;}
-.hero p{font-size:1.1rem;color:#4A3C35;max-width:600px;}
-.hero .cta{margin-top:20px;}
-.hero .cta a{margin:0 8px;padding:12px 28px;border-radius:8px;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;font-weight:600;}
-.hero .cta a:hover{background:linear-gradient(90deg,#C46A32,#D98348);}
-
-/* About Section */
-.about{background:#FFF8F2;padding:32px;border-radius:12px;max-width:900px;width:100%;margin-bottom:40px;}
-.about h2{color:#D98348;font-size:1.5rem;margin-bottom:16px;}
-.about p{color:#4A3C35;font-size:1rem;line-height:1.65;}
-
-/* Footer */
-footer{flex-direction:column;justify-content:center;text-align:center;padding:20px;}
-footer p{font-size:0.9rem;color:#fff;margin-top:8px;}
+html{font-size:1rem;min-width:320px;scroll-behavior:smooth}
+body{font-family:'Figtree',sans-serif;color:#2C2C2C;background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);display:flex;flex-direction:column;min-height:100vh;line-height:1.6;overflow-x:hidden}
+header,footer{width:100%;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:1rem 2vw;flex-shrink:0;flex-wrap:wrap}
+header .logo,footer .logo{font-weight:700;font-size:1.3rem}
+header nav a,header nav .nav-logout{margin:.5rem;padding:.5rem 1rem;border-radius:.5rem;background:#FFFDFB;color:#D98348;font-weight:600;border:2px solid #D98348;box-shadow:0 0.125rem 0.375rem rgba(0,0,0,0.1);transition:.25s}
+header nav a:hover,header nav .nav-logout:hover{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFFDFB;transform:translateY(-2px) scale(1.03);box-shadow:0 0.25rem 0.625rem rgba(0,0,0,.2)}
+main{flex:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:1200px;margin:0 auto;padding:2vw;min-width:320px}
+.hero{width:100%;text-align:center;margin-bottom:4vh;min-width:280px}
+.hero img{width:100%;max-width:80vw;border-radius:.75rem;box-shadow:0 0.375rem 1.25rem rgba(0,0,0,.1)}
+.hero h1{font-size:2rem;color:#5C3A21;margin:2vh 0 1vh}
+.hero p{font-size:1.1rem;color:#4A3C35;max-width:90%;margin:0 auto}
+.hero .cta a{margin:0 .5rem;padding:.75rem 1.75rem;border-radius:.5rem;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;font-weight:600;display:inline-block;transition:.25s}
+.hero .cta a:hover{background:linear-gradient(90deg,#C46A32,#D98348)}
+.about{background:#FFF8F2;padding:2vw;border-radius:.75rem;max-width:90vw;width:100%;margin-bottom:4vh;min-width:280px}
+.about h2{color:#D98348;font-size:1.5rem;margin-bottom:1rem}
+.about p{color:#4A3C35;font-size:1rem;line-height:1.65}
+footer{flex-shrink:0;flex-direction:column;justify-content:center;align-items:center;padding:1.25rem;text-align:center;min-height:5vh}
+footer p{font-size:.9rem;margin-top:.5rem}
+/* Responsive zoom-proof tweaks */
+@media(max-width:768px){
+header,footer{flex-direction:column;text-align:center}
+header nav a,header nav .nav-logout{margin:.5rem 0}
+.hero h1{font-size:1.6rem}
+.hero p{font-size:1rem}
+.about h2{font-size:1.3rem}
+.about p{font-size:.95rem}
+}
 </style>
+
+
+
 </head>
 <body>
 
