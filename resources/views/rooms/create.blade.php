@@ -103,10 +103,15 @@
     .roomtype-row { display:flex; gap:8px; align-items:center; }
 
     /* Card/Form */
-    .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif; }
-    .form-card .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-    .form-card input, .form-card select { padding:6px 10px; border-radius:6px; border:1px solid #E6A574; font-family:'Figtree',sans-serif; }
-    .full-width { grid-column: span 2; }
+    .card {background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif;}
+    .form-card .form-grid {display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+    .form-card .form-grid > div, .form-card .full-width {display:flex; align-items:center; gap:8px;}
+    .form-card label {min-width:100px; font-weight:600; color:#5C3A21;}
+    .form-card input, .form-card select {width:200px; padding:6px 10px; border-radius:6px; border:1px solid #E6A574; font-family:'Figtree',sans-serif;}
+    .form-card .full-width {grid-column:span 2;}
+    .form-card .full-width label {min-width:120px;}
+    .form-card .full-width input {width:300px; background:#FFF3DF; color:#5C4A32; font-weight:500; cursor:pointer;}
+
 
     /* Buttons */
     .btn-confirm { background:#E6A574; color:#5C3A21; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s; }

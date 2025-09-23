@@ -23,7 +23,9 @@
     </div>
 
     <!-- Collapse Toggle BUTTON BELOW NAV -->
-    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i id="sidebarIcon" class="fas fa-angle-left"></i>
+    </button>
 
     <!-- Bottom Nav -->
     <div class="sidebar-bottom">
@@ -69,6 +71,7 @@
 /* Sidebar Toggle */
 .sidebar-toggle { margin: 0.75rem 1rem; background: #D98348; color: #FFF; border: none; border-radius: 6px; padding: .5rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: .2s; width: calc(100% - 2rem); }
 .sidebar-toggle:hover { background: #C46A32; }
+.sidebar-toggle i { font-size: 1.2rem; font-weight: bold; }
 
 /* Collapsed Mode (Manual) */
 .sidebar.collapsed { width: 4rem; backdrop-filter: blur(6px); }
@@ -99,6 +102,7 @@
 <script>
 const sidebar = document.getElementById("sidebar");
 const toggle = document.getElementById("sidebarToggle");
+const sidebarIcon = document.getElementById("sidebarIcon");
 
 let userToggled = false; // track if user clicked the button
 
@@ -106,8 +110,10 @@ function handleResize() {
     if (!userToggled) {
         if (window.innerWidth <= 1024) {
             sidebar.classList.add("collapsed");
+            sidebarIcon.className = "fas fa-angle-right";
         } else {
             sidebar.classList.remove("collapsed");
+            sidebarIcon.className = "fas fa-angle-left";
         }
     }
 }
@@ -117,7 +123,12 @@ handleResize();
 
 toggle.addEventListener("click", function() {
     sidebar.classList.toggle("collapsed");
+    sidebarIcon.className = sidebar.classList.contains("collapsed")
+        ? "fas fa-angle-right"
+        : "fas fa-angle-left";
     userToggled = true; // user has overridden auto behavior
 });
 </script>
 
+<!-- Add Font Awesome (once in your <head>) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
