@@ -30,50 +30,53 @@
         @endif
 
 
-
-<!-- 🎨 Professional Sunset-Tropical Theme -->
-<!-- 🎨 Professional Sunset-Tropical Theme -->
 <style>
 /* 🔹 Reset & Base */
-*{margin:0;padding:0;box-sizing:border-box} /* Reset margins/padding and use border-box */
-html{font-size:1rem;min-width:320px;scroll-behavior:smooth} /* Base font-size, min-width, smooth scroll */
-body{font-family:'Figtree',sans-serif;color:#2C2C2C;background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);display:flex;flex-direction:column;min-height:100vh;line-height:1.6;overflow-x:hidden} /* Body font, colors, layout, min-height, line-height */
+*{margin:0;padding:0;box-sizing:border-box} /* Reset margins/padding */
+html{font-size:1rem;min-width:320px;scroll-behavior:smooth} /* Base font & smooth scroll */
+body{font-family:'Figtree',sans-serif;color:#2C2C2C;background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);display:flex;flex-direction:column;min-height:100vh;line-height:1.6;overflow-x:hidden} /* Body styling */
 
 /* 🔹 Header & Navigation */
-header,footer{width:100%;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:1rem 2vw;flex-shrink:0;flex-wrap:wrap} /* Header/footer layout, gradient, spacing, wrap */
-header .logo,footer .logo{font-weight:700;font-size:1.3rem} /* Logo styling */
-header nav a,header nav .nav-logout{margin:.5rem;padding:.75rem 1.75rem;border-radius:.5rem;background:#FFFDFB;color:#D98348;font-weight:600;border:2px solid #D98348;box-shadow:0 0.125rem 0.375rem rgba(0,0,0,.1);text-align:center;min-width:120px;display:inline-block;transition:.25s} /* Uniform size for dashboard and logout */
+header,footer{width:100%;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:1rem 2vw;flex-shrink:0;flex-wrap:wrap} /* Header/footer layout */
+header .logo,footer .logo{font-weight:800;font-size:1.5rem} /* Logo styling */
+header nav{display:flex;align-items:center;flex-wrap:wrap} /* Nav flex container */
+header nav a,header nav .nav-logout{margin:.5rem;padding:.75rem 1.75rem;border-radius:.5rem;background:#FFFDFB;color:#D98348;font-weight:700;border:2px solid #D98348;box-shadow:0 0.125rem 0.375rem rgba(0,0,0,.1);text-align:center;min-width:120px;display:inline-block;transition:.25s} /* Uniform size buttons */
 header nav a:hover,header nav .nav-logout:hover{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFFDFB;transform:translateY(-2px) scale(1.03);box-shadow:0 0.25rem 0.625rem rgba(0,0,0,.2)} /* Hover effect */
 
 /* 🔹 Main Content */
-main{flex:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:1200px;margin:0 auto;padding:2vw;min-width:320px} /* Main layout, flex, center, max-width, padding */
+main{flex:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:100%;margin:0 auto;padding:2vw;min-width:320px} /* Main layout full width */
 
 /* 🔹 Hero Section */
-.hero{width:100%;text-align:center;margin-bottom:4vh;min-width:280px} /* Hero container */
-.hero img{width:100%;max-width:80vw;border-radius:.75rem;box-shadow:0 0.375rem 1.25rem rgba(0,0,0,.1)} /* Hero image */
-.hero h1{font-size:2rem;color:#5C3A21;margin:2vh 0 1vh} /* Hero heading */
-.hero p{font-size:1.1rem;color:#4A3C35;max-width:90%;margin:0 auto} /* Hero paragraph */
-.hero .cta a{margin:0 .5rem;padding:.75rem 1.75rem;border-radius:.5rem;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;font-weight:600;display:inline-block;transition:.25s} /* CTA buttons */
+.hero{width:100vw;text-align:center;margin-bottom:4vh;min-width:280px;display:flex;flex-direction:column;align-items:center;position:relative;margin-top:0;padding-top:0} /* Hero full width, flush top, less tall */
+.hero img{width:100vw;max-width:100vw;max-height:60vh;border-radius:.75rem;box-shadow:0 0.5rem 1.5rem rgba(0,0,0,.15);display:block;object-fit:cover} /* Hero image full width, limited height */
+.hero h1{font-size:2.2rem;color:#5C3A21;font-weight:800;margin:1vh 0 0;text-shadow:0 2px 4px rgba(0,0,0,.2)} /* Bold hero heading, less top/bottom margin */
+.hero p{font-size:1.1rem;color:#4A3C35;max-width:95%;margin:0.5vh auto 0;font-weight:600;line-height:1.6} /* Hero paragraph smaller margin */
+.hero .cta{margin-top:1.5vh;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem} /* CTA container spacing reduced */
+.hero .cta a{margin:0;padding:.75rem 2rem;border-radius:.5rem;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;font-weight:700;display:inline-block;transition:.25s} /* CTA buttons */
 .hero .cta a:hover{background:linear-gradient(90deg,#C46A32,#D98348)} /* CTA hover */
 
+
 /* 🔹 About Section */
-.about{background:#FFF8F2;padding:2vw;border-radius:.75rem;max-width:90vw;width:100%;margin-bottom:4vh;min-width:280px} /* About container */
-.about h2{color:#D98348;font-size:1.5rem;margin-bottom:1rem} /* About heading */
-.about p{color:#4A3C35;font-size:1rem;line-height:1.65} /* About paragraph */
+.about{background:#FFF8F2;padding:3vw;border-radius:1rem;max-width:100vw;width:100vw;margin-bottom:6vh;min-width:300px;box-shadow:0 0.5rem 1rem rgba(0,0,0,.1);position:relative;z-index:1} /* About full width, clean */
+.about h2{color:#D98348;font-size:2rem;margin-bottom:1.2rem;font-weight:800;text-shadow:0 1px 2px rgba(0,0,0,.1)} /* About heading bold */
+.about p{color:#4A3C35;font-size:1.1rem;line-height:1.75;font-weight:600} /* About paragraph readable */
+.about::before, .about::after{display:none} /* Remove previous oblong/shape decorations */
 
 /* 🔹 Footer Section */
-footer{flex-shrink:0;flex-direction:column;justify-content:center;align-items:center;padding:1.25rem;text-align:center;min-height:5vh} /* Footer layout */
+footer{flex-shrink:0;flex-direction:column;justify-content:center;align-items:center;padding:1.5rem;text-align:center;min-height:5vh} /* Footer layout */
 footer p{font-size:.9rem;margin-top:.5rem} /* Footer text */
 
-/* 🔹 Responsive Zoom-proof Tweaks */
+/* 🔹 Responsive & Hamburger-friendly */
 @media(max-width:768px){
 header,footer{flex-direction:column;text-align:center} /* Stack header/footer */
 header nav a,header nav .nav-logout{margin:.5rem 0} /* Nav spacing */
-.hero h1{font-size:1.6rem} /* Hero heading smaller */
+.hero h1{font-size:2rem} /* Hero heading smaller */
 .hero p{font-size:1rem} /* Hero paragraph smaller */
-.about h2{font-size:1.3rem} /* About heading smaller */
-.about p{font-size:.95rem} /* About paragraph smaller */
+.about h2{font-size:1.6rem} /* About heading smaller */
+.about p{font-size:1rem} /* About paragraph smaller */
+.hero .cta{flex-direction:column;gap:.75rem} /* CTA stacked */
 }
+
 </style>
 
 </head>
