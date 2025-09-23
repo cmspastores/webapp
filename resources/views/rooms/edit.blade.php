@@ -74,7 +74,7 @@
                             @endif
 
                             <!-- New File Input -->
-                            <div id="file_input_wrapper" style="{{ $room->image ? 'display:none;' : '' }}">
+                            <div id="file_input_wrapper" @if($room->image) style="display:none;" @endif>
                                 <input type="file" name="image" class="file-input" accept="image/*" onchange="previewImage(this,'preview_image')">
                             </div>
 
