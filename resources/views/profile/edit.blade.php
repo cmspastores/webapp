@@ -71,9 +71,9 @@
 <style>
 
 /* Profile Header */    
-.profile-header-title { font:900 28px 'Figtree',sans-serif; color:#5C3A21; line-height:1.2; text-align:center; text-shadow:2px 2px 6px rgba(0,0,0,0.25); letter-spacing:1.2px; text-transform:uppercase; margin-bottom:16px; position:relative; }
-.profile-header-title::after { content:''; display:block; width:80px; height:4px; margin:8px auto 0; background:linear-gradient(90deg,#F4C38C,#E6A574); border-radius:2px; }
-.dark .profile-header-title { color:#f6e7d8; }
+.profile-header-title { font:900 32px 'Figtree',sans-serif; color:#5C3A21; line-height:1.2; text-align:center; text-shadow:2px 2px 6px rgba(0,0,0,0.25); letter-spacing:1.2px; text-transform:uppercase; margin-bottom:16px; position:relative; -webkit-text-stroke:0.5px #5C3A21; }
+.dark .profile-header-title { color:#f6e7d8; -webkit-text-stroke:0.5px #f6e7d8; }
+
 
 /* Page & sections */
 .profile-page { max-width:800px; margin:2rem auto; display:flex; flex-direction:column; gap:2rem; }

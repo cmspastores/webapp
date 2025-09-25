@@ -31,51 +31,46 @@
 
 <style>
 /* 🔹 Reset & Base */
-*{margin:0;padding:0;box-sizing:border-box} /* Reset margins/padding */
-html{font-size:1rem;min-width:320px;scroll-behavior:smooth} /* Base font & smooth scroll */
-body{font-family:'Figtree',sans-serif;color:#2C2C2C;background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);display:flex;flex-direction:column;min-height:100vh;line-height:1.6;overflow-x:hidden} /* Body styling */
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:1rem;min-width:320px;scroll-behavior:smooth}
+body{font-family:'Figtree',sans-serif;color:#2C2C2C;background:radial-gradient(circle at top left,#FFF4E9,#FDE6D8,#FADCC5);display:flex;flex-direction:column;min-height:100vh;line-height:1.6;overflow-x:hidden}
 
 /* 🔹 Header & Navigation */
-header,footer{width:100%;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:1rem 2vw;flex-shrink:0;flex-wrap:wrap} /* Header/footer layout */
-header .logo,footer .logo{font-weight:800;font-size:1.5rem} /* Logo styling */
-header nav{display:flex;align-items:center;flex-wrap:wrap} /* Nav flex container */
-header nav a,header nav .nav-logout{margin:.5rem;padding:.75rem 1.75rem;border-radius:.5rem;background:#FFFDFB;color:#D98348;font-weight:700;border:2px solid #D98348;box-shadow:0 0.125rem 0.375rem rgba(0,0,0,.1);text-align:center;min-width:120px;display:inline-block;transition:.25s} /* Uniform size buttons */
-header nav a:hover,header nav .nav-logout:hover{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFFDFB;transform:translateY(-2px) scale(1.03);box-shadow:0 0.25rem 0.625rem rgba(0,0,0,.2)} /* Hover effect */
+header,footer{width:100%;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:1rem 2vw;flex-shrink:0;flex-wrap:wrap}
+header .logo,footer .logo{font-weight:800;font-size:1.5rem}
+header nav{display:flex;align-items:center;flex-wrap:wrap}
+header nav a,header nav .nav-logout{margin:.5rem;padding:.75rem 1.75rem;border-radius:.5rem;background:#FFFDFB;color:#D98348;font-weight:700;border:2px solid #D98348;box-shadow:0 0.125rem 0.375rem rgba(0,0,0,.1);text-align:center;min-width:120px;display:inline-block;transition:.25s}
+header nav a:hover,header nav .nav-logout:hover{background:linear-gradient(90deg,#D98348,#E6A574);color:#FFFDFB;transform:translateY(-2px) scale(1.03);box-shadow:0 0.25rem 0.625rem rgba(0,0,0,.2)}
 
 /* 🔹 Main Content */
-main{flex:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:100%;margin:0 auto;padding:2vw;min-width:320px} /* Main layout full width */
+main{flex:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:100%;margin:0 auto;padding:0;min-width:320px}
 
-/* 🔹 Hero Section */
-.hero{width:100vw;text-align:center;margin-bottom:4vh;min-width:280px;display:flex;flex-direction:column;align-items:center;position:relative;margin-top:0;padding-top:0} /* Hero full width, flush top, less tall */
-.hero img{width:100vw;max-width:100vw;max-height:60vh;border-radius:.75rem;box-shadow:0 0.5rem 1.5rem rgba(0,0,0,.15);display:block;object-fit:cover} /* Hero image full width, limited height */
-.hero h1{font-size:2.2rem;color:#5C3A21;font-weight:800;margin:1vh 0 0;text-shadow:0 2px 4px rgba(0,0,0,.2)} /* Bold hero heading, less top/bottom margin */
-.hero p{font-size:1.1rem;color:#4A3C35;max-width:95%;margin:0.5vh auto 0;font-weight:600;line-height:1.6} /* Hero paragraph smaller margin */
-.hero .cta{margin-top:1.5vh;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem} /* CTA container spacing reduced */
-.hero .cta a{margin:0;padding:.75rem 2rem;border-radius:.5rem;background:linear-gradient(90deg,#D98348,#E6A574);color:#fff;font-weight:700;display:inline-block;transition:.25s} /* CTA buttons */
-.hero .cta a:hover{background:linear-gradient(90deg,#C46A32,#D98348)} /* CTA hover */
+/* 🔹 Hero Section (half screen) */
+.hero{width:100vw;min-height:50vh;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:0;overflow:hidden}
+.hero img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;filter:blur(8px);transform:scale(1.08)}
+.hero::after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.35);z-index:0}
+.hero h1{font-size:2.5rem;color:#FFF;font-weight:800;margin:1vh 0 0;text-shadow:0 2px 4px rgba(0,0,0,.6);z-index:1}
+.hero p{font-size:1.2rem;color:#FFF;max-width:95%;margin:0.5vh auto 0;font-weight:600;line-height:1.6;text-shadow:0 1px 3px rgba(0,0,0,.5);z-index:1}
 
-
-/* 🔹 About Section */
-.about{background:#FFF8F2;padding:3vw;border-radius:1rem;max-width:100vw;width:100vw;margin-bottom:6vh;min-width:300px;box-shadow:0 0.5rem 1rem rgba(0,0,0,.1);position:relative;z-index:1} /* About full width, clean */
-.about h2{color:#D98348;font-size:2rem;margin-bottom:1.2rem;font-weight:800;text-shadow:0 1px 2px rgba(0,0,0,.1)} /* About heading bold */
-.about p{color:#4A3C35;font-size:1.1rem;line-height:1.75;font-weight:600} /* About paragraph readable */
-.about::before, .about::after{display:none} /* Remove previous oblong/shape decorations */
+/* 🔹 About Section (below hero, replaces modal) */
+.about-section{background:#FFF8F2;padding:3rem 1.5rem;max-width:1000px;margin:2rem auto;border-radius:1rem;box-shadow:0 0.5rem 1rem rgba(0,0,0,0.15);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.about-section h2{color:#D98348;font-size:2rem;margin-bottom:1rem;font-weight:800;text-align:center}
+.about-section p{color:#4A3C35;font-size:1.1rem;line-height:1.75;font-weight:600}
 
 /* 🔹 Footer Section */
-footer{flex-shrink:0;flex-direction:column;justify-content:center;align-items:center;padding:1.5rem;text-align:center;min-height:5vh} /* Footer layout */
-footer p{font-size:.9rem;margin-top:.5rem} /* Footer text */
+footer{flex-shrink:0;flex-direction:column;justify-content:center;align-items:center;padding:1rem;text-align:center;min-height:4vh}
+footer p{font-size:1rem;margin-top:.3rem;font-weight:600}
 
-/* 🔹 Responsive & Hamburger-friendly */
+/* 🔹 Responsive */
 @media(max-width:768px){
-header,footer{flex-direction:column;text-align:center} /* Stack header/footer */
-header nav a,header nav .nav-logout{margin:.5rem 0} /* Nav spacing */
-.hero h1{font-size:2rem} /* Hero heading smaller */
-.hero p{font-size:1rem} /* Hero paragraph smaller */
-.about h2{font-size:1.6rem} /* About heading smaller */
-.about p{font-size:1rem} /* About paragraph smaller */
-.hero .cta{flex-direction:column;gap:.75rem} /* CTA stacked */
+  header,footer{flex-direction:column;text-align:center}
+  header nav a,header nav .nav-logout{margin:.5rem 0}
+  .hero h1{font-size:2rem}
+  .hero p{font-size:1rem}
+  .about-section{margin:2rem auto;max-width:90%;position:relative}
+  .about-section h2{font-size:1.6rem}
+  .about-section p{font-size:1rem}
 }
-
 </style>
 
 </head>
@@ -104,15 +99,14 @@ header nav a,header nav .nav-logout{margin:.5rem 0} /* Nav spacing */
 <main>
     <!-- Hero Section -->
     <section class="hero">
-        <img src="{{ asset('images/c5background.jpg') }}" alt="C5 Dormitel Building">
+        <img src="{{ asset('images/c5background.jpg') }}" alt="Front view of C5 Dormitel, Roxas Avenue, Davao City">
         <h1>Welcome to C5 Dormitel</h1>
         <p>Affordable, comfortable, and secure dormitory accommodations for students, professionals, and tourists in Davao City.</p>
-        <div class="cta">
-            
+    </section>
 
-    <!-- About Section -->
-    <section class="about">
-        <h2>About</h2>
+    <!-- About Section (directly visible) -->
+    <section class="about-section">
+        <h2>About Us</h2>
         <p>
             C5 Dormitel has been operational since August 2006, located along Roxas Avenue, Davao City.  
             We provide a unique blend of dormitory-style accommodations within a professional hotel setting.  
@@ -123,7 +117,6 @@ header nav a,header nav .nav-logout{margin:.5rem 0} /* Nav spacing */
 </main>
 
 <footer>
-    <div class="logo">C5 Dormitel</div>
     <p>&copy; {{ date('Y') }} C5 Dormitel. All rights reserved.</p>
 </footer>
 

@@ -95,9 +95,9 @@
     <style>
         /* Container & Header */
         .container { max-width:1200px; margin:0 auto; padding:16px; font-family:'Figtree',sans-serif; }
-        .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
-        .header-title { font-weight:900; font-size:24px; color:#5C3A21; }
-        .header-buttons { display:flex; gap:10px; }
+        .header-container{display:flex;justify-content:center;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;position:relative}
+        .header-title{font:900 32px 'Figtree',sans-serif;color:#5C3A21;line-height:1.2;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,0.25);letter-spacing:1.2px;text-transform:uppercase;margin:0;-webkit-text-stroke:0.5px #5C3A21;position:relative;flex:1}
+        .header-buttons{display:flex;gap:10px;justify-content:flex-end}
 
         /* Buttons */
         .btn-new, .btn-refresh, .btn-back, .btn-edit, .btn-delete, .btn-search { font-family:'Figtree',sans-serif; font-weight:600; border:none; cursor:pointer; transition:0.2s; border-radius:6px; padding:8px 16px; }

@@ -10,10 +10,14 @@
 
     <!-- 🔹 CSS Section -->
     <style>
+    
         .container { max-width:1200px; margin:0 auto; padding:16px; }
-        .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-        .rooms-header { font-family:'Figtree',sans-serif; font-weight:900; font-size:24px; color:#5C3A21; line-height:1.2; }
-        .header-buttons { display:flex; gap:10px; }
+        .header-container{display:flex;justify-content:flex-end;align-items:center;margin-bottom:16px;position:relative}
+        .rooms-header{font:900 32px 'Figtree',sans-serif;color:#5C3A21;line-height:1.2;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,0.25);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:16px;position:absolute;left:50%;transform:translateX(-50%);-webkit-text-stroke:0.5px #5C3A21}
+
+
+        .header-buttons{display:flex;gap:10px;position:relative;right:0}
+       
         .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif; }
         .table-wrapper { overflow-x:auto; }
         table { width:100%; min-width:400px; border-collapse:collapse; font-size:14px; }
@@ -24,8 +28,12 @@
         .btn { padding:6px 14px; border:none; border-radius:8px; cursor:pointer; font-weight:600; text-decoration:none; transition:0.2s; font-family:'Figtree',sans-serif; }
         
         /* 🔹 Updated Add Room Type button */
-        .btn-new { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:12px; padding:8px 18px; box-shadow:0 4px 10px rgba(0,0,0,0.15); transition:0.3s all; display:inline-block; }
-        .btn-new:hover { background:linear-gradient(90deg,#F4C38C,#E6A574); transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,0.2); color:#5C3A21; }
+        .btn-new{background:linear-gradient(90deg,#E6A574,#F4C38C);color:#5C3A21;font-weight:700;border-radius:12px;padding:10px 0;width:140px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:inline-block}
+
+        .btn-new:hover{background:linear-gradient(90deg,#F4C38C,#E6A574);box-shadow:0 6px 14px rgba(0,0,0,0.2);color:#5C3A21}
+
+
+
 
         .btn-new,.btn-refresh,.btn-search { background:#E6A574; color:#5C3A21; border-radius:8px; }
         .btn-new:hover,.btn-refresh:hover,.btn-search:hover { background:#F4C38C; }

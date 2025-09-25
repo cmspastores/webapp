@@ -63,7 +63,7 @@
 
                     <!-- Image -->
                     <div class="full-width">
-                        <label>Room Image (optional)</label>
+                        <label>Room Image</label>
                         <div class="img-wrapper">
                             <!-- Existing Image -->
                             @if($room->image)
@@ -132,10 +132,10 @@
 <!-- 🔹 CSS Section -->
 <style>
     .container { max-width:1200px; margin:0 auto; padding:16px; }
-    .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-    .header-title { font-family:'Figtree',sans-serif; font-weight:900; font-size:24px; color:#5C3A21; }
-    .header-buttons { display:flex; gap:10px; }
-
+    .header-container{display:flex;justify-content:flex-end;align-items:center;margin-bottom:16px;position:relative}
+    .header-title{font:900 32px 'Figtree',sans-serif;color:#5C3A21;line-height:1.2;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,0.25);letter-spacing:1.2px;text-transform:uppercase;margin:0;position:absolute;left:50%;transform:translateX(-50%);-webkit-text-stroke:0.5px #5C3A21}
+    .header-buttons{display:flex;gap:10px;position:relative;z-index:1}
+    
     .roomtype-row { display: flex; gap: 8px; align-items: center;}
 
     .card {background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif;}
