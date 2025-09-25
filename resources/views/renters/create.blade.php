@@ -42,7 +42,8 @@
 .card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); }
 .form-card .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
 .form-card input { padding:6px 10px; border-radius:6px; border:1px solid #E6A574; }
-.full-width { grid-column: span 2; }
+.full-width { grid-column: span 1; }
+
 </style>
 
 
