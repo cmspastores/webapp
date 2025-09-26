@@ -17,6 +17,12 @@
                         <option value="{{ $type->id }}" {{ request('room_type_id')==$type->id?'selected':'' }}>{{ $type->name }}</option>
                     @endforeach
                 </select>
+
+                <select name="room_order" class="search-filter">
+                    <option value="asc" {{ request('room_order')=='asc'?'selected':'' }}>Ascending (1 → 50)</option>
+                    <option value="desc" {{ request('room_order')=='desc'?'selected':'' }}>Descending (50 → 1)</option>
+                </select>
+
                 <button type="submit" class="btn-search">Search</button>
             </form>
 
@@ -31,8 +37,9 @@
             <table class="room-table">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Room#</th>
+                        <th class="hidden-id">#</th>
+
+                        <th>Room #</th>
                         <th>Type</th>
                         <th>Price</th>
                         <th>Occupants</th>
@@ -42,10 +49,12 @@
                 <tbody>
                     @forelse($rooms as $room)
                         <tr>
-                            <td>{{ $room->id }}</td>
+                            <td class="hidden-id">{{ $room->id }}</td>
+
                             <td>{{ $room->room_number }}</td>
                             <td>{{ $room->roomType->name ?? '-' }}</td>
-                            <td>{{ number_format($room->room_price,2) }}</td>
+                            <td>₱{{ number_format($room->room_price, 2) }}</td>
+
                             <td>{{ $room->number_of_occupants ?? '-' }}</td>
                             <td>
                                 <a href="{{ route('rooms.edit',$room) }}" class="btn-edit">Edit</a>
@@ -82,11 +91,14 @@
         .header-container { margin-bottom:16px; }
         .header-title{font:900 32px 'Figtree',sans-serif;color:#5C3A21;line-height:1.2;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,0.25);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:16px;position:relative;-webkit-text-stroke:0.5px #5C3A21}
 
+        .hidden-id { display: none; }
+
         /* Search + Refresh + New Room toolbar */
         .search-refresh { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
         .search-container { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
         .search-input, .search-filter { padding:8px 12px; border-radius:6px; border:1px solid #E6A574; font-size:14px; }
-        .search-filter { background:#fff; }
+        .search-filter { padding:8px 12px; border-radius:6px; border:1px solid #E6A574; font-size:14px; background:#fff; }
+
         .refresh-new-container { display:flex; gap:6px; }
 
         /* Buttons */

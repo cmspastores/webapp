@@ -17,6 +17,7 @@ class RoomsController extends Controller
         }
     }
 
+    // 🔹 Updated index() method with numeric room_number sorting
     public function index(Request $request)
     {
         $query = Room::with('roomType');
@@ -29,8 +30,19 @@ class RoomsController extends Controller
             $query->where('room_type_id', $request->room_type_id);
         }
 
-        // ✅ Paginate 10 per page with query string
-        $rooms = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+            // ✅ Sort numerically by room_number
+    $roomOrder = $request->filled('room_order') ? $request->room_order : 'asc';
+    $query->orderByRaw('CAST(room_number AS UNSIGNED) ' . $roomOrder);
+
+    $rooms = $query->paginate(10)->withQueryString();
+
+    $roomTypes = RoomType::all();
+
+    return view('rooms.index', compact('rooms', 'roomTypes'));
+
+
+        // Paginate 10 per page with query string
+        $rooms = $query->paginate(10)->withQueryString();
 
         $roomTypes = RoomType::all();
 
