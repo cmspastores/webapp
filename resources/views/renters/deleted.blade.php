@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="header-container">
-            <h2 class="header-title">Renter Management</h2>
+            <h2 class="header-title">Renter Archive</h2>
             <div class="header-buttons">
                 @if(!request()->routeIs('renters.index'))
                     <a href="{{ route('renters.index') }}" class="btn-back">← Back to List</a>
@@ -85,10 +85,10 @@
     <!-- 🔹 CSS -->
    <style>
 /* Container & Header */
-.container { max-width:1200px; margin:0 auto; padding:16px; font-family:'Figtree',sans-serif; } 
-.header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; } 
-.header-title { font-weight:900; font-size:24px; color:#5C3A21; } 
-.header-buttons { display:flex; gap:10px; } 
+.container { max-width:1200px; margin:0 auto; padding:16px; }
+.header-container{display:flex;justify-content:flex-end;align-items:center;margin-bottom:16px;position:relative}
+.header-title{font:900 32px 'Figtree',sans-serif;color:#5C3A21;line-height:1.2;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,0.25);letter-spacing:1.2px;text-transform:uppercase;margin:0;position:absolute;left:50%;transform:translateX(-50%);-webkit-text-stroke:0.5px #5C3A21}
+.header-buttons{display:flex;gap:10px;position:relative;z-index:1}
 
 /* Buttons */
 .btn-back { background:#D97A4E; color:#FFF5EC; font-family:'Figtree',sans-serif; font-weight:600; border:none; cursor:pointer; border-radius:6px; padding:6px 14px; text-decoration:none; display:inline-flex; align-items:center; transition:0.2s; } 

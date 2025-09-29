@@ -95,9 +95,11 @@
     <!-- 🔹 Full CSS -->
     <style>
         /* Container & Header */
+
+        
         .container { max-width:1200px; margin:0 auto; padding:16px; font-family:'Figtree',sans-serif; }
-        .header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
-        .header-title { font-weight:900; font-size:24px; color:#5C3A21; }
+        .header-container { margin-bottom:16px; }
+        .header-title{font:900 32px 'Figtree',sans-serif;color:#5C3A21;line-height:1.2;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,0.25);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:16px;position:relative;-webkit-text-stroke:0.5px #5C3A21}
         .header-buttons { display:flex; gap:10px; }
 
         /* Buttons */
