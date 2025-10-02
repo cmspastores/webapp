@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginLogController;
 use App\Http\Controllers\RoomsController;
 use App\Http\Controllers\RoomTypeController;
 use App\Http\Controllers\RentersController;
+use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
@@ -55,6 +56,9 @@ Route::middleware(['auth'])->group(function () {
     // GET /renters/{renter}/edit -> edit (renters.edit)
     // PUT /renters/{renter} -> update (renters.update)
     // DELETE /renters/{renter} -> destroy (renters.destroy) ✅
+
+    // Rental Agreements Management
+    Route::resource('agreements', AgreementController::class);
 
     // ============================
     // Settings (All users)
