@@ -24,7 +24,7 @@ return new class extends Migration
             $table->date('dob')->nullable(); 
 
             // Contact details
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->string('emergency_contact')->nullable();

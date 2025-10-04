@@ -37,7 +37,7 @@
             <table class="room-table">
                 <thead>
                     <tr>
-                        <th class="hidden-id">#</th>
+                        <th class="hidden-id">ID</th>
 
                         <th>Room #</th>
                         <th>Type</th>

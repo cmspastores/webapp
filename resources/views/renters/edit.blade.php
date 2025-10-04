@@ -16,8 +16,10 @@
             <div class="form-grid">
                 <input type="text" name="first_name" value="{{ $renter->first_name }}" placeholder="First Name" required>
                 <input type="text" name="last_name" value="{{ $renter->last_name }}" placeholder="Last Name" required>
+
                 <input type="date" name="dob" value="{{ $renter->dob }}">
-                <input type="email" name="email" value="{{ $renter->email }}" placeholder="Email" required>
+                <input type="email" name="email" value="{{ $renter->email }}" placeholder="Email">
+
                 <input type="text" name="phone" value="{{ $renter->phone }}" placeholder="Contact Number">
                 <input type="text" name="emergency_contact" value="{{ $renter->emergency_contact }}" placeholder="Emergency Contact">
                 <input type="text" name="address" value="{{ $renter->address }}" placeholder="Address" class="full-width">

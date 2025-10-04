@@ -47,14 +47,17 @@
                     {{-- Room Price --}}
                     <div>
                         <label for="room_price">Price</label>
-                        <input type="number" step="0.01" name="room_price" id="room_price" value="{{ old('room_price') }}" required>
+                       <input type="number" step="0.01" name="room_price" id="room_price" value="{{ old('room_price') }}" required min="0.01">
+
+
                         @error('room_price')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
                     {{-- Number of Occupants --}}
                     <div>
                         <label for="number_of_occupants">Occupants</label>
-                        <input type="number" name="number_of_occupants" id="number_of_occupants" value="{{ old('number_of_occupants') }}">
+                        <input type="number" name="number_of_occupants" id="number_of_occupants" value="{{ old('number_of_occupants') ?? 1 }}" required min="1">
+
                         @error('number_of_occupants')<div class="error">{{ $message }}</div>@enderror
                     </div>
 

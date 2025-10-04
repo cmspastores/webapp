@@ -49,7 +49,7 @@ class RentersController extends Controller
             'first_name'        => 'required|string|max:255',
             'last_name'         => 'required|string|max:255',
             'dob'               => 'nullable|date',
-            'email'             => 'required|email|unique:renters,email',
+            'email'             => 'nullable|email|unique:renters,email',
             'phone'             => 'nullable|string|max:20',
             'address'           => 'nullable|string|max:255',
             'emergency_contact' => 'nullable|string|max:255',
@@ -90,7 +90,7 @@ class RentersController extends Controller
         $validated = $request->validate([
             'first_name'        => 'required|string|max:255',
             'last_name'         => 'required|string|max:255',
-            'email'             => 'required|email|unique:renters,email,' . $renter->renter_id . ',renter_id',
+            'email'             => 'nullable|email|unique:renters,email,' . $renter->renter_id . ',renter_id',
             'phone'             => 'nullable|string|max:20',
             'dob'               => 'nullable|date',
             'emergency_contact' => 'nullable|string|max:255',

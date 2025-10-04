@@ -16,7 +16,8 @@
                 <input type="text" name="first_name" placeholder="First Name" required>
                 <input type="text" name="last_name" placeholder="Last Name" required>
                 <input type="date" name="dob" placeholder="Date of Birth">
-                <input type="email" name="email" placeholder="Email" required>
+                <input type="email" name="email" placeholder="Email">
+
                 <input type="text" name="phone" placeholder="Contact Number">
                 <input type="text" name="emergency_contact" placeholder="Emergency Contact">
                 <input type="text" name="address" placeholder="Address" class="full-width">

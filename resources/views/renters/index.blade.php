@@ -37,11 +37,10 @@
             <table class="renter-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th class="hidden-id">ID</th>
                         <th>Full Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>ID</th>
                         <th>Date Created</th>
                         <th>Actions</th>
                     </tr>
@@ -49,15 +48,14 @@
                 <tbody>
                     @forelse($renters as $renter)
                         <tr>
-                            <td>{{ $renter->renter_id }}</td>
+                            <td class="id-column hidden md:table-cell">{{ $renter->renter_id }}</td>
                             <td>{{ $renter->full_name }}</td>
-                            <td>{{ $renter->email }}</td>
+                            <td>{{ $renter->email ?? '-' }}</td>
                             <td>{{ $renter->phone ?? '-' }}</td>
-                            <td>
-                                <a href="{{ route('renters.show', $renter->renter_id) }}" class="text-link">{{ $renter->unique_id }}</a>
-                            </td>
+
                             <td>{{ $renter->created_at_formatted }}</td>
                             <td class="actions">
+                                <a href="{{ route('renters.show', $renter->renter_id) }}" class="btn-view">View</a>
                                 <a href="{{ route('renters.edit', $renter->renter_id) }}" class="btn-edit">Edit</a>
                                 <form action="{{ route('renters.destroy', $renter->renter_id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this renter?');">
                                     @csrf
@@ -113,6 +111,10 @@
         .btn-archive { background:#E6A574; color:#5C3A21; font-family:'Figtree',sans-serif; font-weight:600; border:none; cursor:pointer; transition:0.2s; border-radius:6px; padding:8px 16px; }
         .btn-archive:hover { background:#F4C38C; }
 
+        .btn-view { background:#4C9F70; color:#FFF; font-size:13px; padding:4px 8px; margin-right:4px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; transition:0.2s; }
+        .btn-view:hover { background:#6FC3A1; }
+
+
         /* Search + Filter Form */
         .search-refresh { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
         .search-container { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
@@ -144,6 +146,13 @@
         .table-card { overflow-x:auto; }
         .renter-table { width:100%; border-collapse:collapse; min-width:auto; table-layout:auto; }
 
+
+        /* Hide the first ID column completely */
+        .renter-table th.hidden-id,
+        .renter-table td.id-column {
+        display: none !important;
+    }
+
         @media (max-width:768px) {
             .renter-table th, .renter-table td { font-size:12px; padding:4px 6px; }
         }
@@ -159,6 +168,10 @@
             .renter-table th, .renter-table td { font-size:9px; padding:2px 3px; }
             .renter-table th:nth-child(4),
             .renter-table td:nth-child(4) { display:none; } /* Hide phone too if super tight */
+
+
+
+
         }
     </style>
 

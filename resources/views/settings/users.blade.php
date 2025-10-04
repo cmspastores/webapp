@@ -38,8 +38,8 @@
 .user-table tbody tr:hover { background:#FFF4E1; transition:background 0.2s; }
 
 /* Status */
-.status-active { color:#2E7D32; font-weight:600; }
-.status-inactive { color:#757575; font-weight:600; }
+.status-online { color:#2E7D32; font-weight:600; }
+.status-offline { color:#757575; font-weight:600; }
 .status-blocked { color:#C62828; font-weight:600; }
 
 /* Admin label */
@@ -102,9 +102,9 @@
                             <span class="status-blocked">Blocked</span>
                         @else
                             @if($user->id === Auth::id())
-                                <span class="status-active">Active</span>
+                                <span class="status-online">Online</span>
                             @else
-                                <span class="status-inactive">Inactive</span>
+                                <span class="status-offline">Offline</span>
                             @endif
                         @endif
                     </td>

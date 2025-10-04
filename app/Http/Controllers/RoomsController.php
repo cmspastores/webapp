@@ -65,8 +65,8 @@ class RoomsController extends Controller
         $validated = $request->validate([
             'room_number' => 'required|string|max:50|unique:rooms,room_number',
             'room_type_id' => 'nullable|exists:room_types,id',
-            'room_price' => 'required|numeric|min:0',
-            'number_of_occupants' => 'nullable|integer|min:0',
+            'room_price' => 'required|numeric|min:0.01',
+            'number_of_occupants' => 'nullable|integer|min:1',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -98,8 +98,8 @@ class RoomsController extends Controller
         $validated = $request->validate([
             'room_number' => 'required|string|max:50|unique:rooms,room_number,' . $room->id,
             'room_type_id' => 'nullable|exists:room_types,id',
-            'room_price' => 'required|numeric|min:0',
-            'number_of_occupants' => 'nullable|integer|min:0',
+            'room_price' => 'required|numeric|min:0.01',
+            'number_of_occupants' => 'nullable|integer|min:1',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 

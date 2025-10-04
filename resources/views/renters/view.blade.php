@@ -12,8 +12,7 @@
     <div id="renter-details" class="card">
         <!-- 🔹 Personal Info -->
         <div class="detail-group">
-            <p><strong>ID:</strong> {{ $renter->unique_id }}</p>
-            <p><strong>Name:</strong> {{ $renter->first_name }} {{ $renter->last_name }}</p>
+            <p><strong>Full Name:</strong> {{ $renter->first_name }} {{ $renter->last_name }}</p>
             <p><strong>DOB:</strong> {{ $renter->dob ?? '-' }}</p>
         </div>
 
