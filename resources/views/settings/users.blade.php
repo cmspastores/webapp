@@ -8,8 +8,16 @@
 /* User Management Title */  
 .user-management-title { font:900 32px 'Figtree',sans-serif; color:#5C3A21; line-height:1.2; text-align:center; text-shadow:2px 2px 6px rgba(0,0,0,0.25); letter-spacing:1.2px; text-transform:uppercase; margin-bottom:16px; position:relative; -webkit-text-stroke:0.5px #5C3A21; }
 
-/* Container */
-.user-container { max-width:960px; margin:0 auto; background:#FFFFFF; padding:16px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+/* Combined Container for everything */
+.management-container { 
+    max-width:960px; 
+    margin:0 auto; 
+    background:linear-gradient(135deg,#FFFDFB,#FFF8F0);
+    padding:20px; 
+    border-radius:16px; 
+    border:2px solid #E6A574; 
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
 
 /* Messages */
 .success-message { background:#E9F8F1; color:#256D47; border:1px solid #A7DCC0; border-radius:8px; padding:12px 16px; margin-bottom:16px; font-size:14px; text-align:center; }
@@ -21,21 +29,21 @@
 .filters button, .filters a { display:inline-flex; justify-content:center; align-items:center; background:#E6A574; color:#5C3A21; font-weight:700; border-radius:14px; padding:10px 20px; box-shadow:0 5px 12px rgba(0,0,0,0.08); transition:0.3s all; cursor:pointer; font-size:14px; text-decoration:none; border:none; text-align:center; min-width:100px; }
 .filters button:hover, .filters a:hover { background:#F4C38C; box-shadow:0 5px 12px rgba(0,0,0,0.1); }
 
-/* Table Container */
-.user-table-container { overflow-x:auto; }
+/* Table Containers */
+.user-table-container, .log-table-container { overflow-x:auto; margin-bottom:20px; }
 
-/* Table */
-.user-table { width:100%; border-collapse:separate; border-spacing:0; background:#FFFFFF; border:1px solid #D97A4E; border-radius:12px; table-layout:fixed; text-align:center; }
-.user-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; display:table-header-group; }
-.user-table tbody { display:table-row-group; }
-.user-table th, .user-table td { padding:12px 16px; border-bottom:1px solid #D97A4E; font-size:14px; vertical-align:middle; text-align:center; word-wrap:break-word; }
-.user-table th { font-weight:600; border-right:1px solid #D97A4E; }
-.user-table td { border-right:1px solid #D97A4E; }
-.user-table th:last-child, .user-table td:last-child { border-right:none; }
-.user-table tbody tr:last-child td { border-bottom:none; }
+/* Tables */
+.user-table, .log-table { width:100%; border-collapse:separate; border-spacing:0; background:#FFFFFF; border:1px solid #D97A4E; border-radius:12px; table-layout:fixed; text-align:center; }
+.user-table thead, .log-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; display:table-header-group; }
+.user-table tbody, .log-table tbody { display:table-row-group; }
+.user-table th, .user-table td, .log-table th, .log-table td { padding:12px 16px; border-bottom:1px solid #D97A4E; font-size:14px; vertical-align:middle; text-align:center; word-wrap:break-word; }
+.user-table th, .log-table th { font-weight:600; border-right:1px solid #D97A4E; }
+.user-table td, .log-table td { border-right:1px solid #D97A4E; }
+.user-table th:last-child, .user-table td:last-child, .log-table th:last-child, .log-table td:last-child { border-right:none; }
+.user-table tbody tr:last-child td, .log-table tbody tr:last-child td { border-bottom:none; }
 
 /* Hover */
-.user-table tbody tr:hover { background:#FFF4E1; transition:background 0.2s; }
+.user-table tbody tr:hover, .log-table tbody tr:hover { background:#FFF4E1; transition:background 0.2s; }
 
 /* Status */
 .status-online { color:#2E7D32; font-weight:600; }
@@ -47,28 +55,22 @@
 
 /* Action Buttons */
 .btn-action { display:inline-flex; justify-content:center; align-items:center; font-weight:600; border-radius:6px; padding:6px 14px; font-size:13px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.05); cursor:pointer; border:none; min-width:70px; transition:background 0.2s,color 0.2s; }
-
-/* Default filter buttons */
-.filters button, .filters a { border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; min-width:90px; }
-
-/* Block button */
 .btn-block { background:#E53935; color:#FFFFFF; }
 .btn-block:hover { background:#B71C1C; color:#FFFFFF; }
-
-/* Unblock button */
 .btn-unblock { background:#43A047; color:#FFFFFF; }
 .btn-unblock:hover { background:#2E7D32; color:#FFFFFF; }
+
 </style>
 
-<div class="user-container">
+<div class="management-container">
 
-    <!-- ✅ Success message -->
+    <!-- ✅ Success & error messages -->
     @if(session('success'))
-    <div class="success-message">{{ session('success') }}</div>
+        <div class="success-message">{{ session('success') }}</div>
     @endif
 
     @if(session('error'))
-    <div class="error-message">{{ session('error') }}</div>
+        <div class="error-message">{{ session('error') }}</div>
     @endif
 
     <!-- 🧩 Filters -->
@@ -140,6 +142,11 @@
         {{ $users->withQueryString()->links() }}
     </div>
 
-</div>
+    <!-- 📝 Login Logs Table -->
+    <div class="log-table-container">
+        @include('logstable')
+    </div>
+
+</div> <!-- End management-container -->
 
 </x-app-layout>

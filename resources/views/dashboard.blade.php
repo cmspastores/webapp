@@ -11,7 +11,7 @@
 
             .dashboard-container{padding:16px;max-width:1200px;margin:0 auto;position:relative;z-index:1;}
             
-            .log-table-container{background:linear-gradient(135deg,#FFFDFB,#FFF8F0);border-radius:16px;border:2px solid #E6A574;box-shadow:0 10px 25px rgba(0,0,0,0.15);padding:20px;margin-bottom:20px;transition:transform .2s ease,box-shadow .2s ease;}
+            
             
             .card{background:linear-gradient(135deg,#FFFDFB,#FFF8F0);border-radius:16px;border:2px solid #E6A574;box-shadow:0 10px 25px rgba(0,0,0,0.15);padding:24px 20px;transition:transform .2s ease,box-shadow .2s ease;}
             .card:hover,.log-table-container:hover{transform:translateY(-4px);box-shadow:0 15px 30px rgba(0,0,0,0.18);}
@@ -22,9 +22,7 @@
     </x-slot>
 
     <div class="dashboard-container">
-        <div class="log-table-container">
-            @include('logstable')
-        </div>
+      
 
         <div class="card">
             <h3 style="font-weight:800;font-size:18px;margin-bottom:8px;">Welcome back!</h3>

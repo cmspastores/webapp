@@ -32,6 +32,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Login Logs View (optional)
     Route::get('/login-logs', [LoginLogController::class, 'logstable']);
+    
 
     // Rooms Management
     Route::resource('rooms', RoomsController::class);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\LoginLog;
 
 class UserManagementController extends Controller
 {
@@ -38,7 +39,11 @@ class UserManagementController extends Controller
         // Keep the filter query string in pagination links
         $users->appends($request->only(['name', 'email', 'from', 'to']));
 
-        return view('settings.users', compact('users'));
+        // ✅ Add logs here
+        $logs = LoginLog::latest()->paginate(5);
+
+        // ✅ Pass both users and logs to the view
+        return view('settings.users', compact('users', 'logs'));
     }
 
     // Block a user
@@ -69,7 +74,4 @@ class UserManagementController extends Controller
         return redirect()->route('settings.users')
                          ->with('success', "User {$user->name} has been unblocked.");
     }
-
-  
-    
 }
