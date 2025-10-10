@@ -1,13 +1,6 @@
 <x-app-layout>
-    <!-- 🔹 Header Section -->
-    <x-slot name="header">
-        <div class="header-container">
-            <h2 class="header-title">Edit Room</h2>
-            <div class="header-buttons">
-                <a href="{{ route('rooms.index') }}" class="btn-back">← Back to List</a>
-            </div>
-        </div>
-    </x-slot>
+ 
+  
 
     <div class="container">
         <!-- 🔹 Edit Room Card -->

@@ -1,12 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="header-container">
-            <h2 class="header-title">Add New Room</h2>
-            <div class="header-buttons">
-                <a href="{{ route('rooms.index') }}" class="btn-back">← Back to List</a>
-            </div>
-        </div>
-    </x-slot>
+   
 
     <div class="container">
         <div class="card form-card">

@@ -1,9 +1,4 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="header-container">
-            <h2 class="rooms-header">Edit Room Type</h2>
-        </div>
-    </x-slot>
 
     <style>
         .rooms-header { font:900 32px 'Figtree',sans-serif; color:#5C3A21; line-height:1.2; text-align:center; text-shadow:2px 2px 6px rgba(0,0,0,0.25); letter-spacing:1.2px; text-transform:uppercase; margin-bottom:16px; position:relative; -webkit-text-stroke:0.5px #5C3A21; }
