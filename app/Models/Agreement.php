@@ -13,15 +13,6 @@ class Agreement extends Model
     // If your migration used bigIncrements('agreement_id')
     protected $primaryKey = 'agreement_id';
 
-    // If you want the model to treat dates properly
-    protected $casts = [
-        'agreement_date' => 'date',
-        'start_date'     => 'date',
-        'end_date'       => 'date',
-        'monthly_rent'   => 'decimal:2',
-        'is_active'      => 'boolean',
-    ];
-
     // If your primary key is an integer and auto-incrementing (default)
     public $incrementing = true;
     protected $keyType = 'int';
@@ -36,6 +27,17 @@ class Agreement extends Model
         'is_active',
     ];
 
+    // If you want the model to treat dates properly
+    protected $casts = [
+        'agreement_date' => 'date',
+        'start_date'     => 'date',
+        'end_date'       => 'date',
+        'monthly_rent'   => 'decimal:2',
+        'is_active'      => 'boolean',
+    ];
+
+    protected $dates = ['agreement_date', 'start_date', 'end_date'];
+
     // Relationships
     public function renter()
     {
@@ -48,12 +50,35 @@ class Agreement extends Model
         return $this->belongsTo(Room::class, 'room_id', 'id');
     }
 
+    // 🔹 Automatically detect "expired" without storing it in the DB
+    public function getStatusAttribute()
+    {
+        if (!$this->is_active && $this->end_date && $this->end_date->isPast()) {
+            return 'Expired';
+        }
+
+        return $this->is_active ? 'Active' : 'Terminated';
+    }
+
     // Auto set 1-year end date if not provided
     protected static function booted()
     {
+        // Auto-fill end_date when creating
         static::creating(function ($agreement) {
             if (empty($agreement->end_date) && !empty($agreement->start_date)) {
                 $agreement->end_date = Carbon::parse($agreement->start_date)->addYear();
+            }
+        });
+
+        // Auto-mark expired as inactive when retrieved
+        static::retrieved(function ($agreement) {
+            if (
+                $agreement->is_active &&
+                $agreement->end_date &&
+                Carbon::parse($agreement->end_date)->isPast()
+            ) {
+                $agreement->is_active = false;
+                $agreement->saveQuietly();
             }
         });
     }

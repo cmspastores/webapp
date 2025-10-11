@@ -49,17 +49,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('renters', RentersController::class);
 
-    // This defines:
-    // GET /renters -> index (renters.index)
-    // GET /renters/create -> create (renters.create)
-    // POST /renters -> store (renters.store)
-    // GET /renters/{renter} -> show (renters.show)
-    // GET /renters/{renter}/edit -> edit (renters.edit)
-    // PUT /renters/{renter} -> update (renters.update)
-    // DELETE /renters/{renter} -> destroy (renters.destroy) ✅
-
     // Rental Agreements Management
+    Route::get('/agreements/archived', [AgreementController::class, 'archived'])->name('agreements.archived');
     Route::resource('agreements', AgreementController::class);
+
+    Route::post('/agreements/{agreement}/renew', [AgreementController::class, 'renew'])->name('agreements.renew')
+        ->middleware('admin');
+
+    Route::post('/agreements/{agreement}/terminate', [AgreementController::class, 'terminate'])->name('agreements.terminate')
+        ->middleware('admin');
 
     // ============================
     // Settings (All users)

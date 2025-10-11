@@ -61,13 +61,6 @@
                         <label for="end_date_preview">End Date (auto 1 year)</label>
                         <input type="text" id="end_date_preview" readonly value="{{ old('start_date') ? \Illuminate\Support\Carbon::parse(old('start_date'))->addYear()->toDateString() : now()->addYear()->toDateString() }}">
                     </div>
-
-                    <!-- Monthly Rent (optional placeholder) -->
-                    <div>
-                        <label for="monthly_rent">Monthly Rent (optional)</label>
-                        <input type="number" name="monthly_rent" id="monthly_rent" step="0.01" value="{{ old('monthly_rent') }}">
-                        @error('monthly_rent')<div class="error">{{ $message }}</div>@enderror
-                    </div>
                 </div>
 
                 <div style="margin-top:12px; display:flex; gap:8px;">

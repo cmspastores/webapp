@@ -1,12 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="header-container">
-            <h2 class="header-title">Agreements</h2>
+            <h2 class="header-title">Archived Agreements</h2>
             <div class="header-buttons">
-                @if(auth()->user() && auth()->user()->is_admin)
-                    <a href="{{ route('agreements.create') }}" class="btn btn-new">+ New Agreement</a>
-                @endif
-                <a href="{{ route('agreements.archived') }}" class="btn btn-archive">Archived Agreements</a>
+                <a href="{{ route('agreements.index') }}" class="btn btn-back">← Back to Active</a>
             </div>
         </div>
     </x-slot>
@@ -25,67 +22,36 @@
                         <tr>
                             <th>Renter</th>
                             <th>Room</th>
-                            <th>Agreement Date</th>
                             <th>Start</th>
                             <th>End</th>
-                            <th>Rent</th>
                             <th>Status</th>
-                            <th style="white-space:nowrap">Actions</th>
+                            <th>Rent</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($agreements as $a)
-                            @php
-                                // Optional: check if expired
-                                $status = $a->is_active ? 'Active' : 'Terminated';
-                                if(!$a->is_active && isset($a->end_date) && $a->end_date->isPast()) {
-                                    $status = 'Expired';
-                                }
-                            @endphp
                             <tr>
                                 <td>{{ $a->renter->full_name ?? '—' }}</td>
-                                <td>
-                                    {{ $a->room->room_number ?? '—' }}
-                                    {{ $a->room->roomType->name ? ' - ' . $a->room->roomType->name : '' }}
-                                </td>
-                                <td>{{ optional($a->agreement_date)->toDateString() }}</td>
+                                <td>{{ $a->room->room_number ?? '—' }}</td>
                                 <td>{{ optional($a->start_date)->toDateString() }}</td>
                                 <td>{{ optional($a->end_date)->toDateString() }}</td>
+                                <td>{{ $a->status }}</td>
                                 <td>{{ $a->monthly_rent ? '₱' . number_format($a->monthly_rent,2) : '—' }}</td>
                                 <td>
-                                    <span class="status-badge {{ strtolower($status) }}">{{ $status }}</span>
-                                </td>
-                                <td>
                                     <div style="display:flex;gap:6px;">
-                                        <a href="{{ route('agreements.edit', $a) }}" class="btn btn-yellow">View</a>
-
-                                        @if(auth()->user() && auth()->user()->is_admin)
-                                            @if($a->is_active)
-                                                <form method="POST" action="{{ route('agreements.terminate', $a) }}" onsubmit="return confirm('Terminate this agreement?');">
-                                                    @csrf
-                                                    <button class="btn btn-red" type="submit">Terminate</button>
-                                                </form>
-                                            @else
-                                                <form method="POST" action="{{ route('agreements.renew', $a) }}" onsubmit="return confirm('Renew this agreement for another year?');">
-                                                    @csrf
-                                                    <button class="btn btn-green" type="submit">Renew</button>
-                                                </form>
-                                            @endif
-
-                                            <!--
-                                            <form method="POST" action="{{ route('agreements.destroy', $a) }}" onsubmit="return confirm('Delete this agreement permanently?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-gray" type="submit">Delete</button>
-                                            </form> 
-                                            -->
-                                        @endif
+                                        <a href="{{ route('agreements.edit', $a) }}" class="btn btn-gray">View</a>
+                                        <form method="POST" action="{{ route('agreements.destroy', $a) }}" onsubmit="return confirm('Permanently delete this archived agreement?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-red" type="submit">Delete</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" style="text-align:center;color:#6B7280;">No agreements found.</td>
+                                <td colspan="7" style="text-align:center;color:#6B7280;">No archived agreements found.</td>
                             </tr>
                         @endforelse
                     </tbody>

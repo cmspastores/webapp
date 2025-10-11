@@ -7,6 +7,7 @@ use App\Models\Renters;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class AgreementController extends Controller
 {
@@ -15,9 +16,11 @@ class AgreementController extends Controller
      */
     public function index()
     {
-        // show latest first, 10 per page
+        // Show only active agreements (still valid)
         $agreements = Agreement::with(['renter', 'room.roomType'])
-            ->orderBy('agreement_date', 'desc')
+            ->where('is_active', true)
+            ->whereDate('end_date', '>=', now()) // ensure not expired
+            ->orderBy('start_date', 'desc')
             ->paginate(10);
 
         return view('agreements.index', compact('agreements'));
@@ -44,13 +47,14 @@ class AgreementController extends Controller
             'room_id'        => 'required|exists:rooms,id',
             'agreement_date' => 'required|date',
             'start_date'     => 'required|date',
-            'monthly_rent'   => 'nullable|numeric|min:0',
         ]);
 
-        $start = Carbon::parse($data['start_date'])->startOfDay();
-        $end = (clone $start)->addYear()->subSecond(); // one year less 1s -> inclusive range
+        $room = Room::findOrFail($data['room_id']);
 
-        // conflict if an active agreement exists with overlapping dates:
+        $start = Carbon::parse($data['start_date'])->startOfDay();
+        $end = (clone $start)->addYear()->subSecond();
+
+        // Prevent assigning if active agreement exists for that room
         $conflict = Agreement::where('room_id', $data['room_id'])
             ->where('is_active', true)
             ->where('start_date', '<=', $end->toDateString())
@@ -58,7 +62,7 @@ class AgreementController extends Controller
             ->exists();
 
         if ($conflict) {
-            return back()->withInput()->withErrors(['room_id' => 'This room is already assigned during that period.']);
+            return back()->withInput()->withErrors(['room_id' => 'This room already has an active agreement.']);
         }
 
         Agreement::create([
@@ -67,11 +71,12 @@ class AgreementController extends Controller
             'agreement_date' => $data['agreement_date'],
             'start_date'     => $start->toDateString(),
             'end_date'       => $end->toDateString(),
-            'monthly_rent'   => $data['monthly_rent'] ?? null,
+            // lock current room price at time of creation
+            'monthly_rent'   => $room->room_price,
             'is_active'      => true,
         ]);
 
-        return redirect()->route('agreements.index')->with('success', 'Agreement created.');
+        return redirect()->route('agreements.index')->with('success', 'Agreement created and rent locked to current room price.');
     }
 
     /**
@@ -98,52 +103,68 @@ class AgreementController extends Controller
      */
     public function update(Request $request, Agreement $agreement)
     {
-        $data = $request->validate([
-            'renter_id'      => 'required|exists:renters,renter_id',
-            'room_id'        => 'required|exists:rooms,id',
-            'agreement_date' => 'required|date',
-            'start_date'     => 'required|date',
-            'monthly_rent'   => 'nullable|numeric|min:0',
-            'is_active'      => 'nullable|boolean',
-        ]);
-
-        $start = Carbon::parse($data['start_date'])->startOfDay();
-        $end = (clone $start)->addYear()->subSecond();
-
-        // Check conflicts excluding current agreement
-        $conflict = Agreement::where('room_id', $data['room_id'])
-            ->where('is_active', true)
-            ->where('agreement_id', '<>', $agreement->agreement_id)
-            ->where('start_date', '<=', $end->toDateString())
-            ->where('end_date', '>=', $start->toDateString())
-            ->exists();
-
-        if ($conflict) {
-            return back()->withInput()->withErrors(['room_id' => 'This room is already assigned during that period.']);
-        }
-
-        $agreement->update([
-            'renter_id'      => $data['renter_id'],
-            'room_id'        => $data['room_id'],
-            'agreement_date' => $data['agreement_date'],
-            'start_date'     => $start->toDateString(),
-            'end_date'       => $end->toDateString(),
-            'monthly_rent'   => $data['monthly_rent'] ?? null,
-            'is_active'      => $data['is_active'] ?? true,
-        ]);
-
-        return redirect()->route('agreements.index')->with('success', 'Agreement updated.');
+        abort(403, 'Editing agreements is not allowed. Use renew or terminate.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Renew agreement (admin only)
+     */
+    public function renew(Agreement $agreement)
+    {
+        if (!Auth::user() || !Auth::user()->is_admin) {
+            abort(403, 'Unauthorized');
+        }
+
+        $room = $agreement->room;
+        $agreement->end_date = Carbon::parse($agreement->end_date)->addYear();
+        $agreement->monthly_rent = $room->room_price; // new locked rate
+        $agreement->is_active = true;
+        $agreement->save();
+
+        return redirect()->route('agreements.edit', $agreement)->with('success', 'Agreement renewed with updated room price.');
+    }
+
+    /**
+     * Terminate agreement (admin only)
+     */
+    public function terminate(Agreement $agreement)
+    {
+        if (!Auth::user() || !Auth::user()->is_admin) {
+            abort(403, 'Unauthorized');
+        }
+
+        $agreement->is_active = false;
+        $agreement->end_date = Carbon::now();
+        $agreement->save();
+
+        return redirect()->route('agreements.index')->with('success', 'Agreement terminated successfully.');
+    }
+
+    // Archived agreements view
+    public function archived()
+    {
+        // Agreements that are expired or terminated
+        $agreements = Agreement::with(['renter', 'room.roomType'])
+            ->where(function ($query) {
+                $query->where('is_active', false)
+                    ->orWhereDate('end_date', '<', now());
+            })
+            ->orderBy('end_date', 'desc')
+            ->paginate(10);
+
+        return view('agreements.archived', compact('agreements'));
+    }
+
+    /**
+     * Remove the specified resource.
      */
     public function destroy(Agreement $agreement)
     {
-        // optionally, you could set is_active=false instead of deleting:
-        // $agreement->update(['is_active' => false]);
+        if ($agreement->is_active) {
+        return back()->with('error', 'Cannot delete an active agreement. Please terminate it first.');
+        }
         $agreement->delete();
 
-        return redirect()->route('agreements.index')->with('success', 'Agreement deleted.');
+        return redirect()->route('agreements.archived')->with('success', 'Archived agreement deleted successfully.');
     }
 }

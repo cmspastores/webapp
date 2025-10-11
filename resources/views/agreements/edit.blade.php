@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="header-container">
-            <h2 class="header-title">Edit Agreement</h2>
+            <h2 class="header-title">View Agreement</h2>
             <div class="header-buttons">
                 <a href="{{ route('agreements.index') }}" class="btn-back">← Back to List</a>
             </div>
@@ -10,14 +10,15 @@
 
     <div class="container">
         <div class="card form-card">
-            <form action="{{ route('agreements.update', $agreement) }}" method="POST">
+            <!-- The form stays, but we make fields readonly -->
+            <form action="#" method="POST">
                 @csrf
                 @method('PUT')
 
                 <div class="form-grid">
                     <div>
                         <label for="renter_id">Renter</label>
-                        <select name="renter_id" id="renter_id" {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}>
+                        <select name="renter_id" id="renter_id" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
                             <option value="">-- Select Renter --</option>
                             @foreach($renters as $r)
                                 <option value="{{ $r->renter_id }}" {{ old('renter_id', $agreement->renter_id) == $r->renter_id ? 'selected' : '' }}>
@@ -30,7 +31,7 @@
 
                     <div>
                         <label for="room_id">Room</label>
-                        <select name="room_id" id="room_id" {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}>
+                        <select name="room_id" id="room_id" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
                             <option value="">-- Select Room --</option>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}" {{ old('room_id', $agreement->room_id) == $room->id ? 'selected' : '' }}>
@@ -43,13 +44,13 @@
 
                     <div>
                         <label for="agreement_date">Agreement Date</label>
-                        <input type="date" name="agreement_date" id="agreement_date" value="{{ old('agreement_date', $agreement->agreement_date?->toDateString()) }}" {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}>
+                        <input type="date" name="agreement_date" id="agreement_date" value="{{ old('agreement_date', $agreement->agreement_date?->toDateString()) }}" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
                         @error('agreement_date')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
                     <div>
                         <label for="start_date">Start Date</label>
-                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $agreement->start_date?->toDateString()) }}" {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}>
+                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $agreement->start_date?->toDateString()) }}" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
                         @error('start_date')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
@@ -60,26 +61,47 @@
 
                     <div>
                         <label for="monthly_rent">Monthly Rent</label>
-                        <input type="number" name="monthly_rent" id="monthly_rent" step="0.01" value="{{ old('monthly_rent', $agreement->monthly_rent) }}" {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}>
+                        <input type="number" name="monthly_rent" id="monthly_rent" step="0.01" value="{{ old('monthly_rent', $agreement->monthly_rent) }}" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
                         @error('monthly_rent')<div class="error">{{ $message }}</div>@enderror
+                    </div>
+                    
+                    <div>
+                        <label for="locked_price">Locked Room Price</label>
+                        <input type="text" id="locked_price" value="₱{{ number_format($agreement->monthly_rent, 2) }}" readonly>
                     </div>
 
                     <div>
                         <label for="is_active">Active</label>
-                        <select name="is_active" id="is_active" {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}>
+                        <select name="is_active" id="is_active" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
                             <option value="1" {{ old('is_active', $agreement->is_active) ? 'selected' : '' }}>Active</option>
                             <option value="0" {{ !old('is_active', $agreement->is_active) ? 'selected' : '' }}>Inactive</option>
                         </select>
                     </div>
                 </div>
-
-                <div style="margin-top:12px; display:flex; gap:8px;">
-                    @if(auth()->user() && auth()->user()->is_admin)
-                        <button type="submit" class="btn-confirm">Save Changes</button>
-                    @endif
-                    <a href="{{ route('agreements.index') }}" class="btn-back">Back</a>
-                </div>
             </form>
+
+            <!-- Buttons outside the main form -->
+            <div style="margin-top:12px; display:flex; gap:8px;">
+                <a href="{{ route('agreements.index') }}" class="btn-back">Back</a>
+
+                @if(auth()->user() && auth()->user()->is_admin)
+                    @if($agreement->is_active)
+                        <!-- Renewal -->
+                        <form action="{{ route('agreements.renew', $agreement) }}" method="POST" onsubmit="return confirm('Renew this agreement for another year?')">
+                            @csrf
+                            <button type="submit" class="btn-confirm">Renew Agreement</button>
+                        </form>
+
+                        <!-- Termination -->
+                        <form action="{{ route('agreements.terminate', $agreement) }}" method="POST" onsubmit="return confirm('Are you sure you want to terminate this agreement?')">
+                            @csrf
+                            <button type="submit" class="btn-cancel">Terminate Agreement</button>
+                        </form>
+                    @else
+                        <p style="color:#b54b4b;font-weight:600;">This agreement has been terminated.</p>
+                    @endif
+                @endif
+            </div>
         </div>
     </div>
 
@@ -125,6 +147,8 @@
     .btn-confirm:hover { background:#F4C38C; }
     .btn-back { background:#D97A4E; color:#FFF5EC; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s; }
     .btn-back:hover { background:#F4C38C; color:#5C3A21; }
+    .btn-cancel { background:#b54b4b; color:#fff; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s;}
+    .btn-cancel:hover { background:#d46a6a; }
 
     /* File Inputs */
     .file-input { border:none; background:#FFF3DF; color:#5C4A32; font-weight:500; padding:6px 8px; border-radius:6px; cursor:pointer; }
