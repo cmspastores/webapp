@@ -10,6 +10,7 @@ use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
+use App\Http\Controllers\ReservationController;
 
 // Public Route
 Route::get('/', function () {
@@ -32,7 +33,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Login Logs View (optional)
     Route::get('/login-logs', [LoginLogController::class, 'logstable']);
-    
 
     // Rooms Management
     Route::resource('rooms', RoomsController::class);
@@ -57,6 +57,9 @@ Route::middleware(['auth'])->group(function () {
     // GET /renters/{renter}/edit -> edit (renters.edit)
     // PUT /renters/{renter} -> update (renters.update)
     // DELETE /renters/{renter} -> destroy (renters.destroy) ✅
+
+    // Reservation Management
+    Route::resource('reservation', ReservationController::class);
 
     // Rental Agreements Management
     Route::resource('agreements', AgreementController::class);
