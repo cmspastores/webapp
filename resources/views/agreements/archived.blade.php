@@ -12,9 +12,19 @@
             </div>
         @endif
 
-        <!-- 🔹 Buttons Only -->
-        <div class="search-refresh">
-            <div class="refresh-new-container">
+        <!-- 🔍 Search + Sort Left | Back + Refresh Right -->
+        <div class="toolbar-row">
+            <form method="GET" action="{{ route('agreements.archived') }}" class="search-toolbar">
+                <input type="text" name="search" placeholder="Search renter or room" value="{{ request('search') }}" class="search-input">
+                <select name="sort" class="search-filter">
+                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Room Number ↑ Ascending</option>
+                    <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Room Number ↓ Descending</option>
+                </select>
+                <button type="submit" class="btn-search">Search</button>
+            </form>
+
+            <div class="toolbar-actions">
+                <button type="button" id="btn-refresh" class="btn-refresh">Refresh List</button>
                 <a href="{{ route('agreements.index') }}" class="btn-archive">Back</a>
             </div>
         </div>
@@ -38,7 +48,7 @@
                         @forelse($agreements as $a)
                             <tr>
                                 <td>{{ $a->renter->full_name ?? '—' }}</td>
-                                <td>{{ $a->room->room_number ?? '—' }}{{ $a->room->roomType->name ? ' - ' . $a->room->roomType->name : '' }}</td>
+                                <td>{{ $a->room->room_number ?? '—' }}{{ optional($a->room->roomType)->name ? ' - ' . optional($a->room->roomType)->name : '' }}</td>
                                 <td>{{ optional($a->start_date)->toDateString() }}</td>
                                 <td>{{ optional($a->end_date)->toDateString() }}</td>
                                 <td><span class="status-badge {{ strtolower($a->status) }}">{{ ucfirst($a->status) }}</span></td>
@@ -62,11 +72,16 @@
 
                 <!-- 🔹 Pagination -->
                 <div class="pagination" style="margin-top:12px;">
-                    {{ $agreements->links() }}
+                    {{ $agreements->appends(request()->query())->links() }}
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- 🔹 JS -->
+    <script>
+        document.getElementById('btn-refresh').addEventListener('click',()=>{ window.location.href="{{ route('agreements.archived') }}"; });
+    </script>
 </x-app-layout>
 
 <!-- 🔹 CSS -->
@@ -78,9 +93,20 @@
 .agreements-header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .agreements-header{font-size:24px;font-weight:900;color:#5C3A21;text-align:left;flex:1;padding-bottom:8px;border-bottom:2px solid #D97A4E;margin-bottom:8px;}
 
-/* Buttons Row */
-.search-refresh{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-bottom:16px;gap:10px;}
-.refresh-new-container{display:flex;gap:6px;align-items:center;}
+/* Toolbar: Search + Sort Left, Buttons Right */
+.toolbar-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:16px;gap:10px;}
+.search-toolbar{display:flex;align-items:center;gap:8px;flex:0 1 auto;}
+.toolbar-actions{display:flex;align-items:center;gap:6px;margin-left:auto;flex:0 0 auto;}
+
+/* Search Inputs */
+.search-input{padding:8px 12px;border-radius:8px;border:1px solid #E6A574;font-size:14px;background:#fff;font-family:'Figtree',sans-serif;color:#5C3A21;}
+.search-filter{padding:8px 12px;border-radius:8px;border:1px solid #E6A574;font-size:14px;background:#fff;font-family:'Figtree',sans-serif;color:#5C3A21;}
+.btn-search{background:linear-gradient(90deg,#E6A574,#F4C38C);color:#5C3A21;font-weight:600;border:none;border-radius:10px;padding:8px 16px;font-size:15px;cursor:pointer;transition:0.2s;}
+.btn-search:hover{background:#D97A4E;color:#fff;}
+
+/* Toolbar Buttons */
+.btn-refresh,.btn-archive{background:linear-gradient(90deg,#E6A574,#F4C38C);color:#5C3A21;font-weight:700;border-radius:10px;padding:10px 18px;font-size:15px;box-shadow:0 4px 10px rgba(0,0,0,0.15);text-decoration:none;transition:0.2s;border:none;cursor:pointer;}
+.btn-refresh:hover,.btn-archive:hover{background:#D97A4E;color:#fff;}
 
 /* Table Card */
 .card.table-card{background:linear-gradient(135deg,#FFFDFB,#FFF8F0);border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.12);padding:16px;border:none;overflow-x:auto;}
@@ -89,10 +115,10 @@
 .agreements-table{width:100%;border-collapse:separate;border-spacing:0;text-align:center;table-layout:auto;background:transparent;border-radius:12px;overflow:hidden;}
 .agreements-table thead{background:linear-gradient(to right,#F4C38C,#E6A574);color:#5C3A21;border-radius:12px 12px 0 0;overflow:hidden;}
 .agreements-table th,.agreements-table td{padding:12px 16px;font-size:14px;border-bottom:1px solid #D97A4E;border-right:1px solid #D97A4E;text-align:center;}
-.agreements-table tbody tr:hover{background:#FFF4E1;transition:background 0.2s;}
 .agreements-table th:first-child,.agreements-table td:first-child{border-left:none;}
 .agreements-table th:last-child,.agreements-table td:last-child{border-right:none;}
 .agreements-table tbody tr:last-child td{border-bottom:none;}
+.agreements-table tbody tr:hover{background:#FFF4E1;transition:background 0.2s;}
 
 /* Status Badges */
 .status-badge{padding:4px 10px;border-radius:20px;font-weight:600;font-size:13px;display:inline-block;}
@@ -100,19 +126,17 @@
 .status-badge.terminated{background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;}
 .status-badge.expired{background:#E5E7EB;color:#374151;border:1px solid #D1D5DB;}
 
-/* Action Buttons */
+/* Actions Buttons */
+.actions-buttons{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;align-items:center;width:100%;}
 .actions-buttons .btn-yellow,.actions-buttons .btn-red{padding:6px 12px;border-radius:6px;font-weight:600;font-size:13px;transition:0.2s;border:none;cursor:pointer;}
 .actions-buttons .btn-yellow{background:#4C9F70;color:#fff;}
 .actions-buttons .btn-yellow:hover{background:#6FC3A1;}
 .actions-buttons .btn-red{background:#EF4444;color:#fff;}
 .actions-buttons .btn-red:hover{background:#B91C1C;}
 
-/* Navigation Buttons */
-.btn-archive{background:linear-gradient(90deg,#E6A574,#F4C38C);color:#5C3A21;font-weight:700;border-radius:10px;padding:10px 18px;font-size:15px;box-shadow:0 4px 10px rgba(0,0,0,0.15);text-decoration:none;transition:0.2s;border:none;cursor:pointer;}
-.btn-archive:hover{background:#D97A4E;color:#fff;}
-
-/* Misc */
-.actions-buttons{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;align-items:center;width:100%;}
+/* Inline Form */
 .inline-form{display:inline;}
+
+/* Pagination */
 .pagination{margin-top:16px;display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap;}
 </style>
