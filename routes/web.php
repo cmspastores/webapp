@@ -7,6 +7,7 @@ use App\Http\Controllers\RoomsController;
 use App\Http\Controllers\RoomTypeController;
 use App\Http\Controllers\RentersController;
 use App\Http\Controllers\AgreementController;
+use App\Http\Controllers\BillController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
@@ -58,6 +59,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/agreements/{agreement}/terminate', [AgreementController::class, 'terminate'])->name('agreements.terminate')
         ->middleware('admin');
+    
+    // Bills Management
+    Route::resource('bills', BillController::class)->only(['index','show','create','store']);
 
     // ============================
     // Settings (All users)
