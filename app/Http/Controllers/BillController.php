@@ -28,65 +28,124 @@ class BillController extends Controller
     // form to choose billing period (month) and generate bills
     public function create()
     {
-        return view('bills.create');
+        $agreements = Agreement::where('is_active', true)->orderBy('start_date')->get();
+        return view('bills.create', compact('agreements'));
     }
 
-    // Generate bills for a chosen period (e.g. month and year)
+    /**
+     * Generate bills for a chosen period (e.g. month and year).
+     *
+     * If request contains `agreement_id` -> generate only for that agreement.
+     * If no `agreement_id` -> generate for all active agreements overlapping the period.
+     */
     public function store(Request $request)
     {
-        // validate: accept month/year or explicit start date
         $data = $request->validate([
             'year' => 'required|integer|min:2000',
             'month' => 'required|integer|between:1,12',
+            'agreement_id' => 'nullable|exists:agreements,agreement_id',
         ]);
 
         $year = (int)$data['year'];
         $month = (int)$data['month'];
 
-        // Decide billing period convention:
-        // Option A: use calendar month: period_start = 1st of month, period_end = last day of month
-        // Option B: rolling 30-day periods from agreement start. For now we’ll use calendar-month billing.
         $periodStart = Carbon::create($year, $month, 1)->startOfDay();
         $periodEnd = (clone $periodStart)->endOfMonth()->endOfDay();
-
-        // Find active agreements that overlap the billing period
-        $agreements = Agreement::where('is_active', true)
-            ->whereDate('start_date', '<=', $periodEnd->toDateString())
-            ->whereDate('end_date', '>=', $periodStart->toDateString())
-            ->get();
 
         $created = 0;
         $skipped = 0;
 
-        foreach ($agreements as $agreement) {
-            // Prevent duplicates: already have a bill for same agreement + periodStart/periodEnd
+        if (!empty($data['agreement_id'])) {
+            // Generate for a single agreement
+            $agreement = Agreement::findOrFail($data['agreement_id']);
+
+            // Ensure agreement overlaps the billing period and is active
+            if (! $agreement->is_active ||
+                $agreement->start_date > $periodEnd->toDateString() ||
+                $agreement->end_date < $periodStart->toDateString()
+            ) {
+                return back()->withInput()->withErrors(['agreement_id' => 'Selected agreement is not active for that period.']);
+            }
+
             $exists = Bill::where('agreement_id', $agreement->agreement_id)
                 ->where('period_start', $periodStart->toDateString())
                 ->where('period_end', $periodEnd->toDateString())
                 ->exists();
 
             if ($exists) {
-                $skipped++;
-                continue;
+                $skipped = 1;
+            } else {
+                Bill::create([
+                    'agreement_id' => $agreement->agreement_id,
+                    'renter_id' => $agreement->renter_id,
+                    'room_id' => $agreement->room_id,
+                    'period_start' => $periodStart->toDateString(),
+                    'period_end' => $periodEnd->toDateString(),
+                    'due_date' => $periodEnd->copy()->addDays(7)->toDateString(),
+                    'amount_due' => $agreement->monthly_rent ?? 0,
+                    'balance' => $agreement->monthly_rent ?? 0,
+                    'status' => 'unpaid',
+                ]);
+
+                \Log::info("Bill created for agreement {$agreement->agreement_id} for {$periodStart->format('F Y')}");
+                $created = 1;
             }
 
-            // create bill
-            $bill = Bill::create([
+            return redirect()->route('bills.index')
+                ->with('success', "Bills generated: {$created}, skipped (already exist): {$skipped}");
+        }
+
+        // No agreement specified -> generate for all active agreements that overlap the period
+        $agreements = Agreement::where('is_active', true)
+            ->whereDate('start_date', '<=', $periodEnd->toDateString())
+            ->whereDate('end_date', '>=', $periodStart->toDateString())
+            ->get();
+
+        foreach ($agreements as $agreement) {
+            $exists = Bill::where('agreement_id', $agreement->agreement_id)
+                ->where('period_start', $periodStart->toDateString())
+                ->where('period_end', $periodEnd->toDateString())
+                ->exists();
+
+            if ($exists) { $skipped++; continue; }
+
+            Bill::create([
                 'agreement_id' => $agreement->agreement_id,
                 'renter_id' => $agreement->renter_id,
                 'room_id' => $agreement->room_id,
                 'period_start' => $periodStart->toDateString(),
                 'period_end' => $periodEnd->toDateString(),
-                'due_date' => $periodEnd->copy()->addDays(7)->toDateString(), // example due 7 days after period end
+                'due_date' => $periodEnd->copy()->addDays(7)->toDateString(),
                 'amount_due' => $agreement->monthly_rent ?? 0,
                 'balance' => $agreement->monthly_rent ?? 0,
                 'status' => 'unpaid',
             ]);
 
+            \Log::info("Bill created for agreement {$agreement->agreement_id} for {$periodStart->format('F Y')}");
             $created++;
         }
 
         return redirect()->route('bills.index')
             ->with('success', "Bills generated: {$created}, skipped (already exist): {$skipped}");
+    }
+
+    /**
+     * Optional helper route to generate all — calls store() logic without agreement_id.
+     * Useful for an explicit "Generate All" button that hits a shorter route.
+     */
+    public function generateAll(Request $request)
+    {
+        // Reuse store: build a request without agreement_id
+        $r = $request->merge(['agreement_id' => null]);
+        return $this->store($r);
+    }
+
+    /**
+     * Delete a bill (admin or whoever you allow)
+     */
+    public function destroy(Bill $bill)
+    {
+        $bill->delete();
+        return redirect()->route('bills.index')->with('success', 'Bill deleted.');
     }
 }

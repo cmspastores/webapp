@@ -79,9 +79,63 @@
                     </div>
                 </div>
             </form>
+            
+            <!-- 🔹 Statement of Account Section -->
+            <div style="margin-top:12px; display:flex; gap:8px;">
+                
+                @if(isset($bills) && $bills->count())
+                    <div class="statement-card" style="margin-top: 24px;">
+                        <h3 class="statement-title">Statement of Account</h3>
+
+                        <table class="soa-table">
+                            <thead>
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Due Date</th>
+                                    <th>Amount Due</th>
+                                    <th>Balance</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($bills as $bill)
+                                    <tr>
+                                        <td>{{ \Carbon\Carbon::parse($bill->period_start)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($bill->period_end)->format('M d, Y') }}</td>
+                                        <td>{{ $bill->due_date ? \Carbon\Carbon::parse($bill->due_date)->format('M d, Y') : '—' }}</td>
+                                        <td>₱{{ number_format($bill->amount_due, 2) }}</td>
+                                        <td>₱{{ number_format($bill->balance, 2) }}</td>
+                                        <td>
+                                            @if($bill->status === 'unpaid')
+                                                <span class="status-unpaid">Unpaid</span>
+                                            @else
+                                                <span class="status-paid">Paid</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('bills.show', $bill) }}" class="btn-view-bill">View</a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" class="text-right" style="font-weight:600;">Totals:</td>
+                                    <td>₱{{ number_format($totalDue ?? 0, 2) }}</td>
+                                    <td>₱{{ number_format($totalBalance ?? 0, 2) }}</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                @else
+                    <p style="margin-top:24px; color:#6B6B6B;">No bills have been generated for this agreement yet.</p>
+                @endif
+            </div>
 
             <!-- Buttons outside the main form -->
             <div style="margin-top:12px; display:flex; gap:8px;">
+
                 <a href="{{ route('agreements.index') }}" class="btn-back">Back</a>
 
                 @if(auth()->user() && auth()->user()->is_admin)
@@ -140,6 +194,17 @@
     .form-card .full-width {grid-column:span 2;}
     .form-card .full-width label {min-width:120px;}
     .form-card .full-width input {width:300px; background:#FFF3DF; color:#5C4A32; font-weight:500; cursor:pointer;}
+
+    /* 🔹 Statement of Account Table */
+    .statement-card { background: linear-gradient(135deg, #FFFDFB, #FFF8F0); border-radius: 14px; border: 2px solid #E6A574; padding: 16px; margin-top: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .statement-title { font-size: 20px; font-weight: 700; color: #5C3A21; margin-bottom: 12px; }
+    .soa-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .soa-table th, .soa-table td { padding: 8px 10px; border-bottom: 1px solid #E6A574; text-align: left; }
+    .soa-table th { background: #FFF3DF; color: #5C3A21; font-weight: 600; }
+    .status-unpaid { color: #b54b4b; font-weight: 600; }
+    .status-paid { color: #198754; font-weight: 600; }
+    .btn-view-bill { background: #D97A4E; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; }
+    .btn-view-bill:hover { background: #F4C38C; color: #5C3A21; }
 
 
     /* Buttons */

@@ -1,23 +1,42 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2>Generate Bills</h2>
+        <h2>Generate Bill</h2>
     </x-slot>
 
     <div class="p-6">
         <div class="card">
-            <form action="{{ route('bills.store') }}" method="POST">
+            {{-- Generate for single agreement --}}
+            <form action="{{ route('bills.store') }}" method="POST" style="margin-bottom:12px;">
                 @csrf
+
+                {{-- Select Agreement --}}
+                <div class="mb-3">
+                    <label for="agreement_id" class="form-label">Select Agreement</label>
+                    <select name="agreement_id" id="agreement_id" class="form-control">
+                        <option value="">-- Choose Agreement (or leave blank to generate all) --</option>
+                        @foreach ($agreements as $agreement)
+                            <option value="{{ $agreement->agreement_id }}">
+                                Agreement #{{ $agreement->agreement_id }} —
+                                Renter: {{ $agreement->renter->full_name ?? 'Unknown' }} —
+                                Room: {{ $agreement->room->room_number ?? 'N/A' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Year and Month --}}
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label>Year</label>
                         <input type="number" name="year" value="{{ old('year', now()->year) }}" required>
                     </div>
+
                     <div>
                         <label>Month</label>
                         <select name="month" required>
-                            @for($m=1;$m<=12;$m++)
-                                <option value="{{ $m }}" {{ old('month', now()->month)==$m ? 'selected' : '' }}>
-                                    {{ \Carbon\Carbon::createFromDate(2000,$m,1)->format('F') }}
+                            @for ($m = 1; $m <= 12; $m++)
+                                <option value="{{ $m }}" {{ old('month', now()->month) == $m ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::createFromDate(2000, $m, 1)->format('F') }}
                                 </option>
                             @endfor
                         </select>
@@ -25,9 +44,17 @@
                 </div>
 
                 <div style="margin-top:12px;">
-                    <button class="btn-confirm" type="submit">Generate Bills for Selected Month</button>
+                    <button class="btn-confirm" type="submit">Generate for Selected Agreement</button>
                     <a href="{{ route('bills.index') }}" class="btn-back">Back</a>
                 </div>
+            </form>
+
+            {{-- Generate bills for all agreements --}}
+            <form action="{{ route('bills.generateAll') }}" method="POST" onsubmit="return confirm('Generate bills for ALL active agreements for this month?');">
+                @csrf
+                <input type="hidden" name="year" value="{{ now()->year }}">
+                <input type="hidden" name="month" value="{{ now()->month }}">
+                <button type="submit" class="btn btn-new">Generate Bills for All Active Agreements (This Month)</button>
             </form>
         </div>
     </div>
@@ -35,33 +62,26 @@
 
 <!-- 🔹 CSS Section -->
 <style>
-    .container { max-width:1200px; margin:0 auto; padding:16px; }
-    .header-container{display:flex;justify-content:flex-end;align-items:center;margin-bottom:16px;position:relative}
-    .header-title{font:900 32px 'Figtree',sans-serif;color:#5C3A21;line-height:1.2;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,0.25);letter-spacing:1.2px;text-transform:uppercase;margin:0;position:absolute;left:50%;transform:translateX(-50%);-webkit-text-stroke:0.5px #5C3A21}
-    .header-buttons{display:flex;gap:10px;position:relative;z-index:1}
+    /* 🔹 Layout */
+    .container { max-width: 900px; margin: 0 auto; padding: 16px; font-family: 'Figtree', sans-serif; }
+    .card { background: linear-gradient(135deg, #FFFDFB, #FFF8F0); border-radius: 16px; border: 2px solid #E6A574; padding: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); font-family: 'Figtree', sans-serif; }
 
-    .card {background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif;}
-    table th, table td { padding:8px 10px; border-bottom:1px solid #E6A574; text-align:left; font-size:14px; }
-    table th { background:#FFF3DF; color:#5C3A21; font-weight:700; }
-
-    /* 🔹 Status badges */
-    .status-badge { padding:4px 10px; border-radius:20px; font-weight:600; font-size:13px; display:inline-block; }
-    .btn-archive { background: #6B7280; color: white; padding: 6px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
-    .btn-archive:hover { background: #9CA3AF; }
-    .status-badge.active { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
-    .status-badge.terminated { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
-    .status-badge.expired { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; }
+    /* 🔹 Form */
+    form label { font-weight: 600; color: #5C3A21; display: block; margin-bottom: 6px; }
+    form input, form select { width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid #E6A574; font-family: 'Figtree', sans-serif; font-size: 14px; }
+    .mb-3 { margin-bottom: 16px; }
+    .grid { display: grid; gap: 12px; }
+    .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
 
     /* 🔹 Buttons */
-    .btn { padding:5px 12px; border-radius:6px; font-weight:600; cursor:pointer; text-decoration:none; transition:0.2s; border:none; }
-    .btn-yellow { background:#E6A574; color:#5C3A21; }
-    .btn-yellow:hover { background:#F4C38C; }
-    .btn-red { background:#DC2626; color:white; }
-    .btn-red:hover { background:#EF4444; }
-    .btn-green { background:#059669; color:white; }
-    .btn-green:hover { background:#10B981; }
-    .btn-gray { background:#6B7280; color:white; }
-    .btn-gray:hover { background:#9CA3AF; }
-    .btn-new { background:#D97A4E; color:white; }
-    .btn-new:hover { background:#F4C38C; color:#5C3A21; }
+    .btn { padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.2s; border: none; display: inline-block; }
+    .btn-confirm { background: #E6A574; color: #5C3A21; }
+    .btn-confirm:hover { background: #F4C38C; }
+    .btn-back { background: #D97A4E; color: #FFF5EC; margin-left: 8px; }
+    .btn-back:hover { background: #F4C38C; color: #5C3A21; }
+    .btn-new { background: #b86536; color: #fff; margin-top: 16px; }
+    .btn-new:hover { background: #F4C38C; color: #5C3A21; }
+
+    /* 🔹 Misc */
+    h2 { color: #5C3A21; font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
 </style>

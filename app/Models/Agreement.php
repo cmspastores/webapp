@@ -50,6 +50,11 @@ class Agreement extends Model
         return $this->belongsTo(Room::class, 'room_id', 'id');
     }
 
+    public function bills()
+    {
+        return $this->hasMany(Bill::class, 'agreement_id', 'agreement_id');
+    }
+
     // 🔹 Automatically detect "expired" without storing it in the DB
     public function getStatusAttribute()
     {

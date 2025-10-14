@@ -30,6 +30,12 @@
                             <td>{{ ucfirst($bill->status) }}</td>
                             <td>
                                 <a href="{{ route('bills.show', $bill) }}" class="btn btn-gray">View</a>
+
+                                <form action="{{ route('bills.destroy', $bill) }}" method="POST" style="display:inline-block;margin-left:6px;" onsubmit="return confirm('Delete this bill?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-red" type="submit">Delete</button>
+                                </form>
                             </td>
                         </tr>
                     @empty

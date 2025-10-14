@@ -82,9 +82,16 @@ class AgreementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Agreement $agreement)
     {
-        //
+        // Get all bills linked to this agreement (most recent first)
+        $bills = $agreement->bills()->orderBy('period_start', 'desc')->get();
+
+        // Compute totals for the Statement of Account
+        $totalDue = $bills->sum('amount_due');
+        $totalBalance = $bills->sum('balance');
+
+        return view('agreements.show', compact('agreement', 'bills', 'totalDue', 'totalBalance'));
     }
 
     /**
@@ -95,7 +102,11 @@ class AgreementController extends Controller
         $renters = Renters::orderBy('full_name')->get();
         $rooms = Room::with('roomType')->orderBy('room_number')->get();
 
-        return view('agreements.edit', compact('agreement','renters','rooms'));
+        $bills = $agreement->bills()->orderBy('period_start', 'desc')->get();
+        $totalDue = $bills->sum('amount_due');
+        $totalBalance = $bills->sum('balance');
+
+        return view('agreements.edit', compact('agreement', 'renters', 'rooms', 'bills', 'totalDue', 'totalBalance'));
     }
 
     /**

@@ -60,9 +60,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/agreements/{agreement}/terminate', [AgreementController::class, 'terminate'])->name('agreements.terminate')
         ->middleware('admin');
     
+    // ============================
     // Bills Management
-    Route::resource('bills', BillController::class)->only(['index','show','create','store']);
+    // ============================
+    // Generate all bills (explicit endpoint)
+    Route::post('/bills/generate-all', [\App\Http\Controllers\BillController::class, 'generateAll'])
+        ->name('bills.generateAll')
+        ->middleware('auth'); // adjust middleware as needed
 
+    // Resource routes for bills (index, create, store, show, destroy etc.)
+    Route::resource('bills', \App\Http\Controllers\BillController::class);
+    
     // ============================
     // Settings (All users)
     // ============================
