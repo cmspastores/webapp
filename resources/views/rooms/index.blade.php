@@ -118,7 +118,12 @@
 /* 🧾 Table Card */
 .card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); padding:16px; border:none; overflow-x:auto; }
 
-.room-table { width:100%; border-collapse:separate; border-spacing:0; text-align:center; table-layout:fixed; background:transparent; border-radius:12px; overflow:hidden; }
+/* 🌿 Room Table */
+.room-table { width:100%; min-width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; text-align:center; background:transparent; border-radius:12px; overflow:hidden; display:block; }
+
+/* Table Sections */
+.room-table thead, .room-table tbody, .room-table tr { display:table; width:100%; table-layout:fixed; }
+.room-table tbody { display:block; }
 
 /* Table Header */
 .room-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; border-radius:12px 12px 0 0; overflow:hidden; }
@@ -137,6 +142,14 @@
 
 /* Row hover effect */
 .room-table tbody tr:hover { background:#FFF4E1; transition:background 0.2s; }
+
+/* Empty row styling fixed */
+.room-table tbody tr td[colspan] { display:table-cell; width:auto; min-height:50px; line-height:normal; text-align:center; font-weight:400; color:#5C3A21; }
+
+
+/* Responsive overflow */
+.room-table { overflow-x:auto; }
+
 
 
 /* 📄 Pagination */

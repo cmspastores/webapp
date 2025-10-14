@@ -1,13 +1,4 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="header-container">
-            <h2 class="header-title">Create Agreement</h2>
-            <div class="header-buttons">
-                <a href="{{ route('agreements.index') }}" class="btn-back">← Back to List</a>
-            </div>
-        </div>
-    </x-slot>
-
     <div class="container">
         <div class="card form-card">
             <form action="{{ route('agreements.store') }}" method="POST">
@@ -21,7 +12,7 @@
                             <option value="">-- Select Renter --</option>
                             @foreach($renters as $r)
                                 <option value="{{ $r->renter_id }}" {{ old('renter_id') == $r->renter_id ? 'selected' : '' }}>
-                                    {{ $r->full_name }} ({{ $r->unique_id }})
+                                    {{ $r->full_name }}  <!-- ({{ $r->unique_id }}) -->
                                 </option>
                             @endforeach
                         </select>
@@ -35,7 +26,7 @@
                             <option value="">-- Select Room --</option>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
-                                    {{ $room->room_number }} {{ $room->roomType->name ? ' - ' . $room->roomType->name : '' }}
+                                    {{ $room->room_number }} {{ optional($room->roomType)->name ? ' - ' . optional($room->roomType)->name : '' }}
                                 </option>
                             @endforeach
                         </select>

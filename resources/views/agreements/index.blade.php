@@ -1,26 +1,42 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="header-container">
-            <h2 class="header-title">Agreements</h2>
-            <div class="header-buttons">
-                @if(auth()->user() && auth()->user()->is_admin)
-                    <a href="{{ route('agreements.create') }}" class="btn btn-new">+ New Agreement</a>
-                @endif
-                <a href="{{ route('agreements.archived') }}" class="btn btn-archive">Archived Agreements</a>
-            </div>
-        </div>
-    </x-slot>
-
     <div class="container">
+
+        <!-- 🔹 Header Row -->
+        <div class="agreements-header-row">
+            <div class="agreements-header">Agreements</div>
+        </div>
+
         @if(session('success'))
             <div class="card" style="margin-bottom:12px;padding:8px;background:#D1FAE5;color:#065F46;">
                 {{ session('success') }}
             </div>
         @endif
 
-        <div class="card">
+        <!-- 🔍 Search + Sort Left | Buttons Right -->
+<div class="toolbar-row">
+    <form method="GET" action="{{ route('agreements.index') }}" class="search-toolbar">
+        <input type="text" name="search" placeholder="Search renter or room" value="{{ request('search') }}" class="search-input">
+        <select name="sort" class="search-filter">
+            <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Room Number ↑ Ascending</option>
+            <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Room Number ↓ Descending</option>
+        </select>
+        <button type="submit" class="btn-search">Search</button>
+    </form>
+
+    <div class="toolbar-actions">
+        <button type="button" id="btn-refresh" class="btn-refresh">Refresh List</button>
+        @if(auth()->user() && auth()->user()->is_admin)
+            <a href="{{ route('agreements.create') }}" class="btn-new">+ New Agreement</a>
+        @endif
+        <a href="{{ route('agreements.archived') }}" class="btn-archive">View Archive</a>
+    </div>
+</div>
+
+
+        <!-- 🔹 Agreements Table -->
+        <div class="card table-card">
             <div class="table-wrapper" style="overflow-x:auto;">
-                <table style="width:100%;border-collapse:collapse;">
+                <table class="agreements-table">
                     <thead>
                         <tr>
                             <th>Renter</th>
@@ -36,98 +52,109 @@
                     <tbody>
                         @forelse($agreements as $a)
                             @php
-                                // Optional: check if expired
                                 $status = $a->is_active ? 'Active' : 'Terminated';
-                                if(!$a->is_active && isset($a->end_date) && $a->end_date->isPast()) {
-                                    $status = 'Expired';
-                                }
+                                if(!$a->is_active && isset($a->end_date) && $a->end_date->isPast()) { $status='Expired'; }
                             @endphp
                             <tr>
                                 <td>{{ $a->renter->full_name ?? '—' }}</td>
-                                <td>
-                                    {{ $a->room->room_number ?? '—' }}
-                                    {{ $a->room->roomType->name ? ' - ' . $a->room->roomType->name : '' }}
-                                </td>
+                                <td>{{ $a->room->room_number ?? '—' }}{{ optional($a->room->roomType)->name ? ' - ' . optional($a->room->roomType)->name : '' }}</td>
                                 <td>{{ optional($a->agreement_date)->toDateString() }}</td>
                                 <td>{{ optional($a->start_date)->toDateString() }}</td>
                                 <td>{{ optional($a->end_date)->toDateString() }}</td>
-                                <td>{{ $a->monthly_rent ? '₱' . number_format($a->monthly_rent,2) : '—' }}</td>
-                                <td>
-                                    <span class="status-badge {{ strtolower($status) }}">{{ $status }}</span>
-                                </td>
-                                <td>
-                                    <div style="display:flex;gap:6px;">
-                                        <a href="{{ route('agreements.edit', $a) }}" class="btn btn-yellow">View</a>
-
+                                <td>{{ $a->monthly_rent ? '₱'.number_format($a->monthly_rent,2) : '—' }}</td>
+                                <td><span class="status-badge {{ strtolower($status) }}">{{ $status }}</span></td>
+                                <td class="actions-cell">
+                                    <div class="actions-buttons">
+                                        <a href="{{ route('agreements.edit',$a) }}" class="btn-yellow">View</a>
                                         @if(auth()->user() && auth()->user()->is_admin)
                                             @if($a->is_active)
-                                                <form method="POST" action="{{ route('agreements.terminate', $a) }}" onsubmit="return confirm('Terminate this agreement?');">
-                                                    @csrf
-                                                    <button class="btn btn-red" type="submit">Terminate</button>
-                                                </form>
+                                                <form method="POST" action="{{ route('agreements.terminate',$a) }}" onsubmit="return confirm('Terminate this agreement?');" class="inline-form">@csrf<button class="btn-red" type="submit">Terminate</button></form>
                                             @else
-                                                <form method="POST" action="{{ route('agreements.renew', $a) }}" onsubmit="return confirm('Renew this agreement for another year?');">
-                                                    @csrf
-                                                    <button class="btn btn-green" type="submit">Renew</button>
-                                                </form>
+                                                <form method="POST" action="{{ route('agreements.renew',$a) }}" onsubmit="return confirm('Renew this agreement for another year?');" class="inline-form">@csrf<button class="btn-green" type="submit">Renew</button></form>
                                             @endif
-
-                                            <!--
-                                            <form method="POST" action="{{ route('agreements.destroy', $a) }}" onsubmit="return confirm('Delete this agreement permanently?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-gray" type="submit">Delete</button>
-                                            </form> 
-                                            -->
                                         @endif
                                     </div>
                                 </td>
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="8" style="text-align:center;color:#6B7280;">No agreements found.</td>
-                            </tr>
+                            <tr><td colspan="8" class="text-center">No agreements found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
 
+                <!-- 🔹 Pagination -->
                 <div class="pagination" style="margin-top:12px;">
-                    {{ $agreements->links() }}
-                </div>
+                {{ $agreements->appends(request()->query())->links() }}
+            </div>
+
             </div>
         </div>
     </div>
+
+    <!-- 🔹 JS for Refresh -->
+    <script>
+        document.getElementById('btn-refresh').addEventListener('click',()=>{
+            window.location.href="{{ route('agreements.index') }}";
+        });
+    </script>
 </x-app-layout>
 
-<!-- 🔹 CSS Section -->
+<!-- 🔹 CSS -->
 <style>
-    .container { max-width:1200px; margin:0 auto; padding:16px; }
-    .header-container{display:flex;justify-content:flex-end;align-items:center;margin-bottom:16px;position:relative}
-    .header-title{font:900 32px 'Figtree',sans-serif;color:#5C3A21;line-height:1.2;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,0.25);letter-spacing:1.2px;text-transform:uppercase;margin:0;position:absolute;left:50%;transform:translateX(-50%);-webkit-text-stroke:0.5px #5C3A21}
-    .header-buttons{display:flex;gap:10px;position:relative;z-index:1}
 
-    .card {background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif;}
-    table th, table td { padding:8px 10px; border-bottom:1px solid #E6A574; text-align:left; font-size:14px; }
-    table th { background:#FFF3DF; color:#5C3A21; font-weight:700; }
+/* 🌅 Container */
+.container { max-width:960px; margin:0 auto; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); padding:20px; border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:12px; font-family:'Figtree',sans-serif; }
 
-    /* 🔹 Status badges */
-    .status-badge { padding:4px 10px; border-radius:20px; font-weight:600; font-size:13px; display:inline-block; }
-    .btn-archive { background: #6B7280; color: white; padding: 6px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
-    .btn-archive:hover { background: #9CA3AF; }
-    .status-badge.active { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
-    .status-badge.terminated { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
-    .status-badge.expired { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; }
+/* 🏷️ Header */
+.agreements-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.agreements-header { font-size:24px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; margin-bottom:8px; }
 
-    /* 🔹 Buttons */
-    .btn { padding:5px 12px; border-radius:6px; font-weight:600; cursor:pointer; text-decoration:none; transition:0.2s; border:none; }
-    .btn-yellow { background:#E6A574; color:#5C3A21; }
-    .btn-yellow:hover { background:#F4C38C; }
-    .btn-red { background:#DC2626; color:white; }
-    .btn-red:hover { background:#EF4444; }
-    .btn-green { background:#059669; color:white; }
-    .btn-green:hover { background:#10B981; }
-    .btn-gray { background:#6B7280; color:white; }
-    .btn-gray:hover { background:#9CA3AF; }
-    .btn-new { background:#D97A4E; color:white; }
-    .btn-new:hover { background:#F4C38C; color:#5C3A21; }
+/* 🔧 Toolbar Layout */
+.toolbar-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:16px; gap:10px; }
+.search-toolbar { display:flex; align-items:center; gap:8px; flex:0 1 auto; }
+.toolbar-actions { display:flex; align-items:center; gap:6px; margin-left:auto; flex:0 0 auto; }
+
+/* 🔍 Search + Filter */
+.search-input, .search-filter { padding:8px 12px; border-radius:8px; border:1px solid #E6A574; font-size:14px; background:#fff; font-family:'Figtree',sans-serif; color:#5C3A21; }
+.btn-search { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:600; border:none; border-radius:10px; padding:8px 16px; font-size:15px; cursor:pointer; transition:0.2s; }
+.btn-search:hover { background:#D97A4E; color:#fff; }
+
+/* 🔹 Buttons */
+.btn-refresh, .btn-new, .btn-archive { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-decoration:none; transition:0.2s; border:none; cursor:pointer; }
+.btn-refresh:hover, .btn-new:hover, .btn-archive:hover { background:#D97A4E; color:#fff; }
+
+/* 📋 Table Card */
+.card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); padding:16px; border:none; overflow-x:auto; }
+
+/* 📑 Agreements Table */
+.agreements-table { width:100%; border-collapse:separate; border-spacing:0; text-align:center; table-layout:auto; background:transparent; border-radius:12px; overflow:hidden; }
+.agreements-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; border-radius:12px 12px 0 0; overflow:hidden; }
+.agreements-table th, .agreements-table td { padding:12px 16px; font-size:14px; border-bottom:1px solid #D97A4E; border-right:1px solid #D97A4E; text-align:center; }
+.agreements-table th:first-child, .agreements-table td:first-child { border-left:none; }
+.agreements-table th:last-child, .agreements-table td:last-child { border-right:none; }
+.agreements-table tbody tr:last-child td { border-bottom:none; }
+.agreements-table tbody tr:hover { background:#FFF4E1; transition:background 0.2s; }
+
+/* 🟩 Status Badges */
+.status-badge { padding:4px 10px; border-radius:20px; font-weight:600; font-size:13px; display:inline-block; }
+.status-badge.active { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
+.status-badge.terminated { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
+.status-badge.expired { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; }
+
+/* ⚙️ Action Buttons */
+.actions-buttons { display:flex; gap:6px; justify-content:center; flex-wrap:nowrap; align-items:center; width:100%; }
+.actions-buttons .btn-yellow, .actions-buttons .btn-red, .actions-buttons .btn-green { padding:6px 12px; border-radius:6px; font-weight:600; font-size:13px; transition:0.2s; border:none; cursor:pointer; }
+.actions-buttons .btn-yellow { background:#4C9F70; color:#fff; }
+.actions-buttons .btn-yellow:hover { background:#6FC3A1; }
+.actions-buttons .btn-red { background:#EF4444; color:#fff; }
+.actions-buttons .btn-red:hover { background:#B91C1C; }
+.actions-buttons .btn-green { background:#F4C38C; color:#5C3A21; }
+.actions-buttons .btn-green:hover { background:#CF8C55; }
+
+/* 🧾 Misc */
+.inline-form { display:inline; }
+.pagination { margin-top:16px; display:flex; justify-content:flex-end; gap:6px; flex-wrap:wrap; }
+
+
+
 </style>

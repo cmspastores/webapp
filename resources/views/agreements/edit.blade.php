@@ -1,12 +1,4 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="header-container">
-            <h2 class="header-title">View Agreement</h2>
-            <div class="header-buttons">
-                <a href="{{ route('agreements.index') }}" class="btn-back">← Back to List</a>
-            </div>
-        </div>
-    </x-slot>
 
     <div class="container">
         <div class="card form-card">
@@ -18,11 +10,11 @@
                 <div class="form-grid">
                     <div>
                         <label for="renter_id">Renter</label>
-                        <select name="renter_id" id="renter_id" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
+                        <select name="renter_id" id="renter_id" disabled> {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
                             <option value="">-- Select Renter --</option>
                             @foreach($renters as $r)
                                 <option value="{{ $r->renter_id }}" {{ old('renter_id', $agreement->renter_id) == $r->renter_id ? 'selected' : '' }}>
-                                    {{ $r->full_name }} ({{ $r->unique_id }})
+                                    {{ $r->full_name }} <!-- ({{ $r->unique_id }}) -->
                                 </option>
                             @endforeach
                         </select>
@@ -35,7 +27,7 @@
                             <option value="">-- Select Room --</option>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}" {{ old('room_id', $agreement->room_id) == $room->id ? 'selected' : '' }}>
-                                    {{ $room->room_number }} {{ $room->roomType->name ? ' - ' . $room->roomType->name : '' }}
+                                    {{ $room->room_number }} {{ optional($room->roomType)->name ? ' - ' . optional($room->roomType)->name : '' }}
                                 </option>
                             @endforeach
                         </select>
@@ -189,11 +181,18 @@
     .card {background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif;}
     .form-card .form-grid {display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
     .form-card .form-grid > div, .form-card .full-width {display:flex; align-items:center; gap:8px;}
-    .form-card label {min-width:100px; font-weight:600; color:#5C3A21;}
-    .form-card input, .form-card select {width:200px; padding:6px 10px; border-radius:6px; border:1px solid #E6A574; font-family:'Figtree',sans-serif;}
+    .form-card input, .form-card input:disabled, .form-card select, .form-card select:disabled {width:200px;padding:6px 10px;border-radius:6px;border:1px solid #E6A574;font-family:'Figtree',sans-serif;background:#FFFDFB;color:#000 !important;-webkit-text-fill-color:#000 !important;box-sizing:border-box;}
+    .form-card .full-width input {width:300px;}
+
     .form-card .full-width {grid-column:span 2;}
-    .form-card .full-width label {min-width:120px;}
-    .form-card .full-width input {width:300px; background:#FFF3DF; color:#5C4A32; font-weight:500; cursor:pointer;}
+    .form-card .full-width input {width:300px;background:#FFF3DF;color:#5C4A32;font-weight:500;cursor:pointer;}
+    
+
+    .form-card input:disabled,.form-card select:disabled{color:#000 !important;-webkit-text-fill-color:#000 !important;background:#FFFDFB !important;border:1px solid #E6A574 !important;cursor:not-allowed;}
+
+    .form-card select:disabled option { color:#5C4A32 !important; }
+    .form-card input#end_date_preview,.form-card input#locked_price{pointer-events:none;background:#FFF3DF;color:#000 !important;-webkit-text-fill-color:#000 !important;border:1px solid #E6A574;cursor:not-allowed;}
+
 
     /* 🔹 Statement of Account Table */
     .statement-card { background: linear-gradient(135deg, #FFFDFB, #FFF8F0); border-radius: 14px; border: 2px solid #E6A574; padding: 16px; margin-top: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }

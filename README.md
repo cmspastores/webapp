@@ -19,7 +19,7 @@ to provide accessible, secure, and functional spaces in the city center.
 * General
 * Room Types Management
 * Rooms Management
-* Customer Management
+* Renters Management
 * Reservation Management
 * Agreement Registration Management
 * Billing Management
@@ -102,13 +102,11 @@ Then list tables:
 ## Landing Page
 <img src="public/screenshots/landingpage.png" width=500>
 
-
-## Log In Form
+## Sign In Form
 <img src="public/screenshots/signin.png" width=500>
 
-## Sign In Form
+## Log In Form
 <img src="public/screenshots/login.png" width=500>
-
 
 ## Dashboard
 <img src="public/screenshots/dashboard.png" width=500>

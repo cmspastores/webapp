@@ -14,17 +14,30 @@ class AgreementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Show only active agreements (still valid)
-        $agreements = Agreement::with(['renter', 'room.roomType'])
-            ->where('is_active', true)
-            ->whereDate('end_date', '>=', now()) // ensure not expired
-            ->orderBy('start_date', 'desc')
-            ->paginate(10);
+    $search = $request->input('search');
+    $sort = $request->input('sort', 'asc'); // default ascending
 
-        return view('agreements.index', compact('agreements'));
-    }
+    $agreements = Agreement::with(['renter', 'room.roomType'])
+        ->where('is_active', true)
+        ->whereDate('end_date', '>=', now())
+        ->when($search, function ($query, $search) {
+            $query->whereHas('renter', function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%");
+            })
+            ->orWhereHas('room', function ($q) use ($search) {
+                $q->where('room_number', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy(Room::select('room_number')->whereColumn('rooms.id', 'agreements.room_id'), $sort)
+        ->paginate(10)
+        ->appends(['search' => $search, 'sort' => $sort]);
+
+    return view('agreements.index', compact('agreements', 'search', 'sort'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -152,19 +165,32 @@ class AgreementController extends Controller
     }
 
     // Archived agreements view
-    public function archived()
-    {
-        // Agreements that are expired or terminated
-        $agreements = Agreement::with(['renter', 'room.roomType'])
-            ->where(function ($query) {
-                $query->where('is_active', false)
-                    ->orWhereDate('end_date', '<', now());
-            })
-            ->orderBy('end_date', 'desc')
-            ->paginate(10);
+    public function archived(Request $request)
+{
+    $search = $request->input('search');
+    $sort = $request->input('sort', 'asc');
 
-        return view('agreements.archived', compact('agreements'));
-    }
+     // Agreements that are expired or terminated
+    $agreements = Agreement::with(['renter', 'room.roomType'])
+        ->where(function ($query) {
+            $query->where('is_active', false)
+                ->orWhereDate('end_date', '<', now());
+        })
+        ->when($search, function ($query, $search) {
+            $query->whereHas('renter', function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%");
+            })
+            ->orWhereHas('room', function ($q) use ($search) {
+                $q->where('room_number', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy(Room::select('room_number')->whereColumn('rooms.id', 'agreements.room_id'), $sort)
+        ->paginate(10)
+        ->appends(['search' => $search, 'sort' => $sort]);
+
+    return view('agreements.archived', compact('agreements', 'search', 'sort'));
+}
+
 
     /**
      * Remove the specified resource.
