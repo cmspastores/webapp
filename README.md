@@ -111,11 +111,23 @@ Then list tables:
 ## Dashboard
 <img src="public/screenshots/dashboard.png" width=500>
 
+## Rooms
+<img src="public/screenshots/rooms.png" width=500>
+
 ## Renters
 <img src="public/screenshots/renters.png" width=500>
 
-## Rooms
-<img src="public/screenshots/rooms.png" width=500>
+## Agreement Registration
+<img src="public/screenshots/agreements.png" width=500>
+
+## Reservations
+<img src="public/screenshots/reservations.png" width=500>
+
+## Billings
+<img src="public/screenshots/bills.png" width=500>
+
+## Charges
+
 
 ## User Management
 <img src="public/screenshots/usermanagement.png" width=500>
