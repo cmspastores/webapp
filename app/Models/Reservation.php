@@ -15,7 +15,6 @@ class Reservation extends Model
 
     protected $primaryKey = 'reservation_id';
 
-    // fillable must include foreign keys and names used by the form
     protected $fillable = [
         'agreement_id',
         'room_id',
@@ -25,14 +24,15 @@ class Reservation extends Model
         'check_in_date',
         'check_out_date',
         'status',
+        'pending_payload',
     ];
 
     protected $casts = [
         'check_in_date' => 'date',
         'check_out_date' => 'date',
+        'pending_payload' => 'array',
     ];
 
-    // Eager-load agreement and its renter by default (optional)
     protected $with = ['agreement', 'agreement.renter'];
 
     /**

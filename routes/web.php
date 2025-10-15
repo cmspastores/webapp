@@ -62,6 +62,10 @@ Route::middleware(['auth'])->group(function () {
     // Reservation Management
     Route::resource('reservation', ReservationController::class);
 
+    // Confirm pending reservation (create renter + agreement and link)
+    Route::post('reservation/{reservation}/confirm', [ReservationController::class, 'confirm'])
+        ->name('reservation.confirm');
+
     // Rental Agreements Management
     Route::get('/agreements/archived', [AgreementController::class, 'archived'])->name('agreements.archived');
     Route::resource('agreements', AgreementController::class);
