@@ -12,7 +12,7 @@
                             <option value="">-- Select Renter --</option>
                             @foreach($renters as $r)
                                 <option value="{{ $r->renter_id }}" {{ old('renter_id') == $r->renter_id ? 'selected' : '' }}>
-                                    {{ $r->full_name }}  <!-- ({{ $r->unique_id }}) -->
+                                    {{ $r->full_name }}
                                 </option>
                             @endforeach
                         </select>
@@ -22,11 +22,15 @@
                     <!-- Room -->
                     <div>
                         <label for="room_id">Room</label>
-                        <select name="room_id" id="room_id" required>
+                        <select name="room_id" id="room_id" required onchange="handleRoomChange()">
                             <option value="">-- Select Room --</option>
                             @foreach($rooms as $room)
-                                <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
-                                    {{ $room->room_number }} {{ optional($room->roomType)->name ? ' - ' . optional($room->roomType)->name : '' }}
+                                <option value="{{ $room->id }}"
+                                    data-transient="{{ optional($room->roomType)->is_transient ? '1' : '0' }}"
+                                    data-type-name="{{ optional($room->roomType)->name }}"
+                                    {{ old('room_id') == $room->id ? 'selected' : '' }}>
+                                    {{ $room->room_number }}
+                                    {{ optional($room->roomType)->name ? ' - ' . optional($room->roomType)->name : '' }}
                                 </option>
                             @endforeach
                         </select>
@@ -36,22 +40,36 @@
                     <!-- Agreement Date -->
                     <div>
                         <label for="agreement_date">Agreement Date</label>
-                        <input type="date" name="agreement_date" id="agreement_date" value="{{ old('agreement_date', now()->toDateString()) }}" required>
+                        <input type="date" name="agreement_date" id="agreement_date"
+                               value="{{ old('agreement_date', now()->toDateString()) }}" required>
                         @error('agreement_date')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
                     <!-- Start Date -->
                     <div>
                         <label for="start_date">Start Date</label>
-                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', now()->toDateString()) }}" required onchange="computeEndDate()">
+                        <input type="date" name="start_date" id="start_date"
+                               value="{{ old('start_date', now()->toDateString()) }}" required onchange="computeEndDate()">
                         @error('start_date')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
-                    <!-- End Date (preview only) -->
-                    <div class="full-width">
-                        <label for="end_date_preview">End Date (auto 1 year)</label>
-                        <input type="text" id="end_date_preview" readonly value="{{ old('start_date') ? \Illuminate\Support\Carbon::parse(old('start_date'))->addYear()->toDateString() : now()->addYear()->toDateString() }}">
+                    <!-- 🔹 Length of Stay (Transient only) -->
+                    <div id="stay_length_field" style="display:none;">
+                        <label for="stay_length">Length of Stay (Days)</label>
+                        <input type="number" name="stay_length" id="stay_length" min="1"
+                               value="{{ old('stay_length', 1) }}" onchange="computeEndDate()">
+                        @error('stay_length')<div class="error">{{ $message }}</div>@enderror
                     </div>
+
+                    <!-- End Date -->
+                    <div class="full-width">
+                        <label for="end_date">End Date</label>
+                        <input type="date" name="end_date" id="end_date" required>
+                        <small id="end_date_note" style="color:#777;"></small>
+                    </div>
+
+                    <!-- Rent Info (Auto-filled) -->
+                    <div id="rent_info" class="full-width" style="margin-top:8px; font-weight:bold;"></div>
                 </div>
 
                 <div style="margin-top:12px; display:flex; gap:8px;">
@@ -66,17 +84,85 @@
         function computeEndDate() {
             const start = document.getElementById('start_date').value;
             if (!start) return;
+
+            const selectedRoom = document.getElementById('room_id').selectedOptions[0];
+            if (!selectedRoom) return;
+
+            const isTransient = selectedRoom.dataset.transient === '1';
+            const stayDays = parseInt(document.getElementById('stay_length')?.value || 1);
+
             const d = new Date(start);
-            d.setFullYear(d.getFullYear() + 1);
-            // format YYYY-MM-DD
+
+            if (isTransient) {
+                // Transient — compute default based on stay length
+                d.setDate(d.getDate() + stayDays);
+            } else {
+                // Dorm — fixed 1 year after start
+                d.setFullYear(d.getFullYear() + 1);
+            }
+
             const yyyy = d.getFullYear();
-            let mm = (d.getMonth() + 1).toString().padStart(2, '0');
-            let dd = d.getDate().toString().padStart(2, '0');
-            document.getElementById('end_date_preview').value = `${yyyy}-${mm}-${dd}`;
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const formatted = `${yyyy}-${mm}-${dd}`;
+
+            // Update end_date field
+            const endInput = document.getElementById('end_date');
+            endInput.value = formatted;
         }
 
-        // run once on load to ensure preview matches default
-        document.addEventListener('DOMContentLoaded', computeEndDate);
+        function updateRentInfo() {
+            const selectedRoom = document.getElementById('room_id').selectedOptions[0];
+            const rentInfo = document.getElementById('rent_info');
+
+            if (!selectedRoom) {
+                rentInfo.textContent = '';
+                return;
+            }
+
+            const isTransient = selectedRoom.dataset.transient === '1';
+            const typeName = selectedRoom.dataset.typeName || '';
+            rentInfo.textContent = isTransient
+                ? `Room Type: ${typeName} — Daily Rate`
+                : `Room Type: ${typeName} — Monthly Rate`;
+        }
+
+        function handleRoomChange() {
+            const select = document.getElementById('room_id');
+            const selected = select.selectedOptions[0];
+            const stayField = document.getElementById('stay_length_field');
+            const endDateField = document.getElementById('end_date');
+            const endNote = document.getElementById('end_date_note');
+
+            if (!selected) {
+                stayField.style.display = 'none';
+                endDateField.readOnly = true;
+                endNote.textContent = '';
+                return;
+            }
+
+            const isTransient = selected.dataset.transient === '1';
+
+            if (isTransient) {
+                // Transient: show stay length + editable end date
+                stayField.style.display = 'block';
+                endDateField.readOnly = false;
+                endNote.textContent = 'Transient: You can manually adjust the end date.';
+            } else {
+                // Dorm: hide stay length + auto compute + lock end date
+                stayField.style.display = 'none';
+                endDateField.readOnly = true;
+                endNote.textContent = 'Dorm: End date auto-set 1 year after start date.';
+            }
+
+            updateRentInfo();
+            computeEndDate();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            handleRoomChange();
+            computeEndDate();
+        });
     </script>
 </x-app-layout>
 
