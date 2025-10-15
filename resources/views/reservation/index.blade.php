@@ -21,11 +21,15 @@
                         <thead>
                             <tr>
                                 <th>Room ID</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
+                                <th>Guest</th>
+                                <th>Renter</th>
+                                <th>Renter Contact</th>
+                                <th>Agreement #</th>
+                                <th>Agreement Start</th>
+                                <th>Agreement End</th>
                                 <th>Type</th>
-                                <th>Check-In Date</th>
-                                <th>Check-Out Date</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -33,11 +37,44 @@
                             @foreach($reservations as $reservation)
                                 <tr>
                                     <td>{{ $reservation->room_id }}</td>
-                                    <td>{{ $reservation->first_name }}</td>
-                                    <td>{{ $reservation->last_name }}</td>
+
+                                    <td>
+                                        {{ $reservation->first_name }} {{ $reservation->last_name }}
+                                    </td>
+
+                                    <td>
+                                        {{-- Access renter via accessor or agreement relation --}}
+                                        {{ optional($reservation->renter)->full_name ?? '-' }}
+                                    </td>
+
+                                    <td>
+                                        {{ optional($reservation->renter)->email ?? '-' }}
+                                        @if(optional($reservation->renter)->phone)
+                                            <div>{{ optional($reservation->renter)->phone }}</div>
+                                        @endif
+                                    </td>
+
+                                    <td>{{ optional($reservation->agreement)->agreement_number ?? (optional($reservation->agreement)->agreement_id ? 'Agreement #' . optional($reservation->agreement)->agreement_id : '-') }}</td>
+
+                                    <td>
+                                        @if($reservation->agreement && $reservation->agreement->start_date)
+                                            {{ $reservation->agreement->start_date->format('Y-m-d') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+
+                                    <td>
+                                        @if($reservation->agreement && $reservation->agreement->end_date)
+                                            {{ $reservation->agreement->end_date->format('Y-m-d') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+
                                     <td>{{ $reservation->reservation_type }}</td>
-                                    <td>{{ $reservation->check_in_date->format('Y-m-d') }}</td>
-                                    <td>{{ $reservation->check_out_date->format('Y-m-d') }}</td>
+                                    <td>{{ $reservation->check_in_date ? $reservation->check_in_date->format('Y-m-d') : '-' }}</td>
+                                    <td>{{ $reservation->check_out_date ? $reservation->check_out_date->format('Y-m-d') : '-' }}</td>
                                     <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
                                 </tr>
                             @endforeach

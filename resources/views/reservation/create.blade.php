@@ -6,59 +6,128 @@
 
                 <div class="form-grid">
 
-                    <!-- Agreement -->
-                    <div>
-                        <label for="agreement_id">Agreement</label>
-                        <select id="agreement_id" name="agreement_id">
-                            <option value="">-- Select Agreement --</option>
-                            @isset($agreements)
-                                @foreach($agreements as $agreement)
-                                    <option value="{{ $agreement->agreement_id ?? $agreement->id }}" {{ old('agreement_id') == ($agreement->agreement_id ?? $agreement->id) ? 'selected' : '' }}>
-                                        {{ $agreement->agreement_number ?? ('Agreement #' . ($agreement->agreement_id ?? $agreement->id)) }}
-                                    </option>
-                                @endforeach
-                            @endisset
-                        </select>
-                        @error('agreement_id') <div class="error">{{ $message }}</div> @enderror
+                    <!-- Always create a new agreement (use same fields as agreements.create) -->
+                    <div style="grid-column: span 2;">
+                        <label>Agreement (new)</label>
+
+                        <div id="agreement-new" style="margin-top:10px; border-top:1px dashed #E6A574; padding-top:10px;">
+                            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">
+                                <div>
+                                    <label for="agreement_room_id">Agreement - Room to reserve</label>
+                                    <select id="agreement_room_id" name="agreement_room_id">
+                                        <option value="">-- Select Room for Agreement --</option>
+                                        @isset($rooms)
+                                            @foreach($rooms as $room)
+                                                <option value="{{ $room->id }}" {{ old('agreement_room_id') == $room->id ? 'selected' : '' }}>
+                                                    {{ $room->room_number ?? ('Room ' . $room->id) }}
+                                                </option>
+                                            @endforeach
+                                        @endisset
+                                    </select>
+                                    @error('agreement_room_id') <div class="error">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div>
+                                    <label for="agreement_date">Agreement Date</label>
+                                    <input id="agreement_date" name="agreement_date" type="date" value="{{ old('agreement_date', now()->toDateString()) }}" />
+                                    @error('agreement_date') <div class="error">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div>
+                                    <label for="start_date">Start Date</label>
+                                    <input id="start_date" name="start_date" type="date" value="{{ old('start_date', now()->toDateString()) }}" onchange="computeEndDate()" />
+                                    @error('start_date') <div class="error">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div id="agreement_monthly_rent_wrap" style="{{ old('reservation_type') === 'dorm' ? '' : 'display:none;' }}">
+                                    <label for="agreement_monthly_rent">Monthly Rent</label>
+                                    <input id="agreement_monthly_rent" name="agreement_monthly_rent" type="number" step="0.01" value="{{ old('agreement_monthly_rent') }}" />
+                                    @error('agreement_monthly_rent') <div class="error">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div class="full-width" style="grid-column: span 2;">
+                                    <label for="end_date_preview">End Date (auto 1 year - optional)</label>
+                                    <input type="text" id="end_date_preview" readonly value="{{ old('start_date') ? \Illuminate\Support\Carbon::parse(old('start_date'))->addYear()->toDateString() : now()->addYear()->toDateString() }}">
+                                    {{-- optional hidden end_date if you want to submit explicit end_date --}}
+                                    <input type="hidden" id="end_date" name="end_date" value="{{ old('end_date') }}">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Room -->
-                    <div>
-                        <label for="room_id">Room</label>
-                        <select id="room_id" name="room_id">
-                            <option value="">-- Select Room --</option>
-                            @isset($rooms)
-                                @foreach($rooms as $room)
-                                    <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
-                                        {{ $room->room_number ?? ('Room ' . $room->id) }}
-                                    </option>
-                                @endforeach
-                            @endisset
-                        </select>
-                        @error('room_id') <div class="error">{{ $message }}</div> @enderror
-                    </div>
+                    <!-- Renter fields (use same names as renters.create) -->
+                    <div style="grid-column: span 2; margin-top:6px; font-weight:700; color:#5C3A21;">Renter information (optional) — creating a renter will attach it to the created agreement</div>
 
-                    <!-- Guest Names -->
                     <div>
-                        <label for="first_name">First Name</label>
+                        <label for="first_name">Renter First Name</label>
                         <input id="first_name" name="first_name" value="{{ old('first_name') }}" />
                         @error('first_name') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
                     <div>
-                        <label for="last_name">Last Name</label>
+                        <label for="last_name">Renter Last Name</label>
                         <input id="last_name" name="last_name" value="{{ old('last_name') }}" />
                         @error('last_name') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Reservation Type -->
+                    <div>
+                        <label for="dob">Renter Date of Birth</label>
+                        <input id="dob" name="dob" type="date" value="{{ old('dob') }}" />
+                        @error('dob') <div class="error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div>
+                        <label for="email">Renter Email</label>
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" />
+                        @error('email') <div class="error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div>
+                        <label for="phone">Renter Phone</label>
+                        <input id="phone" name="phone" value="{{ old('phone') }}" />
+                        @error('phone') <div class="error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label for="address">Renter Address</label>
+                        <input id="address" name="address" value="{{ old('address') }}" />
+                        @error('address') <div class="error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label for="emergency_contact">Renter Emergency Contact</label>
+                        <input id="emergency_contact" name="emergency_contact" value="{{ old('emergency_contact') }}" />
+                        @error('emergency_contact') <div class="error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div>
+                        <label for="guardian_name">Guardian Name</label>
+                        <input id="guardian_name" name="guardian_name" value="{{ old('guardian_name') }}" />
+                        @error('guardian_name') <div class="error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div>
+                        <label for="guardian_phone">Guardian Phone</label>
+                        <input id="guardian_phone" name="guardian_phone" value="{{ old('guardian_phone') }}" />
+                        @error('guardian_phone') <div class="error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div style="grid-column: span 2;">
+                        <label for="guardian_email">Guardian Email</label>
+                        <input id="guardian_email" name="guardian_email" type="email" value="{{ old('guardian_email') }}" />
+                        @error('guardian_email') <div class="error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <!-- Reservation Type & Dates & Status -->
                     <div>
                         <label for="reservation_type">Reservation Type</label>
-                        <input id="reservation_type" name="reservation_type" value="{{ old('reservation_type') }}" />
+                        <select id="reservation_type" name="reservation_type">
+                            <option value="transient" {{ old('reservation_type') === 'transient' ? 'selected' : '' }}>Transient</option>
+                            <option value="dorm" {{ old('reservation_type') === 'dorm' ? 'selected' : '' }}>Dorm</option>
+                        </select>
                         @error('reservation_type') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Dates -->
                     <div>
                         <label for="check_in_date">Check-in Date</label>
                         <input id="check_in_date" name="check_in_date" type="date" value="{{ old('check_in_date') }}" />
@@ -71,7 +140,6 @@
                         @error('check_out_date') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Status -->
                     <div>
                         <label for="status">Status</label>
                         <input id="status" name="status" value="{{ old('status', 'booked') }}" />
@@ -88,6 +156,49 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeEl = document.getElementById('reservation_type');
+        const rentWrap = document.getElementById('agreement_monthly_rent_wrap');
+        const rentInput = document.getElementById('agreement_monthly_rent');
+        const startEl = document.getElementById('start_date');
+        const endPreview = document.getElementById('end_date_preview');
+        const endHidden = document.getElementById('end_date');
+
+        function toggleRent() {
+            if (!typeEl) return;
+            if (typeEl.value === 'dorm') {
+                rentWrap.style.display = '';
+            } else {
+                rentWrap.style.display = 'none';
+                if (rentInput) rentInput.value = '';
+            }
+        }
+
+        function computeEndDate() {
+            const start = startEl.value;
+            if (!start) return;
+            const d = new Date(start);
+            d.setFullYear(d.getFullYear() + 1);
+            const yyyy = d.getFullYear();
+            let mm = (d.getMonth() + 1).toString().padStart(2, '0');
+            let dd = d.getDate().toString().padStart(2, '0');
+            const val = `${yyyy}-${mm}-${dd}`;
+            if (endPreview) endPreview.value = val;
+            if (endHidden) endHidden.value = val;
+        }
+
+        if (typeEl) {
+            typeEl.addEventListener('change', toggleRent);
+            toggleRent();
+        }
+        if (startEl) {
+            startEl.addEventListener('change', computeEndDate);
+            computeEndDate();
+        }
+    });
+</script>
 
 <!-- 🔹 CSS Section -->
 <style>
@@ -109,4 +220,7 @@
 
     /* Error Messages */
     .error { color:#e07b7b; font-size:12px; margin-top:4px; }
+    .muted { font-size:12px; color:#6B7280; }
+
+    .full-width input { width:100%; }
 </style>
