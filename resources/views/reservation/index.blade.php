@@ -11,10 +11,63 @@
             <a href="{{ route('reservation.create') }}" class="btn-new">+ Create Reservation</a>
         </div>
 
-        <!-- 🔹 Reservations Table Card -->
+        {{-- Pending Reservations --}}
+        <div class="card table-card" style="margin-bottom:18px;">
+            <h3 style="margin:0 0 12px 0; color:#5C3A21;">Pending Reservations</h3>
+            @if(empty($pendingReservations) || $pendingReservations->isEmpty())
+                <p>No pending reservations.</p>
+            @else
+                <div class="table-wrapper">
+                    <table class="reservations-table">
+                        <thead>
+                            <tr>
+                                <th>Created</th>
+                                <th>Room (preview)</th>
+                                <th>Renter (pending)</th>
+                                <th>Contact</th>
+                                <th>Type</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($pendingReservations as $reservation)
+                                <tr>
+                                    <td>{{ $reservation->created_at->format('Y-m-d') }}</td>
+                                    <td>{{ $reservation->room_id }}</td>
+                                    <td>{{ $reservation->pending_payload['renter']['first_name'] ?? '-' }} {{ $reservation->pending_payload['renter']['last_name'] ?? '' }}</td>
+                                    <td>
+                                        {{ $reservation->pending_payload['renter']['email'] ?? '-' }}
+                                        @if(!empty($reservation->pending_payload['renter']['phone']))
+                                            <div>{{ $reservation->pending_payload['renter']['phone'] }}</div>
+                                        @endif
+                                    </td>
+                                    <td>{{ $reservation->reservation_type }}</td>
+                                    <td>{{ $reservation->check_in_date ? $reservation->check_in_date->format('Y-m-d') : '-' }}</td>
+                                    <td>{{ $reservation->check_out_date ? $reservation->check_out_date->format('Y-m-d') : '-' }}</td>
+                                    <td style="display:flex;gap:6px;align-items:center;justify-content:center">
+                                        <span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span>
+
+                                        {{-- Confirm button --}}
+                                        <form method="POST" action="{{ route('reservation.confirm', $reservation) }}" style="display:inline">
+                                            @csrf
+                                            <button type="submit" class="btn-confirm" title="Confirm reservation">Confirm</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+
+        {{-- Confirmed Reservations --}}
         <div class="card table-card">
-            @if($reservations->isEmpty())
-                <p>No reservations found.</p>
+            <h3 style="margin:0 0 12px 0; color:#5C3A21;">Confirmed Reservations</h3>
+            @if(empty($confirmedReservations) || $confirmedReservations->isEmpty())
+                <p>No confirmed reservations.</p>
             @else
                 <div class="table-wrapper">
                     <table class="reservations-table">
@@ -34,47 +87,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($reservations as $reservation)
+                            @foreach($confirmedReservations as $reservation)
                                 <tr>
                                     <td>{{ $reservation->room_id }}</td>
-
-                                    <td>
-                                        {{ $reservation->first_name }} {{ $reservation->last_name }}
-                                    </td>
-
-                                    <td>
-                                        {{-- Access renter via accessor or agreement relation --}}
-                                        {{ optional($reservation->renter)->full_name ?? '-' }}
-                                    </td>
-
+                                    <td>{{ $reservation->first_name }} {{ $reservation->last_name }}</td>
+                                    <td>{{ optional($reservation->renter)->full_name ?? '-' }}</td>
                                     <td>
                                         {{ optional($reservation->renter)->email ?? '-' }}
                                         @if(optional($reservation->renter)->phone)
                                             <div>{{ optional($reservation->renter)->phone }}</div>
                                         @endif
                                     </td>
-
                                     <td>{{ optional($reservation->agreement)->agreement_number ?? (optional($reservation->agreement)->agreement_id ? 'Agreement #' . optional($reservation->agreement)->agreement_id : '-') }}</td>
-
-                                    <td>
-                                        @if($reservation->agreement && $reservation->agreement->start_date)
-                                            {{ $reservation->agreement->start_date->format('Y-m-d') }}
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-
-                                    <td>
-                                        @if($reservation->agreement && $reservation->agreement->end_date)
-                                            {{ $reservation->agreement->end_date->format('Y-m-d') }}
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-
+                                    <td>{{ $reservation->agreement && $reservation->agreement->start_date ? $reservation->agreement->start_date->format('Y-m-d') : '-' }}</td>
+                                    <td>{{ $reservation->agreement && $reservation->agreement->end_date ? $reservation->agreement->end_date->format('Y-m-d') : '-' }}</td>
                                     <td>{{ $reservation->reservation_type }}</td>
                                     <td>{{ $reservation->check_in_date ? $reservation->check_in_date->format('Y-m-d') : '-' }}</td>
                                     <td>{{ $reservation->check_out_date ? $reservation->check_out_date->format('Y-m-d') : '-' }}</td>
+
                                     <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
                                 </tr>
                             @endforeach
@@ -83,6 +113,7 @@
                 </div>
             @endif
         </div>
+
     </div>
 </x-app-layout>
 
@@ -114,7 +145,13 @@
 
 /* 🟩 Status Badges */
 .status-badge { padding:4px 10px; border-radius:20px; font-weight:600; font-size:13px; display:inline-block; }
-.status-badge.booked { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
+.status-badge.verified { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }   /* confirmed */
+.status-badge.unverified { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; } /* pending/unverified */
 .status-badge.cancelled { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
 .status-badge.checkedout { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; }
+
+/* 🔘 Confirm Button */
+.btn-confirm { background:#4CAF50; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s, transform 0.2s; }
+.btn-confirm:hover { background:#45A049; transform:translateY(-1px); }
+.btn-confirm:active { transform:translateY(1px); }
 </style>

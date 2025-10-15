@@ -118,7 +118,7 @@
                         @error('guardian_email') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Reservation Type & Dates & Status -->
+                    <!-- Reservation Type & Dates -->
                     <div>
                         <label for="reservation_type">Reservation Type</label>
                         <select id="reservation_type" name="reservation_type">
@@ -138,12 +138,6 @@
                         <label for="check_out_date">Check-out Date</label>
                         <input id="check_out_date" name="check_out_date" type="date" value="{{ old('check_out_date') }}" />
                         @error('check_out_date') <div class="error">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div>
-                        <label for="status">Status</label>
-                        <input id="status" name="status" value="{{ old('status', 'booked') }}" />
-                        @error('status') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
                 </div>
