@@ -17,27 +17,26 @@ class AgreementController extends Controller
     public function index(Request $request)
     {
         // Show only active agreements (still valid)
-    $search = $request->input('search');
-    $sort = $request->input('sort', 'asc'); // default ascending
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'asc'); // default ascending
 
-    $agreements = Agreement::with(['renter', 'room.roomType'])
-        ->where('is_active', true)
-        ->whereDate('end_date', '>=', now())
-        ->when($search, function ($query, $search) {
-            $query->whereHas('renter', function ($q) use ($search) {
-                $q->where('full_name', 'like', "%{$search}%");
+        $agreements = Agreement::with(['renter', 'room.roomType'])
+            ->where('is_active', true)
+            ->whereDate('end_date', '>=', now())
+            ->when($search, function ($query, $search) {
+                $query->whereHas('renter', function ($q) use ($search) {
+                    $q->where('full_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('room', function ($q) use ($search) {
+                    $q->where('room_number', 'like', "%{$search}%");
+                });
             })
-            ->orWhereHas('room', function ($q) use ($search) {
-                $q->where('room_number', 'like', "%{$search}%");
-            });
-        })
-        ->orderBy(Room::select('room_number')->whereColumn('rooms.id', 'agreements.room_id'), $sort)
-        ->paginate(10)
-        ->appends(['search' => $search, 'sort' => $sort]);
+            ->orderBy(Room::select('room_number')->whereColumn('rooms.id', 'agreements.room_id'), $sort)
+            ->paginate(10)
+            ->appends(['search' => $search, 'sort' => $sort]);
 
-    return view('agreements.index', compact('agreements', 'search', 'sort'));
-}
-
+        return view('agreements.index', compact('agreements', 'search', 'sort'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -60,36 +59,71 @@ class AgreementController extends Controller
             'room_id'        => 'required|exists:rooms,id',
             'agreement_date' => 'required|date',
             'start_date'     => 'required|date',
+            'end_date'       => 'nullable|date',
+            'stay_length'    => 'nullable|integer|min:1', // for transient stays
         ]);
 
-        $room = Room::findOrFail($data['room_id']);
+        $room = Room::with('roomType')->findOrFail($data['room_id']);
+        $roomType = $room->roomType;
 
         $start = Carbon::parse($data['start_date'])->startOfDay();
-        $end = (clone $start)->addYear()->subSecond();
 
-        // Prevent assigning if active agreement exists for that room
-        $conflict = Agreement::where('room_id', $data['room_id'])
-            ->where('is_active', true)
-            ->where('start_date', '<=', $end->toDateString())
-            ->where('end_date', '>=', $start->toDateString())
-            ->exists();
+        // 🔹 Transient or Dorm logic
+        if ($roomType && $roomType->is_transient) {
+            // User can set end date for transient
+            $end = isset($data['end_date'])
+                ? Carbon::parse($data['end_date'])->startOfDay()
+                : $start->copy()->addDays($data['stay_length'] ?? 1);
 
-        if ($conflict) {
-            return back()->withInput()->withErrors(['room_id' => 'This room already has an active agreement.']);
+            $rate = $room->room_price ?? 0;
+            $rateUnit = 'daily';
+            $monthlyRent = null; // not used
+        } else {
+            // Dorm auto 1 year
+            $end = (clone $start)->addYear();
+
+            $rate = $room->room_price ?? 0;
+            $rateUnit = 'monthly';
+            $monthlyRent = $rate;
         }
 
-        Agreement::create([
+        // 🔹 Capacity check
+        $capacity = (int)($room->number_of_occupants ?? 1);
+        if ($capacity < 1) $capacity = 1;
+
+        $activeCount = Agreement::where('room_id', $room->id)
+            ->where('is_active', true)
+            ->count();
+
+        if ($activeCount + 1 > $capacity) {
+            return back()
+                ->withInput()
+                ->withErrors(['room_id' => 'Room capacity reached. This room allows only ' . $capacity . ' occupant(s).']);
+        }
+
+        // 🔹 Create Agreement (aligned with your DB)
+        $agreement = Agreement::create([
             'renter_id'      => $data['renter_id'],
             'room_id'        => $data['room_id'],
             'agreement_date' => $data['agreement_date'],
             'start_date'     => $start->toDateString(),
             'end_date'       => $end->toDateString(),
-            // lock current room price at time of creation
-            'monthly_rent'   => $room->room_price,
+            'monthly_rent'   => $monthlyRent,
+            'rate'           => $rate,
+            'rate_unit'      => $rateUnit,
             'is_active'      => true,
         ]);
 
-        return redirect()->route('agreements.index')->with('success', 'Agreement created and rent locked to current room price.');
+        // 🔹 Recalculate shared rent only for dorms
+        if (!$roomType->is_transient) {
+            $this->recalcRoomAgreementRents($room);
+        }
+
+        return redirect()
+            ->route('agreements.index')
+            ->with('success', $roomType->is_transient
+                ? 'Transient stay created successfully.'
+                : 'Dorm agreement created successfully. Rent adjusted based on occupancy.');
     }
 
     /**
@@ -140,12 +174,30 @@ class AgreementController extends Controller
         }
 
         $room = $agreement->room;
-        $agreement->end_date = Carbon::parse($agreement->end_date)->addYear();
-        $agreement->monthly_rent = $room->room_price; // new locked rate
-        $agreement->is_active = true;
-        $agreement->save();
+        $roomType = $room->roomType;
 
-        return redirect()->route('agreements.edit', $agreement)->with('success', 'Agreement renewed with updated room price.');
+        if ($roomType && $roomType->is_transient) {
+            // EXTEND STAY by 1 day
+            $agreement->end_date = Carbon::parse($agreement->end_date)->addDay();
+            $agreement->is_active = true;
+            $agreement->save();
+
+            $message = 'Transient stay extended by 1 day successfully.';
+        } else {
+            // DORM: renew for another year
+            $agreement->end_date = Carbon::parse($agreement->end_date)->addYear();
+            $agreement->is_active = true;
+            $agreement->save();
+
+            // Recalculate rents (based on new total active agreements)
+            $this->recalcRoomAgreementRents($room);
+
+            $message = 'Dorm agreement renewed successfully. Rent updated based on occupancy.';
+        }
+
+        return redirect()
+            ->route('agreements.edit', $agreement)
+            ->with('success', $message);
     }
 
     /**
@@ -161,36 +213,66 @@ class AgreementController extends Controller
         $agreement->end_date = Carbon::now();
         $agreement->save();
 
-        return redirect()->route('agreements.index')->with('success', 'Agreement terminated successfully.');
+        // Recalculate rent for remaining active agreements in this room
+        $this->recalcRoomAgreementRents($agreement->room);
+
+        return redirect()
+            ->route('agreements.index')
+            ->with('success', 'Agreement terminated successfully and rents recalculated.');
     }
 
     // Archived agreements view
     public function archived(Request $request)
-{
-    $search = $request->input('search');
-    $sort = $request->input('sort', 'asc');
+    {
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'asc');
 
-     // Agreements that are expired or terminated
-    $agreements = Agreement::with(['renter', 'room.roomType'])
-        ->where(function ($query) {
-            $query->where('is_active', false)
-                ->orWhereDate('end_date', '<', now());
-        })
-        ->when($search, function ($query, $search) {
-            $query->whereHas('renter', function ($q) use ($search) {
-                $q->where('full_name', 'like', "%{$search}%");
+        // Agreements that are expired or terminated
+        $agreements = Agreement::with(['renter', 'room.roomType'])
+            ->where(function ($query) {
+                $query->where('is_active', false)
+                    ->orWhereDate('end_date', '<', now());
             })
-            ->orWhereHas('room', function ($q) use ($search) {
-                $q->where('room_number', 'like', "%{$search}%");
-            });
-        })
-        ->orderBy(Room::select('room_number')->whereColumn('rooms.id', 'agreements.room_id'), $sort)
-        ->paginate(10)
-        ->appends(['search' => $search, 'sort' => $sort]);
+            ->when($search, function ($query, $search) {
+                $query->whereHas('renter', function ($q) use ($search) {
+                    $q->where('full_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('room', function ($q) use ($search) {
+                    $q->where('room_number', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy(Room::select('room_number')->whereColumn('rooms.id', 'agreements.room_id'), $sort)
+            ->paginate(10)
+            ->appends(['search' => $search, 'sort' => $sort]);
 
-    return view('agreements.archived', compact('agreements', 'search', 'sort'));
-}
+        return view('agreements.archived', compact('agreements', 'search', 'sort'));
+    }
 
+    private function recalcRoomAgreementRents($roomOrId)
+    {
+        $room = $roomOrId instanceof \App\Models\Room ? $roomOrId : \App\Models\Room::find($roomOrId);
+        if (!$room) return;
+
+        // capacity (fallback to 1 if not set)
+        $capacity = (int) ($room->number_of_occupants ?? 1);
+        if ($capacity < 1) $capacity = 1;
+
+        // count active agreements (only currently active ones)
+        $activeCount = \App\Models\Agreement::where('room_id', $room->id)
+            ->where('is_active', true)
+            ->count();
+
+        // divisor is min(activeCount, capacity) but at least 1
+        $divisor = max(1, min($activeCount, $capacity));
+
+        // compute per-person monthly rent (decimal)
+        $perPerson = $room->room_price / $divisor;
+
+        // update all active agreements for this room to the perPerson
+        \App\Models\Agreement::where('room_id', $room->id)
+            ->where('is_active', true)
+            ->update(['monthly_rent' => $perPerson]);
+    }
 
     /**
      * Remove the specified resource.

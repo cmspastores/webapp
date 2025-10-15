@@ -18,22 +18,18 @@ class Agreement extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'renter_id',
-        'room_id',
-        'agreement_date',
-        'start_date',
-        'end_date',
-        'monthly_rent',
-        'is_active',
+        'renter_id', 'room_id', 'agreement_date', 'start_date', 'end_date',
+        'monthly_rent', // if you keep legacy
+        'rate','rate_unit','is_active',
     ];
 
     // If you want the model to treat dates properly
     protected $casts = [
         'agreement_date' => 'date',
-        'start_date'     => 'date',
-        'end_date'       => 'date',
-        'monthly_rent'   => 'decimal:2',
-        'is_active'      => 'boolean',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'rate' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
     protected $dates = ['agreement_date', 'start_date', 'end_date'];
@@ -50,9 +46,25 @@ class Agreement extends Model
         return $this->belongsTo(Room::class, 'room_id', 'id');
     }
 
+    // convenient access to room type
+    public function roomType()
+    {
+        return $this->hasOneThrough(RoomType::class, Room::class, 'id', 'id', 'room_id', 'room_type_id');
+    }
+
     public function bills()
     {
         return $this->hasMany(Bill::class, 'agreement_id', 'agreement_id');
+    }
+
+    public function isTransient()
+    {
+        return ($this->rate_unit ?? 'monthly') === 'daily';
+    }
+
+    public function displayRate()
+    {
+        return ($this->rate_unit === 'daily' ? '₱' . number_format($this->rate,2) . ' / day' : '₱' . number_format($this->rate,2) . ' / month');
     }
 
     // 🔹 Automatically detect "expired" without storing it in the DB

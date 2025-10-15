@@ -52,7 +52,13 @@
                                 <td>{{ optional($a->start_date)->toDateString() }}</td>
                                 <td>{{ optional($a->end_date)->toDateString() }}</td>
                                 <td><span class="status-badge {{ strtolower($a->status) }}">{{ ucfirst($a->status) }}</span></td>
-                                <td>{{ $a->monthly_rent ? '₱'.number_format($a->monthly_rent,2) : '—' }}</td>
+                                <td>
+                                    @if($a->rate_unit === 'daily')
+                                        ₱{{ number_format($a->rate, 2) }} /day
+                                    @else
+                                        ₱{{ number_format($a->monthly_rent ?? $a->rate, 2) }} /month
+                                    @endif
+                                </td>
                                 <td class="actions-cell">
                                     <div class="actions-buttons">
                                         <a href="{{ route('agreements.edit',$a) }}" class="btn-yellow">View</a>

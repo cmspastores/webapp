@@ -1,5 +1,4 @@
 <x-app-layout>
-
     <div class="container">
         <div class="card form-card">
             <!-- The form stays, but we make fields readonly -->
@@ -56,10 +55,21 @@
                         <input type="number" name="monthly_rent" id="monthly_rent" step="0.01" value="{{ old('monthly_rent', $agreement->monthly_rent) }}" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
                         @error('monthly_rent')<div class="error">{{ $message }}</div>@enderror
                     </div>
+                    @if(optional($agreement->room->roomType)->is_transient)
+                        <div>
+                            <label>Stay Type</label>
+                            <input type="text" value="Transient (Daily)" readonly>
+                        </div>
+                    @endif
                     
                     <div>
                         <label for="locked_price">Locked Room Price</label>
-                        <input type="text" id="locked_price" value="₱{{ number_format($agreement->monthly_rent, 2) }}" readonly>
+                        <input type="text" id="locked_price" 
+                            value="@if($agreement->rate_unit === 'daily')
+                                    ₱{{ number_format($agreement->rate, 2) }} /day
+                                @else
+                                    ₱{{ number_format($agreement->monthly_rent ?? $agreement->rate, 2) }} /month
+                                @endif" readonly>
                     </div>
 
                     <div>
@@ -164,6 +174,14 @@
         }
         document.addEventListener('DOMContentLoaded', computeEndDate);
         document.getElementById('start_date')?.addEventListener('change', computeEndDate);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Show correct label for end date
+            const isTransient = {{ optional($agreement->room->roomType)->is_transient ? 'true' : 'false' }};
+            const endLabel = document.querySelector('label[for="end_date_preview"]');
+            if (isTransient && endLabel) {
+                endLabel.textContent = 'End Date (auto, daily stay)';
+            }
+        });
     </script>
 </x-app-layout>
 

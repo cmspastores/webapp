@@ -13,24 +13,24 @@
         @endif
 
         <!-- 🔍 Search + Sort Left | Buttons Right -->
-<div class="toolbar-row">
-    <form method="GET" action="{{ route('agreements.index') }}" class="search-toolbar">
-        <input type="text" name="search" placeholder="Search renter or room" value="{{ request('search') }}" class="search-input">
-        <select name="sort" class="search-filter">
-            <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Room Number ↑ Ascending</option>
-            <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Room Number ↓ Descending</option>
-        </select>
-        <button type="submit" class="btn-search">Search</button>
-    </form>
+        <div class="toolbar-row">
+            <form method="GET" action="{{ route('agreements.index') }}" class="search-toolbar">
+                <input type="text" name="search" placeholder="Search renter or room" value="{{ request('search') }}" class="search-input">
+                <select name="sort" class="search-filter">
+                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Room Number ↑ Ascending</option>
+                    <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Room Number ↓ Descending</option>
+                </select>
+                <button type="submit" class="btn-search">Search</button>
+            </form>
 
-    <div class="toolbar-actions">
-        <button type="button" id="btn-refresh" class="btn-refresh">Refresh List</button>
-        @if(auth()->user() && auth()->user()->is_admin)
-            <a href="{{ route('agreements.create') }}" class="btn-new">+ New Agreement</a>
-        @endif
-        <a href="{{ route('agreements.archived') }}" class="btn-archive">View Archive</a>
-    </div>
-</div>
+            <div class="toolbar-actions">
+                <button type="button" id="btn-refresh" class="btn-refresh">Refresh List</button>
+                @if(auth()->user() && auth()->user()->is_admin)
+                    <a href="{{ route('agreements.create') }}" class="btn-new">+ New Agreement</a>
+                @endif
+                <a href="{{ route('agreements.archived') }}" class="btn-archive">View Archive</a>
+            </div>
+        </div>
 
 
         <!-- 🔹 Agreements Table -->
@@ -52,8 +52,14 @@
                     <tbody>
                         @forelse($agreements as $a)
                             @php
-                                $status = $a->is_active ? 'Active' : 'Terminated';
-                                if(!$a->is_active && isset($a->end_date) && $a->end_date->isPast()) { $status='Expired'; }
+                                $now = \Carbon\Carbon::now();
+                                if ($a->end_date && \Carbon\Carbon::parse($a->end_date)->isPast()) {
+                                    $status = 'Expired';
+                                } elseif ($a->is_active) {
+                                    $status = 'Active';
+                                } else {
+                                    $status = 'Terminated';
+                                }
                             @endphp
                             <tr>
                                 <td>{{ $a->renter->full_name ?? '—' }}</td>
@@ -61,7 +67,13 @@
                                 <td>{{ optional($a->agreement_date)->toDateString() }}</td>
                                 <td>{{ optional($a->start_date)->toDateString() }}</td>
                                 <td>{{ optional($a->end_date)->toDateString() }}</td>
-                                <td>{{ $a->monthly_rent ? '₱'.number_format($a->monthly_rent,2) : '—' }}</td>
+                                <td>
+                                    @if($a->rate_unit === 'daily')
+                                        ₱{{ number_format($a->rate, 2) }} /day
+                                    @else
+                                        ₱{{ number_format($a->monthly_rent ?? $a->rate, 2) }} /month
+                                    @endif
+                                </td>
                                 <td><span class="status-badge {{ strtolower($status) }}">{{ $status }}</span></td>
                                 <td class="actions-cell">
                                     <div class="actions-buttons">

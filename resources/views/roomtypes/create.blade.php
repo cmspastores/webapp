@@ -25,6 +25,13 @@
                     <input type="text" name="name" id="name" value="{{ old('name') }}" required>
                     @error('name')<div class="error">{{ $message }}</div>@enderror
                 </div>
+                <div>
+                    <label for="is_transient">Type</label>
+                    <select name="is_transient" id="is_transient">
+                        <option value="0" {{ old('is_transient', $roomType->is_transient ?? 0) == 0 ? 'selected' : '' }}>Dorm (monthly)</option>
+                        <option value="1" {{ old('is_transient', $roomType->is_transient ?? 0) == 1 ? 'selected' : '' }}>Transient (daily)</option>
+                    </select>
+                </div>
                 <div style="display:flex; gap:8px;">
                     <button type="submit" class="btn btn-save">Save</button>
                     <a href="{{ route('roomtypes.index') }}" class="btn btn-cancel">Cancel</a>

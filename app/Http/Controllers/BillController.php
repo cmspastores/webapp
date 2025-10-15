@@ -55,26 +55,41 @@ class BillController extends Controller
         $created = 0;
         $skipped = 0;
 
-        if (!empty($data['agreement_id'])) {
-            // Generate for a single agreement
-            $agreement = Agreement::findOrFail($data['agreement_id']);
+        // Helper function
+        $createBill = function ($agreement, $periodStart, $periodEnd) use (&$created, &$skipped) {
+            $roomType = $agreement->room->roomType ?? null;
+            $isTransient = $roomType && $roomType->is_transient;
 
-            // Ensure agreement overlaps the billing period and is active
-            if (! $agreement->is_active ||
-                $agreement->start_date > $periodEnd->toDateString() ||
-                $agreement->end_date < $periodStart->toDateString()
-            ) {
-                return back()->withInput()->withErrors(['agreement_id' => 'Selected agreement is not active for that period.']);
-            }
-
+            // Check if bill already exists
             $exists = Bill::where('agreement_id', $agreement->agreement_id)
                 ->where('period_start', $periodStart->toDateString())
                 ->where('period_end', $periodEnd->toDateString())
                 ->exists();
 
             if ($exists) {
-                $skipped = 1;
+                $skipped++;
+                return;
+            }
+
+            if ($isTransient) {
+                // Daily bill (Transient)
+                $days = $periodEnd->diffInDays($periodStart) + 1;
+                $amount = ($agreement->daily_fee ?? 0) * $days;
+
+                Bill::create([
+                    'agreement_id' => $agreement->agreement_id,
+                    'renter_id' => $agreement->renter_id,
+                    'room_id' => $agreement->room_id,
+                    'period_start' => $periodStart->toDateString(),
+                    'period_end' => $periodEnd->toDateString(),
+                    'due_date' => $periodEnd->copy()->addDays(3)->toDateString(), // shorter window
+                    'amount_due' => $amount,
+                    'balance' => $amount,
+                    'status' => 'unpaid',
+                ]);
+
             } else {
+                // Monthly bill (Dorm)
                 Bill::create([
                     'agreement_id' => $agreement->agreement_id,
                     'renter_id' => $agreement->renter_id,
@@ -86,43 +101,34 @@ class BillController extends Controller
                     'balance' => $agreement->monthly_rent ?? 0,
                     'status' => 'unpaid',
                 ]);
-
-                \Log::info("Bill created for agreement {$agreement->agreement_id} for {$periodStart->format('F Y')}");
-                $created = 1;
             }
 
-            return redirect()->route('bills.index')
-                ->with('success', "Bills generated: {$created}, skipped (already exist): {$skipped}");
-        }
-
-        // No agreement specified -> generate for all active agreements that overlap the period
-        $agreements = Agreement::where('is_active', true)
-            ->whereDate('start_date', '<=', $periodEnd->toDateString())
-            ->whereDate('end_date', '>=', $periodStart->toDateString())
-            ->get();
-
-        foreach ($agreements as $agreement) {
-            $exists = Bill::where('agreement_id', $agreement->agreement_id)
-                ->where('period_start', $periodStart->toDateString())
-                ->where('period_end', $periodEnd->toDateString())
-                ->exists();
-
-            if ($exists) { $skipped++; continue; }
-
-            Bill::create([
-                'agreement_id' => $agreement->agreement_id,
-                'renter_id' => $agreement->renter_id,
-                'room_id' => $agreement->room_id,
-                'period_start' => $periodStart->toDateString(),
-                'period_end' => $periodEnd->toDateString(),
-                'due_date' => $periodEnd->copy()->addDays(7)->toDateString(),
-                'amount_due' => $agreement->monthly_rent ?? 0,
-                'balance' => $agreement->monthly_rent ?? 0,
-                'status' => 'unpaid',
-            ]);
-
-            \Log::info("Bill created for agreement {$agreement->agreement_id} for {$periodStart->format('F Y')}");
             $created++;
+        };
+
+        // Single agreement
+        if (!empty($data['agreement_id'])) {
+            $agreement = Agreement::findOrFail($data['agreement_id']);
+
+            if (! $agreement->is_active ||
+                $agreement->start_date > $periodEnd->toDateString() ||
+                $agreement->end_date < $periodStart->toDateString()
+            ) {
+                return back()->withInput()->withErrors(['agreement_id' => 'Selected agreement is not active for that period.']);
+            }
+
+            $createBill($agreement, $periodStart, $periodEnd);
+        }
+        else {
+            // All active agreements overlapping period
+            $agreements = Agreement::where('is_active', true)
+                ->whereDate('start_date', '<=', $periodEnd->toDateString())
+                ->whereDate('end_date', '>=', $periodStart->toDateString())
+                ->get();
+
+            foreach ($agreements as $agreement) {
+                $createBill($agreement, $periodStart, $periodEnd);
+            }
         }
 
         return redirect()->route('bills.index')

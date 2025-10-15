@@ -29,11 +29,15 @@ class RoomTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:room_types,name',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'is_transient' => 'nullable|boolean',
         ]);
 
-        RoomType::create($request->only('name'));
+        RoomType::create([
+            'name' => $validated['name'],
+            'is_transient' => $request->boolean('is_transient'),
+        ]);
 
         return redirect()->route('roomtypes.index')->with('success', 'Room type created successfully.');
     }
@@ -51,11 +55,15 @@ class RoomTypeController extends Controller
      */
     public function update(Request $request, RoomType $roomtype)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:room_types,name,' . $roomtype->id,
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'is_transient' => 'nullable|boolean',
         ]);
 
-        $roomtype->update($request->only('name'));
+        $roomtype->update([
+            'name' => $validated['name'],
+            'is_transient' => $request->boolean('is_transient'),
+        ]);
 
         return redirect()->route('roomtypes.index')->with('success', 'Room type updated successfully.');
     }
