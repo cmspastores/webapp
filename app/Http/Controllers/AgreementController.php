@@ -114,6 +114,40 @@ class AgreementController extends Controller
             'is_active'      => true,
         ]);
 
+        // --- Auto-create bill for transient agreements (daily billing)
+        if (($roomType && $roomType->is_transient) || (($agreement->rate_unit ?? 'monthly') === 'daily')) {
+            // Period start (start of day)
+            $periodStart = Carbon::parse($agreement->start_date)->startOfDay();
+
+            // Period end (date part) — agreement->end_date is date (keep it as date)
+            $periodEndDate = Carbon::parse($agreement->end_date)->startOfDay();
+
+            // inclusive days: diffInDays returns 0 for same day, so +1 to count both endpoints
+            $days = $periodStart->diffInDays($periodEndDate) + 1;
+            if ($days < 1) $days = 1;
+
+            // daily rate — prefer the agreement->rate (if set by your code), else room price fallback
+            $dailyRate = (float) ($agreement->rate ?? $room->room_price ?? 0);
+
+            $amount = round($dailyRate * $days, 2);
+
+            // due_date = expiry day at 12:00 (noon)
+            $dueDate = $periodEndDate->copy()->setTime(12, 0, 0);
+
+            \App\Models\Bill::create([
+                'agreement_id' => $agreement->agreement_id,
+                'renter_id'    => $agreement->renter_id,
+                'room_id'      => $agreement->room_id,
+                'period_start' => $periodStart->toDateString(),
+                'period_end'   => $periodEndDate->toDateString(),
+                'due_date'     => $dueDate, // datetime
+                'amount_due'   => $amount,
+                'balance'      => $amount,
+                'status'       => 'unpaid',
+                'notes'        => 'Auto-generated bill for transient stay',
+            ]);
+        }
+
         // 🔹 Recalculate shared rent only for dorms
         if (!$roomType->is_transient) {
             $this->recalcRoomAgreementRents($room);

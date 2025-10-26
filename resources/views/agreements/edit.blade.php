@@ -50,26 +50,25 @@
                         <input type="text" id="end_date_preview" readonly value="{{ old('start_date') ? \Illuminate\Support\Carbon::parse(old('start_date'))->addYear()->toDateString() : $agreement->end_date?->toDateString() }}">
                     </div>
 
-                    <div>
-                        <label for="monthly_rent">Monthly Rent</label>
-                        <input type="number" name="monthly_rent" id="monthly_rent" step="0.01" value="{{ old('monthly_rent', $agreement->monthly_rent) }}" disabled> <!-- {{ (auth()->user() && auth()->user()->is_admin) ? '' : 'disabled' }}> -->
-                        @error('monthly_rent')<div class="error">{{ $message }}</div>@enderror
-                    </div>
-                    @if(optional($agreement->room->roomType)->is_transient)
-                        <div>
-                            <label>Stay Type</label>
-                            <input type="text" value="Transient (Daily)" readonly>
+                    <!-- Rent & Stay info -->
+                    <div class="full-width" style="align-items:flex-start; flex-direction:column; gap:6px;">
+                        <div style="display:flex; align-items:center; gap:8px; width:100%;">
+                            <label style="min-width:120px;">Rate / Rent</label>
+
+                            @php
+                                $isTransient = optional($agreement->room->roomType)->is_transient || ($agreement->rate_unit === 'daily');
+                                $displayRate = $isTransient
+                                    ? '₱' . number_format($agreement->rate ?? 0, 2) . ' / day'
+                                    : '₱' . number_format($agreement->monthly_rent ?? $agreement->rate ?? 0, 2) . ' / month';
+                            @endphp
+
+                            <input type="text" value="{{ $displayRate }}" readonly class="wide-input" id="locked_price">
                         </div>
-                    @endif
-                    
-                    <div>
-                        <label for="locked_price">Locked Room Price</label>
-                        <input type="text" id="locked_price" 
-                            value="@if($agreement->rate_unit === 'daily')
-                                    ₱{{ number_format($agreement->rate, 2) }} /day
-                                @else
-                                    ₱{{ number_format($agreement->monthly_rent ?? $agreement->rate, 2) }} /month
-                                @endif" readonly>
+
+                        <div style="display:flex; align-items:center; gap:8px; width:100%;">
+                            <label style="min-width:120px;">Stay Type</label>
+                            <input type="text" value="{{ $isTransient ? 'Transient (Daily)' : 'Dorm (Monthly)' }}" readonly class="wide-input">
+                        </div>
                     </div>
 
                     <div>
@@ -104,7 +103,14 @@
                                 @foreach($bills as $bill)
                                     <tr>
                                         <td>{{ \Carbon\Carbon::parse($bill->period_start)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($bill->period_end)->format('M d, Y') }}</td>
-                                        <td>{{ $bill->due_date ? \Carbon\Carbon::parse($bill->due_date)->format('M d, Y') : '—' }}</td>
+                                        <td>
+                                            @if($bill->due_date)
+                                                {{-- formatted datetime: e.g. Oct 03, 2025 at 12:00 PM --}}
+                                                {{ \Carbon\Carbon::parse($bill->due_date)->format('M d, Y \a\t h:i A') }}
+                                            @else
+                                                — 
+                                            @endif
+                                        </td>
                                         <td>₱{{ number_format($bill->amount_due, 2) }}</td>
                                         <td>₱{{ number_format($bill->balance, 2) }}</td>
                                         <td>
@@ -222,7 +228,10 @@
     .status-paid { color: #198754; font-weight: 600; }
     .btn-view-bill { background: #D97A4E; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; }
     .btn-view-bill:hover { background: #F4C38C; color: #5C3A21; }
-
+    .wide-input { width: 300px; max-width: 100%; padding:6px 10px; border-radius:6px; border:1px solid #E6A574; }
+    @media (max-width: 720px) {
+        .wide-input { width: 100%; }
+    }
 
     /* Buttons */
     .btn-confirm { background:#E6A574; color:#5C3A21; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s; }

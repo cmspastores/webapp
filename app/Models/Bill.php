@@ -25,7 +25,7 @@ class Bill extends Model
     protected $casts = [
         'period_start' => 'date',
         'period_end' => 'date',
-        'due_date' => 'date',
+        'due_date'     => 'datetime',
         'amount_due' => 'decimal:2',
         'balance' => 'decimal:2',
     ];
