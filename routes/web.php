@@ -87,6 +87,13 @@ Route::middleware(['auth'])->group(function () {
     // Resource routes for bills (index, create, store, show, destroy etc.)
     Route::resource('bills', \App\Http\Controllers\BillController::class);
     
+    // create/destroy bill charges
+    Route::post('bills/{bill}/charges', [\App\Http\Controllers\BillChargeController::class, 'store'])
+        ->name('bills.charges.store');
+
+    Route::delete('bills/{bill}/charges/{charge}', [\App\Http\Controllers\BillChargeController::class, 'destroy'])
+        ->name('bills.charges.destroy');
+
     // ============================
     // Settings (All users)
     // ============================

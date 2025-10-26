@@ -34,6 +34,56 @@
             </div>
         </div>
 
+        <!-- Charges list -->
+        <div class="card" style="margin-top:12px;">
+            <h3>Charges</h3>
+
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Description</th><th>Amount</th><th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($bill->charges as $c)
+                        <tr>
+                            <td>{{ $c->name }}</td>
+                            <td>{{ $c->description ?? '—' }}</td>
+                            <td>₱{{ number_format($c->amount,2) }}</td>
+                            <td>
+                                <form action="{{ route('bills.charges.destroy', [$bill, $c]) }}" method="POST" onsubmit="return confirm('Remove charge?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-red">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                    @if($bill->charges->isEmpty())
+                        <tr><td colspan="4">No charges yet.</td></tr>
+                    @endif
+                </tbody>
+            </table>
+
+            <!-- Add charge form (simple inline) -->
+            <form action="{{ route('bills.charges.store', $bill) }}" method="POST" style="margin-top:12px;">
+                @csrf
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                    <input type="text" name="name" placeholder="Charge name" required>
+                    <input type="text" name="description" placeholder="Description (optional)">
+                    <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+                    <button class="btn-confirm" type="submit">Add Charge</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Totals display -->
+        <div style="margin-top:8px;font-weight:700;">
+            Base rent: ₱{{ number_format($bill->base_amount ?? 0,2) }} <br>
+            Charges: ₱{{ number_format($bill->total_charges ?? 0,2) }} <br>
+            Total due: ₱{{ number_format($bill->amount_due, 2) }}
+        </div>
+
         <!-- Back Button -->
         <div class="action-container">
             <a href="{{ route('bills.index') }}" class="btn-back">Back</a>
