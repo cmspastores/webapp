@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Agreement;
 use App\Models\Bill;
+
+use App\Models\BillCharge; // 🔹 ADDED THIS LINE for querying charges
+
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
@@ -174,4 +177,36 @@ class BillController extends Controller
         $bill->delete();
         return redirect()->route('bills.index')->with('success', 'Bill deleted.');
     }
+
+    // 🔹 Sales/Reports method
+public function reports(Request $request)
+{
+    // Optional filters for month/year
+    $month = $request->input('month');
+    $year = $request->input('year');
+
+    // Start with all bills
+    $query = Bill::with('charges', 'renter', 'room');
+
+    // Apply filters if provided
+    if ($month && $year) {
+        $query->whereYear('period_start', $year)
+              ->whereMonth('period_start', $month);
+    }
+
+    $bills = $query->get();
+
+    // Aggregate totals
+    $totalRevenue = $bills->sum('amount_due');
+    $totalOutstanding = $bills->where('status', 'unpaid')->sum('balance');
+
+    // Aggregate charges by type
+    $chargesByType = BillCharge::selectRaw('name, SUM(amount) as total')
+                        ->groupBy('name')
+                        ->get();
+
+    return view('bills.reports', compact('bills', 'totalRevenue', 'totalOutstanding', 'chargesByType'));
 }
+
+}
+

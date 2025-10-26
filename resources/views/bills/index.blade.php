@@ -6,9 +6,10 @@
             <div class="bills-header">Bills</div>
         </div>
 
-        <!-- 🔹 Create Button -->
+        <!-- 🔹 Create Button + Reports Button -->
         <div class="toolbar-row">
-            <a href="{{ route('bills.create') }}" class="btn-new">Generate Month Bills</a>
+            <a href="{{ route('bills.create') }}" class="btn-new">Generate Monthly Bills</a>
+            <a href="{{ route('bills.reports') }}" class="btn-new" style="margin-left:12px;">View Reports</a>
         </div>
 
         <!-- 🔹 Bills Table Card -->
@@ -65,7 +66,8 @@
 .bills-header { font-size:24px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; margin-bottom:8px; }
 
 /* 🔹 Toolbar */
-.toolbar-row { display:flex; justify-content:flex-start; margin-bottom:16px; }
+.toolbar-row { display:flex; justify-content:flex-start; gap:12; margin-bottom:16px; }
+
 .btn-new { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-decoration:none; transition:0.2s; border:none; cursor:pointer; }
 .btn-new:hover { background:#D97A4E; color:#fff; }
 
