@@ -22,8 +22,8 @@
             <li><a href="{{ route('rooms.index') }}" class="{{ request()->routeIs('rooms.*') ? 'active' : '' }}">Rooms</a></li>
             <li><a href="{{ route('renters.index') }}" class="{{ request()->routeIs('renters.*') ? 'active' : '' }}">Renters</a></li>
             <li><a href="{{ route('reservation.index') }}" class="{{ request()->routeIs('reservation.*') ? 'active' : '' }}">Reservations</a></li>
-            <li><a href="{{ route('agreements.index') }}" class="{{ request()->routeIs('agreements.*') ? 'active' : '' }}">Agreement Registration</a></li>
-            <li><a href="{{ route('bills.index') }}" class="{{ request()->routeIs('billing.*') ? 'active' : '' }}">Billing</a></li>
+            <li><a href="{{ route('agreements.index') }}" class="{{ request()->routeIs('agreements.*') ? 'active' : '' }}">Agreement Registrations</a></li>
+            <li><a href="{{ route('bills.index') }}" class="{{ request()->routeIs('bills.*') ? 'active' : '' }}">Billings</a></li>
         </ul>
     </div>
 

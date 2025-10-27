@@ -6,10 +6,26 @@
             <div class="bills-header">Billings</div>
         </div>
 
-        <!-- 🔹 Toolbar -->
+        <!-- 🔍 Toolbar: Search + Refresh | Buttons Right -->
         <div class="toolbar-row">
-            <a href="{{ route('bills.create') }}" class="btn-new">Generate Monthly Bills</a>
-            <a href="{{ route('bills.reports') }}" class="btn-new" style="margin-left:12px;">View Reports</a>
+            <!-- Left: Search + Refresh -->
+            <div class="left-toolbar">
+                <form method="GET" action="{{ route('bills.index') }}" class="search-toolbar">
+                    <input type="text" name="search" placeholder="Search renter or room" value="{{ request('search') }}" class="search-input">
+                    <select name="sort" class="search-filter">
+                        <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Period Start ↑ Ascending</option>
+                        <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Period Start ↓ Descending</option>
+                    </select>
+                    <button type="submit" class="btn-search">Search</button>
+                </form>
+                <button type="button" id="btn-refresh" class="btn-refresh">Refresh List</button>
+            </div>
+
+            <!-- Right: Action Buttons -->
+            <div class="toolbar-actions">
+                <a href="{{ route('bills.create') }}" class="btn-new btn-fullwidth">Generate Monthly Bills</a>
+                <a href="{{ route('bills.reports') }}" class="btn-archive btn-fullwidth">View Reports</a>
+            </div>
         </div>
 
         <!-- 🔹 Bills Table Card -->
@@ -27,7 +43,7 @@
                                 <th>Amount</th>
                                 <th>Balance</th>
                                 <th>Status</th>
-                                <th>Actions</th>
+                                <th style="white-space:nowrap">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -40,23 +56,38 @@
                                     <td>₱{{ number_format($bill->balance,2) }}</td>
                                     <td><span class="status-badge {{ strtolower($bill->status) }}">{{ ucfirst($bill->status) }}</span></td>
                                     <td class="actions-cell">
-                                        <a href="{{ route('bills.show', $bill) }}" class="btn-view">View</a>
-                                        <form action="{{ route('bills.destroy', $bill) }}" method="POST" class="inline-form" onsubmit="return confirm('Delete this bill?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn-delete" type="submit">Delete</button>
-                                        </form>
+                                        <div class="actions-buttons">
+                                            <a href="{{ route('bills.show', $bill) }}" class="btn-view">View</a>
+                                            <form action="{{ route('bills.destroy', $bill) }}" method="POST" class="inline-form" onsubmit="return confirm('Delete this bill?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn-delete" type="submit">Delete</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+
+                    <!-- 🔹 Pagination -->
+                    <div class="pagination" style="margin-top:12px;">
+                        {{ $bills->appends(request()->query())->links() }}
+                    </div>
                 </div>
             @endif
         </div>
     </div>
+
+    <!-- 🔹 JS for Refresh -->
+    <script>
+        document.getElementById('btn-refresh').addEventListener('click', () => {
+            window.location.href = "{{ route('bills.index') }}";
+        });
+    </script>
 </x-app-layout>
 
+<!-- 🔹 CSS -->
 <style>
 /* 🌅 Container */ 
 .container { max-width:960px; margin:0 auto; padding:20px; font-family:'Figtree',sans-serif; display:flex; flex-direction:column; gap:12px; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); }
@@ -65,15 +96,27 @@
 .bills-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; } 
 .bills-header { font-size:24px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; margin-bottom:8px; }
 
-/* 🔹 Toolbar */ 
-.toolbar-row { display:flex; justify-content:flex-start; gap:12px; margin-bottom:16px; } 
-.btn-new { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-decoration:none; transition:0.2s; border:none; cursor:pointer; } 
-.btn-new:hover { background:#D97A4E; color:#fff; }
+/* 🔧 Toolbar Layout */
+.toolbar-row { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; margin-bottom:16px; gap:12px; }
+.left-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.search-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.toolbar-actions { display:flex; flex-direction:column; gap:6px; min-width:160px; }
+.btn-fullwidth { display:block; width:100%; text-align:center; }
+
+/* 🔍 Search + Filter */
+.search-input, .search-filter { padding:8px 12px; border-radius:8px; border:1px solid #E6A574; font-size:14px; background:#fff; font-family:'Figtree',sans-serif; color:#5C3A21; }
+.btn-search, .btn-refresh { min-width:100px; }
+.btn-search { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:600; border:none; border-radius:10px; padding:8px 16px; font-size:15px; cursor:pointer; transition:0.2s; }
+.btn-search:hover, .btn-refresh:hover { background:#D97A4E; color:#fff; }
+
+/* 🔹 Buttons */
+.btn-refresh, .btn-new, .btn-archive { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-decoration:none; transition:0.2s; border:none; cursor:pointer; }
+.btn-refresh:hover, .btn-new:hover, .btn-archive:hover { background:#D97A4E; color:#fff; }
 
 /* 📋 Table Card */ 
 .card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; padding:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); }
 
-/* 📑 Table Scroll + Layout */ 
+/* 📑 Table Scroll + Layout */
 .table-wrapper { max-height:480px; overflow-y:auto; overflow-x:auto; scrollbar-width:thin; scrollbar-color:#E6A574 #FFF8F0; } 
 .table-wrapper::-webkit-scrollbar { height:8px; width:8px; } 
 .table-wrapper::-webkit-scrollbar-thumb { background-color:#E6A574; border-radius:8px; } 
@@ -95,6 +138,7 @@
 .status-badge.pending { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; }
 
 /* ⚙️ Action Buttons */ 
+.actions-buttons { display:flex; gap:6px; justify-content:center; flex-wrap:nowrap; align-items:center; width:100%; }
 .inline-form { display:inline-block; margin-left:6px; } 
 .btn-view, .btn-delete { padding:6px 12px; border-radius:6px; font-weight:600; font-size:13px; cursor:pointer; border:none; transition:0.2s; text-decoration:none; display:inline-block; text-align:center; } 
 .btn-view { background:#4C9F70; color:#fff; } 
@@ -102,9 +146,13 @@
 .btn-delete { background:#EF4444; color:#fff; } 
 .btn-delete:hover { background:#B91C1C; }
 
-/* 📱 Responsive Table Columns */ 
+/* 📱 Responsive Table Columns */
 @media (max-width:768px) { 
   .bills-table th:nth-child(4), .bills-table td:nth-child(4), 
   .bills-table th:nth-child(5), .bills-table td:nth-child(5) { display:none; } 
+  .toolbar-row { flex-direction:column; align-items:stretch; gap:8px; }
+  .left-toolbar { width:100%; justify-content:flex-start; }
+  .toolbar-actions { width:100%; flex-direction:row; gap:8px; }
+  .btn-fullwidth { width:auto; flex:1; }
 }
 </style>

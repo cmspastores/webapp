@@ -102,6 +102,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('bills/{bill}/charges/{charge}', [\App\Http\Controllers\BillChargeController::class, 'destroy'])
         ->name('bills.charges.destroy');
 
+    Route::resource('bills', \App\Http\Controllers\BillController::class);
 
 
 

@@ -52,7 +52,7 @@
     <div class="reports-container">
         <div class="card">
             {{-- Back button --}}
-            <a href="{{ route('bills.index') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+            <a href="{{ route('bills.index') }}" class="btn-back"></i> Back</a>
 
             {{-- Reports header --}}
             <h3><i class="fa-solid fa-chart-line"></i> Reports & Sales Summary</h3>
