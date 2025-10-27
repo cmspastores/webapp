@@ -25,10 +25,10 @@
                                 <th>Room (preview)</th>
                                 <th>Renter (pending)</th>
                                 <th>Contact</th>
-                                <th>Type</th>
                                 <th>Check-In</th>
                                 <th>Check-Out</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,16 +43,21 @@
                                             <div>{{ $reservation->pending_payload['renter']['phone'] }}</div>
                                         @endif
                                     </td>
-                                    <td>{{ $reservation->reservation_type }}</td>
                                     <td>{{ $reservation->check_in_date ? $reservation->check_in_date->format('Y-m-d') : '-' }}</td>
                                     <td>{{ $reservation->check_out_date ? $reservation->check_out_date->format('Y-m-d') : '-' }}</td>
+                                    <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
                                     <td style="display:flex;gap:6px;align-items:center;justify-content:center">
-                                        <span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span>
-
                                         {{-- Confirm button --}}
                                         <form method="POST" action="{{ route('reservation.confirm', $reservation) }}" style="display:inline">
                                             @csrf
                                             <button type="submit" class="btn-confirm" title="Confirm reservation">Confirm</button>
+                                        </form>
+
+                                        {{-- Delete pending reservation --}}
+                                        <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" style="display:inline" onsubmit="return confirm('Delete this pending reservation?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete" title="Delete pending reservation">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -80,7 +85,6 @@
                                 <th>Agreement #</th>
                                 <th>Agreement Start</th>
                                 <th>Agreement End</th>
-                                <th>Type</th>
                                 <th>Check-In</th>
                                 <th>Check-Out</th>
                                 <th>Status</th>
@@ -101,7 +105,6 @@
                                     <td>{{ optional($reservation->agreement)->agreement_number ?? (optional($reservation->agreement)->agreement_id ? 'Agreement #' . optional($reservation->agreement)->agreement_id : '-') }}</td>
                                     <td>{{ $reservation->agreement && $reservation->agreement->start_date ? $reservation->agreement->start_date->format('Y-m-d') : '-' }}</td>
                                     <td>{{ $reservation->agreement && $reservation->agreement->end_date ? $reservation->agreement->end_date->format('Y-m-d') : '-' }}</td>
-                                    <td>{{ $reservation->reservation_type }}</td>
                                     <td>{{ $reservation->check_in_date ? $reservation->check_in_date->format('Y-m-d') : '-' }}</td>
                                     <td>{{ $reservation->check_out_date ? $reservation->check_out_date->format('Y-m-d') : '-' }}</td>
 
@@ -150,8 +153,12 @@
 .status-badge.cancelled { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
 .status-badge.checkedout { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; }
 
-/* 🔘 Confirm Button */
+/* 🔘 Confirm & Delete Buttons */
 .btn-confirm { background:#4CAF50; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s, transform 0.2s; }
 .btn-confirm:hover { background:#45A049; transform:translateY(-1px); }
 .btn-confirm:active { transform:translateY(1px); }
+
+.btn-delete { background:#E53E3E; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s, transform 0.2s; }
+.btn-delete:hover { background:#C53030; transform:translateY(-1px); }
+.btn-delete:active { transform:translateY(1px); }
 </style>
