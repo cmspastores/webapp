@@ -11,7 +11,7 @@
                     <!-- Renter -->
                     <div>
                         <label for="renter_id">Renter</label>
-                        <select name="renter_id" id="renter_id" @if(!(auth()->user() && auth()->user()->is_admin)) disabled @endif>
+                        <select name="renter_id" id="renter_id" disabled>
                             <option value="">-- Select Renter --</option>
                             @foreach($renters as $r)
                                 <option value="{{ $r->renter_id }}" {{ old('renter_id', $agreement->renter_id) == $r->renter_id ? 'selected' : '' }}>
@@ -25,7 +25,7 @@
                     <!-- Room -->
                     <div>
                         <label for="room_id">Room</label>
-                        <select name="room_id" id="room_id" @if(!(auth()->user() && auth()->user()->is_admin)) disabled @endif>
+                        <select name="room_id" id="room_id" disabled>
                             <option value="">-- Select Room --</option>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}" {{ old('room_id', $agreement->room_id) == $room->id ? 'selected' : '' }}>
@@ -39,14 +39,14 @@
                     <!-- Agreement Date -->
                     <div>
                         <label for="agreement_date">Agreement Date</label>
-                        <input type="date" name="agreement_date" id="agreement_date" value="{{ old('agreement_date', $agreement->agreement_date?->toDateString()) }}" @if(!(auth()->user() && auth()->user()->is_admin)) disabled @endif>
+                        <input type="date" name="agreement_date" id="agreement_date" value="{{ old('agreement_date', $agreement->agreement_date?->toDateString()) }}" disabled>
                         @error('agreement_date')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
                     <!-- Start Date -->
                     <div>
                         <label for="start_date">Start Date</label>
-                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $agreement->start_date?->toDateString()) }}" @if(!(auth()->user() && auth()->user()->is_admin)) disabled @endif>
+                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $agreement->start_date?->toDateString()) }}" disabled>
                         @error('start_date')<div class="error">{{ $message }}</div>@enderror
                     </div>
 
@@ -79,7 +79,7 @@
                     <!-- Active Status -->
                     <div>
                         <label for="is_active">Active</label>
-                        <select name="is_active" id="is_active" @if(!(auth()->user() && auth()->user()->is_admin)) disabled @endif>
+                        <select name="is_active" id="is_active" disabled>
                             <option value="1" {{ old('is_active', $agreement->is_active) ? 'selected' : '' }}>Active</option>
                             <option value="0" {{ !old('is_active', $agreement->is_active) ? 'selected' : '' }}>Inactive</option>
                         </select>
@@ -180,8 +180,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             computeEndDate();
 
-            document.getElementById('start_date')?.addEventListener('change', computeEndDate);
-
             const isTransient = "{{ optional($agreement->room->roomType)->is_transient ? 'true' : 'false' }}" === 'true';
             const endLabel = document.querySelector('label[for="end_date_preview"]');
             if (isTransient && endLabel) {
@@ -191,16 +189,13 @@
     </script>
 </x-app-layout>
 
-<!-- 🔹 CSS -->
 <style>
     .container { max-width:1200px; margin:0 auto; padding:16px; }
     .card { background: linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); font-family:'Figtree',sans-serif; }
     .form-card .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
     .form-card .form-grid > div, .form-card .full-width { display:flex; align-items:center; gap:8px; }
-    .form-card input, .form-card select { width:200px; padding:6px 10px; border-radius:6px; border:1px solid #E6A574; font-family:'Figtree',sans-serif; background:#FFFDFB; color:#000 !important; box-sizing:border-box; }
-    .form-card .full-width input { width:300px; background:#FFF3DF; color:#5C4A32; font-weight:500; cursor:pointer; }
-    .form-card input:disabled, .form-card select:disabled { cursor:not-allowed; color:#000 !important; background:#FFFDFB !important; border:1px solid #E6A574 !important; }
-    .form-card select:disabled option { color:#5C4A32 !important; }
+    .form-card input, .form-card select { width:200px; padding:6px 10px; border-radius:6px; border:1px solid #E6A574; font-family:'Figtree',sans-serif; background:#FFFDFB; color:#000 !important; box-sizing:border-box; cursor:not-allowed; }
+    .form-card .full-width input { width:300px; background:#FFF3DF; color:#5C4A32; font-weight:500; }
     .statement-card { background: linear-gradient(135deg, #FFFDFB, #FFF8F0); border-radius: 14px; border: 2px solid #E6A574; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     .statement-title { font-size: 20px; font-weight: 700; color: #5C3A21; margin-bottom: 12px; }
     .soa-table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -209,8 +204,8 @@
     .status-unpaid { color: #b54b4b; font-weight: 600; }
     .status-paid { color: #198754; font-weight: 600; }
     .btn-view-bill { background: #D97A4E; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; }
-    .btn-view-bill:hover { background: #F4C38C; color: #5C3A21; }
-    .wide-input { width: 300px; max-width: 100%; padding:6px 10px; border-radius:6px; border:1px solid #E6A574; }
+    .btn-view-bill:hover { background: #F4C38C; color: #5C4A32; }
+    .wide-input { width: 300px; max-width: 100%; padding:6px 10px; border-radius:6px; border:1px solid #E6A574; cursor:not-allowed; }
     @media (max-width: 720px) { .wide-input { width: 100%; } }
     .btn-confirm { background:#E6A574; color:#5C3A21; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s; }
     .btn-confirm:hover { background:#F4C38C; }

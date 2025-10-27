@@ -32,9 +32,16 @@
             </div>
         </div>
 
-        <!-- 🔹 Agreements Table -->
-        <div class="card table-card">
+        <!-- 🔹 Toggle Buttons -->
+        <div class="toggle-buttons" style="display:flex; gap:10px; margin-bottom:16px;">
+            <button type="button" id="btn-dorm" class="btn-toggle active">Dorm / Monthly</button>
+            <button type="button" id="btn-transient" class="btn-toggle">Transient / Daily</button>
+        </div>
+
+        <!-- 🔹 Dorm / Monthly Agreements Table -->
+        <div class="card table-card" id="table-dorm">
             <div class="table-wrapper">
+                <h3 style="text-align:left;margin-bottom:8px;color:#5C3A21;">Dorm / Monthly Agreements</h3>
                 <table class="agreements-table">
                     <thead>
                         <tr>
@@ -49,7 +56,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($agreements as $a)
+                        @forelse($agreements->where('rate_unit','!=','daily') as $a)
                             @php
                                 $now = \Carbon\Carbon::now();
                                 if ($a->end_date && \Carbon\Carbon::parse($a->end_date)->isPast()) {
@@ -66,14 +73,7 @@
                                 <td>{{ optional($a->agreement_date)->format('M d, Y') }}</td>
                                 <td>{{ optional($a->start_date)->format('M d, Y') }}</td>
                                 <td>{{ optional($a->end_date)->format('M d, Y') }}</td>
-
-                                <td>
-                                    @if($a->rate_unit === 'daily')
-                                        ₱{{ number_format($a->rate, 2) }} /day
-                                    @else
-                                        ₱{{ number_format($a->monthly_rent ?? $a->rate, 2) }} /month
-                                    @endif
-                                </td>
+                                <td>₱{{ number_format($a->monthly_rent ?? $a->rate, 2) }} /month</td>
                                 <td><span class="status-badge {{ strtolower($status) }}">{{ $status }}</span></td>
                                 <td class="actions-cell">
                                     <div class="actions-buttons">
@@ -89,28 +89,106 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="8" class="text-center">No agreements found.</td></tr>
+                            <tr><td colspan="8" class="text-center">No dorm agreements found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
-
-                <!-- 🔹 Pagination -->
-                <div class="pagination" style="margin-top:12px;">
-                    {{ $agreements->appends(request()->query())->links() }}
-                </div>
             </div>
         </div>
+
+        <!-- 🔹 Transient / Daily Agreements Table -->
+        <div class="card table-card" id="table-transient" style="display:none;">
+            <div class="table-wrapper">
+                <h3 style="text-align:left;margin-bottom:8px;color:#5C3A21;">Transient / Daily Agreements</h3>
+                <table class="agreements-table">
+                    <thead>
+                        <tr>
+                            <th>Renter</th>
+                            <th>Room</th>
+                            <th>Agreement Date</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Rent</th>
+                            <th>Status</th>
+                            <th style="white-space:nowrap">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($agreements->where('rate_unit','daily') as $a)
+                            @php
+                                $now = \Carbon\Carbon::now();
+                                if ($a->end_date && \Carbon\Carbon::parse($a->end_date)->isPast()) {
+                                    $status = 'Expired';
+                                } elseif ($a->is_active) {
+                                    $status = 'Active';
+                                } else {
+                                    $status = 'Terminated';
+                                }
+                            @endphp
+                            <tr>
+                                <td>{{ $a->renter->full_name ?? '—' }}</td>
+                                <td>{{ $a->room->room_number ?? '—' }}{{ optional($a->room->roomType)->name ? ' - ' . optional($a->room->roomType)->name : '' }}</td>
+                                <td>{{ optional($a->agreement_date)->format('M d, Y') }}</td>
+                                <td>{{ optional($a->start_date)->format('M d, Y') }}</td>
+                                <td>{{ optional($a->end_date)->format('M d, Y') }}</td>
+                                <td>₱{{ number_format($a->rate, 2) }} /day</td>
+                                <td><span class="status-badge {{ strtolower($status) }}">{{ $status }}</span></td>
+                                <td class="actions-cell">
+                                    <div class="actions-buttons">
+                                        <a href="{{ route('agreements.edit',$a) }}" class="btn-yellow">View</a>
+                                        @if(auth()->user() && auth()->user()->is_admin)
+                                            @if($a->is_active)
+                                                <form method="POST" action="{{ route('agreements.terminate',$a) }}" onsubmit="return confirm('Terminate this agreement?');" class="inline-form">@csrf<button class="btn-red" type="submit">Terminate</button></form>
+                                            @else
+                                                <form method="POST" action="{{ route('agreements.renew',$a) }}" onsubmit="return confirm('Renew this agreement for another year?');" class="inline-form">@csrf<button class="btn-green" type="submit">Renew</button></form>
+                                            @endif
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="8" class="text-center">No transient agreements found.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 🔹 Pagination -->
+        <div class="pagination" style="margin-top:12px;">
+            {{ $agreements->appends(request()->query())->links() }}
+        </div>
+
     </div>
 
-    <!-- 🔹 JS for Refresh -->
+    <!-- 🔹 JS for Table Toggle & Refresh -->
     <script>
-        document.getElementById('btn-refresh').addEventListener('click',()=>{
+        const btnDorm = document.getElementById('btn-dorm');
+        const btnTransient = document.getElementById('btn-transient');
+        const tableDorm = document.getElementById('table-dorm');
+        const tableTransient = document.getElementById('table-transient');
+
+        btnDorm.addEventListener('click', () => {
+            tableDorm.style.display = 'block';
+            tableTransient.style.display = 'none';
+            btnDorm.classList.add('active');
+            btnTransient.classList.remove('active');
+        });
+
+        btnTransient.addEventListener('click', () => {
+            tableDorm.style.display = 'none';
+            tableTransient.style.display = 'block';
+            btnDorm.classList.remove('active');
+            btnTransient.classList.add('active');
+        });
+
+        document.getElementById('btn-refresh').addEventListener('click', () => {
             window.location.href="{{ route('agreements.index') }}";
         });
     </script>
+
 </x-app-layout>
 
-<!-- 🔹 CSS -->
 <style>
 /* 🌅 Container */
 .container { max-width:1100px; margin:0 auto; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); padding:20px; border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:12px; font-family:'Figtree',sans-serif; }
@@ -132,6 +210,11 @@
 /* 🔹 Buttons */
 .btn-refresh, .btn-new, .btn-archive { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-decoration:none; transition:0.2s; border:none; cursor:pointer; }
 .btn-refresh:hover, .btn-new:hover, .btn-archive:hover { background:#D97A4E; color:#fff; }
+
+/* 🔹 Toggle Buttons */
+.btn-toggle { padding:8px 16px; border-radius:10px; font-weight:700; cursor:pointer; border:none; background:#E6A574; color:#5C3A21; transition:0.2s; }
+.btn-toggle.active { background:#D97A4E; color:#fff; }
+.btn-toggle:hover { opacity:0.85; }
 
 /* 📋 Table Card */
 .card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); padding:16px; border:none; overflow:hidden; }

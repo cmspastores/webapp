@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agreement;
 use App\Models\Bill;
-use App\Models\BillCharge; // 🔹 ADDED THIS LINE for querying charges
+use App\Models\BillCharge; // 🔹 kept in case needed elsewhere
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
@@ -140,20 +140,34 @@ class BillController extends Controller
         $month = $request->input('month');
         $year = $request->input('year');
 
-        $query = Bill::with('charges', 'renter', 'room');
+        $query = Bill::with('renter', 'room', 'agreement');
         if ($month && $year) {
             $query->whereYear('period_start', $year)
                   ->whereMonth('period_start', $month);
         }
 
         $bills = $query->get();
+
+        // Total revenue & outstanding remain
         $totalRevenue = $bills->sum('amount_due');
         $totalOutstanding = $bills->where('status', 'unpaid')->sum('balance');
 
-        $chargesByType = BillCharge::selectRaw('name, SUM(amount) as total')
-                            ->groupBy('name')
-                            ->get();
+        // 🔹 NEW: Sales Summary by Renter Type
+        $transientSales = $bills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')
+                                 ->sum('amount_due');
 
-        return view('bills.reports', compact('bills', 'totalRevenue', 'totalOutstanding', 'chargesByType'));
+        $monthlySales = $bills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')
+                               ->sum('amount_due');
+
+        $totalSales = $transientSales + $monthlySales;
+
+        return view('bills.reports', compact(
+            'bills',
+            'totalRevenue',
+            'totalOutstanding',
+            'transientSales',
+            'monthlySales',
+            'totalSales'
+        ));
     }
 }

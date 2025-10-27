@@ -44,60 +44,83 @@
     </style>
 
     @php
+        $transientSales = $transientSales ?? 0;
+        $monthlySales = $monthlySales ?? 0;
+        $totalSales = $totalSales ?? 0;
         $totalRevenue = $totalRevenue ?? 0;
         $totalOutstanding = $totalOutstanding ?? 0;
-        $chargesByType = $chargesByType ?? collect([]);
     @endphp
 
     <div class="reports-container">
         <div class="card">
             {{-- Back button --}}
-            <a href="{{ route('bills.index') }}" class="btn-back"></i> Back</a>
+            <a href="{{ route('bills.index') }}" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
 
             {{-- Reports header --}}
-            <h3><i class="fa-solid fa-chart-line"></i> Reports & Sales Summary</h3>
+            <h3><i class="fa-solid fa-chart-line"></i> Sales Report Summary</h3>
 
             {{-- Summary values --}}
             <p><i class="fa-solid fa-money-bill-wave"></i> Total Revenue: ₱{{ number_format($totalRevenue,2) }}</p>
             <p><i class="fa-solid fa-clock"></i> Total Outstanding: ₱{{ number_format($totalOutstanding,2) }}</p>
 
-            {{-- Charges table --}}
-            <h3 style="margin-top:24px;"><i class="fa-solid fa-list-check"></i> Charges by Type</h3>
+            {{-- Sales by Renter Type Table --}}
+            <h3 style="margin-top:24px;"><i class="fa-solid fa-list-check"></i> Sales by Renter Type</h3>
             <table>
                 <thead>
-                    <tr><th>Charge</th><th>Total</th></tr>
+                    <tr>
+                        <th>Renter Type</th>
+                        <th>Amount (₱)</th>
+                        <th>Percentage</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    @forelse($chargesByType as $charge)
-                        <tr><td>{{ $charge->name }}</td><td>₱{{ number_format($charge->total,2) }}</td></tr>
-                    @empty
-                        <tr><td colspan="2">No charges recorded.</td></tr>
-                    @endforelse
+                    @php
+                        $transientPercent = $totalSales > 0 ? round(($transientSales/$totalSales)*100,2) : 0;
+                        $monthlyPercent = $totalSales > 0 ? round(($monthlySales/$totalSales)*100,2) : 0;
+                    @endphp
+                    <tr>
+                        <td>Transient</td>
+                        <td>₱{{ number_format($transientSales,2) }}</td>
+                        <td>{{ $transientPercent }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Monthly</td>
+                        <td>₱{{ number_format($monthlySales,2) }}</td>
+                        <td>{{ $monthlyPercent }}%</td>
+                    </tr>
                 </tbody>
             </table>
 
             {{-- Pie chart --}}
-            <div class="chart-container" id="chargesChartContainer"
-                 data-labels="{{ $chargesByType->pluck('name')->join(',') }}"
-                 data-values="{{ $chargesByType->pluck('total')->join(',') }}">
-                <canvas id="chargesChart"></canvas>
+            <div class="chart-container" id="salesChartContainer"
+                 data-labels="Transient,Monthly"
+                 data-values="{{ $transientSales }},{{ $monthlySales }}">
+                <canvas id="salesChart"></canvas>
             </div>
         </div>
     </div>
 
     <script>
-        const container = document.getElementById('chargesChartContainer');
-        const labels = container.dataset.labels ? container.dataset.labels.split(',') : [];
-        const values = container.dataset.values ? container.dataset.values.split(',').map(Number) : [];
+        const container = document.getElementById('salesChartContainer');
+        const labels = container.dataset.labels.split(',');
+        const values = container.dataset.values.split(',').map(Number);
 
-        if (labels.length && values.length) {
-            new Chart(document.getElementById('chargesChart'), {
+        if(labels.length && values.length){
+            new Chart(document.getElementById('salesChart'), {
                 type: 'pie',
-                data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#E6A574','#F4C38C','#D97A4E','#B85C38','#FFC89B','#FCE5C3'] }] },
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#E6A574','#F4C38C'],
+                        borderColor: '#FFF8F0',
+                        borderWidth: 2
+                    }]
+                },
                 options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#5C3A21', font: { family: 'Figtree' } } },
+                    responsive:true,
+                    plugins:{
+                        legend: { position:'bottom', labels:{ color:'#5C3A21', font:{ family:'Figtree' } } },
                         tooltip: { callbacks: { label: ctx => `${ctx.label}: ₱${ctx.formattedValue}` } }
                     }
                 }
