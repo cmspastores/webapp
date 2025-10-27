@@ -39,16 +39,9 @@
                                     @error('start_date') <div class="error">{{ $message }}</div> @enderror
                                 </div>
 
-                                <div id="agreement_monthly_rent_wrap" style="{{ old('reservation_type') === 'dorm' ? '' : 'display:none;' }}">
-                                    <label for="agreement_monthly_rent">Monthly Rent</label>
-                                    <input id="agreement_monthly_rent" name="agreement_monthly_rent" type="number" step="0.01" value="{{ old('agreement_monthly_rent') }}" />
-                                    @error('agreement_monthly_rent') <div class="error">{{ $message }}</div> @enderror
-                                </div>
-
                                 <div class="full-width" style="grid-column: span 2;">
                                     <label for="end_date_preview">End Date (auto 1 year - optional)</label>
                                     <input type="text" id="end_date_preview" readonly value="{{ old('start_date') ? \Illuminate\Support\Carbon::parse(old('start_date'))->addYear()->toDateString() : now()->addYear()->toDateString() }}">
-                                    {{-- optional hidden end_date if you want to submit explicit end_date --}}
                                     <input type="hidden" id="end_date" name="end_date" value="{{ old('end_date') }}">
                                 </div>
                             </div>
@@ -118,16 +111,7 @@
                         @error('guardian_email') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Reservation Type & Dates -->
-                    <div>
-                        <label for="reservation_type">Reservation Type</label>
-                        <select id="reservation_type" name="reservation_type">
-                            <option value="transient" {{ old('reservation_type') === 'transient' ? 'selected' : '' }}>Transient</option>
-                            <option value="dorm" {{ old('reservation_type') === 'dorm' ? 'selected' : '' }}>Dorm</option>
-                        </select>
-                        @error('reservation_type') <div class="error">{{ $message }}</div> @enderror
-                    </div>
-
+                    <!-- Reservation Dates (reservation_type removed) -->
                     <div>
                         <label for="check_in_date">Check-in Date</label>
                         <input id="check_in_date" name="check_in_date" type="date" value="{{ old('check_in_date') }}" />
@@ -153,22 +137,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const typeEl = document.getElementById('reservation_type');
-        const rentWrap = document.getElementById('agreement_monthly_rent_wrap');
-        const rentInput = document.getElementById('agreement_monthly_rent');
         const startEl = document.getElementById('start_date');
         const endPreview = document.getElementById('end_date_preview');
         const endHidden = document.getElementById('end_date');
-
-        function toggleRent() {
-            if (!typeEl) return;
-            if (typeEl.value === 'dorm') {
-                rentWrap.style.display = '';
-            } else {
-                rentWrap.style.display = 'none';
-                if (rentInput) rentInput.value = '';
-            }
-        }
 
         function computeEndDate() {
             const start = startEl.value;
@@ -183,10 +154,6 @@
             if (endHidden) endHidden.value = val;
         }
 
-        if (typeEl) {
-            typeEl.addEventListener('change', toggleRent);
-            toggleRent();
-        }
         if (startEl) {
             startEl.addEventListener('change', computeEndDate);
             computeEndDate();
