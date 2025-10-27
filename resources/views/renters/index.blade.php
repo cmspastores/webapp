@@ -29,42 +29,50 @@
 
     <!-- 🔹 Renter Table List -->
     <div class="card table-card">
-        <table class="renter-table">
-            <thead>
-                <tr>
-                    <th class="hidden-id">ID</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Date Created</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($renters as $renter)
-                <tr>
-                    <td class="hidden-id">{{ $renter->renter_id }}</td>
-                    <td>{{ $renter->full_name }}</td>
-                    <td>{{ $renter->email ?? '-' }}</td>
-                    <td>{{ $renter->phone ?? '-' }}</td>
-                    <td>{{ $renter->created_at_formatted }}</td>
-                    <td class="actions-cell">
-                        <div class="actions-buttons">
-                            <a href="{{ route('renters.show', $renter->renter_id) }}" class="btn-view">View</a>
-                            <a href="{{ route('renters.edit', $renter->renter_id) }}" class="btn-edit">Edit</a>
-                            <form action="{{ route('renters.destroy', $renter->renter_id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this renter?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-delete">Delete</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="6" class="text-center">No renters found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <table class="renter-table">
+                <thead>
+                    <tr>
+                        <th class="hidden-id">ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Emergency Contact</th>
+                        <th>Address</th>
+                        <th>Date of Birth</th>
+                        <th>Date Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($renters as $renter)
+                    <tr>
+                        <td class="hidden-id">{{ $renter->renter_id }}</td>
+                        <td>{{ $renter->full_name }}</td>
+                        <td>{{ $renter->email ?? '-' }}</td>
+                        <td>{{ $renter->phone ?? '-' }}</td>
+                        <td>{{ $renter->emergency_contact ?? '-' }}</td>
+                        <td>{{ $renter->address ?? '-' }}</td>
+                        <td>{{ $renter->dob ? \Carbon\Carbon::parse($renter->dob)->format('M d, Y') : '-' }}</td>
+                        <td>{{ $renter->created_at_formatted }}</td>
+                        <td class="actions-cell">
+                            <div class="actions-buttons">
+                                <a href="{{ route('renters.show', $renter->renter_id) }}" class="btn-view">View</a>
+                                <a href="{{ route('renters.edit', $renter->renter_id) }}" class="btn-edit">Edit</a>
+                                <form action="{{ route('renters.destroy', $renter->renter_id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this renter?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-delete">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="9" class="text-center">No renters found.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
         <!-- 🔹 Pagination -->
         <div class="pagination">
@@ -84,11 +92,21 @@
 <!-- 🔹 CSS -->
 <style>
 /* 🌴 Container */
-.container { max-width:960px; margin:0 auto; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); padding:20px; border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:12px; font-family:'Figtree',sans-serif; }
+.container { max-width:1200px; margin:0 auto; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); padding:24px; border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:12px; font-family:'Figtree',sans-serif; }
+
+/* 🧾 Table Wrapper */
+.table-wrapper { overflow-x:auto; border-radius:12px; }
+
+/* Scrollbar Styling */
+.table-wrapper { max-height:480px; overflow-y:auto; overflow-x:auto; scrollbar-width:thin; scrollbar-color:#E6A574 #FFF8F0; }
+.table-wrapper::-webkit-scrollbar { height:8px; width:8px; }
+.table-wrapper::-webkit-scrollbar-thumb { background-color:#E6A574; border-radius:8px; }
+.table-wrapper::-webkit-scrollbar-track { background:#FFF8F0; }
+
 
 /* 🏷️ Header Row */
 .renters-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-.renters-header { font-size:24px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; margin-bottom:8px; }
+.renters-header { font-size:26px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; margin-bottom:8px; }
 
 /* 🔹 Search + Refresh + New Renter toolbar */
 .search-refresh { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:16px; gap:10px; }
@@ -114,12 +132,10 @@
 
 /* 🧾 Card & Table */
 .card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); padding:16px; border:none; overflow-x:auto; }
-.renter-table { width:100%; border-collapse:separate; border-spacing:0; text-align:center; table-layout:auto; background:transparent; border-radius:12px; overflow:hidden; }
-.renter-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; border-radius:12px 12px 0 0; overflow:hidden; }
-.renter-table th, .renter-table td { padding:12px 16px; font-size:14px; border-bottom:1px solid #D97A4E; border-right:1px solid #D97A4E; }
+.renter-table { width:100%; min-width:1100px; border-collapse:separate; border-spacing:0; text-align:center; background:transparent; border-radius:12px; overflow:hidden; }
+.renter-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; border-radius:12px 12px 0 0; }
+.renter-table th, .renter-table td { padding:12px 16px; font-size:14px; border-bottom:1px solid #D97A4E; border-right:1px solid #D97A4E; white-space:nowrap; }
 .renter-table tbody tr:hover { background:#FFF4E1; transition:background 0.2s; }
-.renter-table thead tr:first-child th:first-child { border-top-left-radius:12px; }
-.renter-table thead tr:first-child th:last-child { border-top-right-radius:12px; }
 .renter-table th:first-child, .renter-table td:first-child { border-left:none; }
 .renter-table th:last-child, .renter-table td:last-child { border-right:none; }
 .renter-table tbody tr:last-child td { border-bottom:none; }
@@ -137,17 +153,16 @@
 .text-center { text-align:center; }
 
 /* Responsive tweaks */
-@media (max-width:768px) { .renter-table th, .renter-table td { font-size:12px; padding:8px 10px; } }
-@media (max-width:480px) { .renter-table th, .renter-table td { font-size:11px; padding:4px 6px; } .renter-table th:nth-child(5), .renter-table td:nth-child(5) { display:none; } }
+@media (max-width:768px) { .renter-table th:nth-child(4), .renter-table td:nth-child(4), .renter-table th:nth-child(5), .renter-table td:nth-child(5) { display:none; } }
+@media (max-width:480px) { .renter-table th, .renter-table td { font-size:11px; padding:4px 6px; } .renter-table th:nth-child(6), .renter-table td:nth-child(6) { display:none; } }
 @media (max-width:360px) { .renter-table th, .renter-table td { font-size:10px; padding:3px 4px; } .renter-table th:nth-child(4), .renter-table td:nth-child(4) { display:none; } }
-
 </style>
 
 <!-- 🔹 JS -->
 <script>
-    document.getElementById('btn-refresh').addEventListener('click', () => {
-        window.location.href = "{{ route('renters.index') }}";
-    });
+document.getElementById('btn-refresh').addEventListener('click', () => {
+    window.location.href = "{{ route('renters.index') }}";
+});
 </script>
 
 </x-app-layout>

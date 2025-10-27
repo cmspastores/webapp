@@ -32,10 +32,9 @@
             </div>
         </div>
 
-
         <!-- 🔹 Agreements Table -->
         <div class="card table-card">
-            <div class="table-wrapper" style="overflow-x:auto;">
+            <div class="table-wrapper">
                 <table class="agreements-table">
                     <thead>
                         <tr>
@@ -64,9 +63,10 @@
                             <tr>
                                 <td>{{ $a->renter->full_name ?? '—' }}</td>
                                 <td>{{ $a->room->room_number ?? '—' }}{{ optional($a->room->roomType)->name ? ' - ' . optional($a->room->roomType)->name : '' }}</td>
-                                <td>{{ optional($a->agreement_date)->toDateString() }}</td>
-                                <td>{{ optional($a->start_date)->toDateString() }}</td>
-                                <td>{{ optional($a->end_date)->toDateString() }}</td>
+                                <td>{{ optional($a->agreement_date)->format('M d, Y') }}</td>
+                                <td>{{ optional($a->start_date)->format('M d, Y') }}</td>
+                                <td>{{ optional($a->end_date)->format('M d, Y') }}</td>
+
                                 <td>
                                     @if($a->rate_unit === 'daily')
                                         ₱{{ number_format($a->rate, 2) }} /day
@@ -96,9 +96,8 @@
 
                 <!-- 🔹 Pagination -->
                 <div class="pagination" style="margin-top:12px;">
-                {{ $agreements->appends(request()->query())->links() }}
-            </div>
-
+                    {{ $agreements->appends(request()->query())->links() }}
+                </div>
             </div>
         </div>
     </div>
@@ -113,9 +112,8 @@
 
 <!-- 🔹 CSS -->
 <style>
-
 /* 🌅 Container */
-.container { max-width:960px; margin:0 auto; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); padding:20px; border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:12px; font-family:'Figtree',sans-serif; }
+.container { max-width:1100px; margin:0 auto; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); padding:20px; border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:12px; font-family:'Figtree',sans-serif; }
 
 /* 🏷️ Header */
 .agreements-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
@@ -136,12 +134,16 @@
 .btn-refresh:hover, .btn-new:hover, .btn-archive:hover { background:#D97A4E; color:#fff; }
 
 /* 📋 Table Card */
-.card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); padding:16px; border:none; overflow-x:auto; }
+.card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); padding:16px; border:none; overflow:hidden; }
+.table-wrapper { width:100%; overflow-x:auto; overflow-y:hidden; max-width:100%; scrollbar-color:#E6A574 #FFF8F0; scrollbar-width:thin; }
+.table-wrapper::-webkit-scrollbar { height:8px; }
+.table-wrapper::-webkit-scrollbar-thumb { background:#E6A574; border-radius:10px; }
+.table-wrapper::-webkit-scrollbar-track { background:#FFF8F0; border-radius:10px; }
 
 /* 📑 Agreements Table */
-.agreements-table { width:100%; border-collapse:separate; border-spacing:0; text-align:center; table-layout:auto; background:transparent; border-radius:12px; overflow:hidden; }
+.agreements-table { width:1200px; min-width:100%; border-collapse:separate; border-spacing:0; text-align:center; table-layout:auto; background:transparent; border-radius:12px; overflow:hidden; }
 .agreements-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; border-radius:12px 12px 0 0; overflow:hidden; }
-.agreements-table th, .agreements-table td { padding:12px 16px; font-size:14px; border-bottom:1px solid #D97A4E; border-right:1px solid #D97A4E; text-align:center; }
+.agreements-table th, .agreements-table td { padding:12px 16px; font-size:14px; border-bottom:1px solid #D97A4E; border-right:1px solid #D97A4E; text-align:center; white-space:nowrap; }
 .agreements-table th:first-child, .agreements-table td:first-child { border-left:none; }
 .agreements-table th:last-child, .agreements-table td:last-child { border-right:none; }
 .agreements-table tbody tr:last-child td { border-bottom:none; }
@@ -166,7 +168,4 @@
 /* 🧾 Misc */
 .inline-form { display:inline; }
 .pagination { margin-top:16px; display:flex; justify-content:flex-end; gap:6px; flex-wrap:wrap; }
-
-
-
 </style>
