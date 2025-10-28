@@ -207,11 +207,17 @@ class ReservationController extends Controller
     /**
      * Remove the specified reservation from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->delete();
 
-        return response()->json(['message' => 'Reservation deleted successfully.']);
+        // If the client expects JSON (API/AJAX), return JSON
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['message' => 'Reservation deleted successfully.']);
+        }
+
+        // Normal web request -> redirect back to index with flash message
+        return redirect()->route('reservation.index')->with('success', 'Reservation deleted successfully.');
     }
 }
