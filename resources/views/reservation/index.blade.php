@@ -158,7 +158,34 @@
 .btn-confirm:hover { background:#45A049; transform:translateY(-1px); }
 .btn-confirm:active { transform:translateY(1px); }
 
-.btn-delete { background:#E53E3E; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s, transform 0.2s; }
-.btn-delete:hover { background:#C53030; transform:translateY(-1px); }
-.btn-delete:active { transform:translateY(1px); }
+.btn-delete {
+    display: inline-flex;           /* ensure button box */
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #E53E3E;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1;
+    transition: background 0.15s ease, transform 0.08s ease;
+    -webkit-appearance: none;       /* prevent UA button reset */
+    appearance: none;
+}
+
+/* stronger hover/focus styles */
+.btn-delete:hover { background: #C53030; transform: translateY(-1px); }
+.btn-delete:active { transform: translateY(1px); }
+.btn-delete:focus { outline: 2px solid rgba(229,62,62,0.25); outline-offset: 2px; }
+
+/* fallback in case something targets anchor.btn-delete */
+a.btn-delete { display: inline-flex; align-items:center; justify-content:center; }
+
+/* ensure the button inside form inline layout keeps spacing */
+td form { display: inline-block; margin: 0 4px; }
 </style>
