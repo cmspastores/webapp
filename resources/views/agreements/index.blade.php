@@ -7,7 +7,7 @@
         </div>
 
         @if(session('success'))
-            <div class="card" style="margin-bottom:12px;padding:8px;background:#D1FAE5;color:#065F46;">
+            <div class="card" style="margin-bottom:12px; padding:8px; background:#D1FAE5; color:#065F46;">
                 {{ session('success') }}
             </div>
         @endif
@@ -38,10 +38,30 @@
             <button type="button" id="btn-transient" class="btn-toggle">Transient / Daily</button>
         </div>
 
-        <!-- 🔹 Dorm / Monthly Agreements Table -->
+        <!-- 🔹 Prepare Collections -->
+        @php
+            $allAgreements = collect($agreements instanceof \Illuminate\Pagination\AbstractPaginator ? $agreements->items() : $agreements);
+
+            $dormAgreements = collect();
+            $transientAgreements = collect();
+
+            foreach ($allAgreements as $a) {
+                $roomType = strtolower($a->room->roomType->name ?? '');
+                $rateUnit = strtolower($a->rate_unit ?? '');
+
+                // Force anything marked "Transient" or daily rate into transient group
+                if ($rateUnit === 'daily' || str_contains($roomType, 'transient')) {
+                    $transientAgreements->push($a);
+                } else {
+                    $dormAgreements->push($a);
+                }
+            }
+        @endphp
+
+        <!-- 🏠 Dorm / Monthly Agreements Table -->
         <div class="card table-card" id="table-dorm">
             <div class="table-wrapper">
-                <h3 style="text-align:left;margin-bottom:8px;color:#5C3A21;">Dorm / Monthly Agreements</h3>
+                <h3 style="text-align:left; margin-bottom:8px; color:#5C3A21;">Dorm / Monthly Agreements</h3>
                 <table class="agreements-table">
                     <thead>
                         <tr>
@@ -52,11 +72,11 @@
                             <th>End</th>
                             <th>Rent</th>
                             <th>Status</th>
-                            <th style="white-space:nowrap">Actions</th>
+                            <th style="white-space:nowrap;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($agreements->where('rate_unit','!=','daily') as $a)
+                        @forelse($dormAgreements as $a)
                             @php
                                 $now = \Carbon\Carbon::now();
                                 if ($a->end_date && \Carbon\Carbon::parse($a->end_date)->isPast()) {
@@ -69,7 +89,10 @@
                             @endphp
                             <tr>
                                 <td>{{ $a->renter->full_name ?? '—' }}</td>
-                                <td>{{ $a->room->room_number ?? '—' }}{{ optional($a->room->roomType)->name ? ' - ' . optional($a->room->roomType)->name : '' }}</td>
+                                <td>
+                                    {{ $a->room->room_number ?? '—' }}
+                                    {{ optional($a->room->roomType)->name ? ' - ' . optional($a->room->roomType)->name : '' }}
+                                </td>
                                 <td>{{ optional($a->agreement_date)->format('M d, Y') }}</td>
                                 <td>{{ optional($a->start_date)->format('M d, Y') }}</td>
                                 <td>{{ optional($a->end_date)->format('M d, Y') }}</td>
@@ -77,12 +100,18 @@
                                 <td><span class="status-badge {{ strtolower($status) }}">{{ $status }}</span></td>
                                 <td class="actions-cell">
                                     <div class="actions-buttons">
-                                        <a href="{{ route('agreements.edit',$a) }}" class="btn-yellow">View</a>
+                                        <a href="{{ route('agreements.edit', $a) }}" class="btn-yellow">View</a>
                                         @if(auth()->user() && auth()->user()->is_admin)
                                             @if($a->is_active)
-                                                <form method="POST" action="{{ route('agreements.terminate',$a) }}" onsubmit="return confirm('Terminate this agreement?');" class="inline-form">@csrf<button class="btn-red" type="submit">Terminate</button></form>
+                                                <form method="POST" action="{{ route('agreements.terminate', $a) }}" onsubmit="return confirm('Terminate this agreement?');" class="inline-form">
+                                                    @csrf
+                                                    <button class="btn-red" type="submit">Terminate</button>
+                                                </form>
                                             @else
-                                                <form method="POST" action="{{ route('agreements.renew',$a) }}" onsubmit="return confirm('Renew this agreement for another year?');" class="inline-form">@csrf<button class="btn-green" type="submit">Renew</button></form>
+                                                <form method="POST" action="{{ route('agreements.renew', $a) }}" onsubmit="return confirm('Renew this agreement for another year?');" class="inline-form">
+                                                    @csrf
+                                                    <button class="btn-green" type="submit">Renew</button>
+                                                </form>
                                             @endif
                                         @endif
                                     </div>
@@ -96,10 +125,10 @@
             </div>
         </div>
 
-        <!-- 🔹 Transient / Daily Agreements Table -->
+        <!-- 🕓 Transient / Daily Agreements Table -->
         <div class="card table-card" id="table-transient" style="display:none;">
             <div class="table-wrapper">
-                <h3 style="text-align:left;margin-bottom:8px;color:#5C3A21;">Transient / Daily Agreements</h3>
+                <h3 style="text-align:left; margin-bottom:8px; color:#5C3A21;">Transient / Daily Agreements</h3>
                 <table class="agreements-table">
                     <thead>
                         <tr>
@@ -110,11 +139,11 @@
                             <th>End</th>
                             <th>Rent</th>
                             <th>Status</th>
-                            <th style="white-space:nowrap">Actions</th>
+                            <th style="white-space:nowrap;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($agreements->where('rate_unit','daily') as $a)
+                        @forelse($transientAgreements as $a)
                             @php
                                 $now = \Carbon\Carbon::now();
                                 if ($a->end_date && \Carbon\Carbon::parse($a->end_date)->isPast()) {
@@ -127,20 +156,29 @@
                             @endphp
                             <tr>
                                 <td>{{ $a->renter->full_name ?? '—' }}</td>
-                                <td>{{ $a->room->room_number ?? '—' }}{{ optional($a->room->roomType)->name ? ' - ' . optional($a->room->roomType)->name : '' }}</td>
+                                <td>
+                                    {{ $a->room->room_number ?? '—' }}
+                                    {{ optional($a->room->roomType)->name ? ' - ' . optional($a->room->roomType)->name : '' }}
+                                </td>
                                 <td>{{ optional($a->agreement_date)->format('M d, Y') }}</td>
                                 <td>{{ optional($a->start_date)->format('M d, Y') }}</td>
                                 <td>{{ optional($a->end_date)->format('M d, Y') }}</td>
-                                <td>₱{{ number_format($a->rate, 2) }} /day</td>
+                                <td>₱{{ number_format($a->rate ?? $a->monthly_rent, 2) }} /day</td>
                                 <td><span class="status-badge {{ strtolower($status) }}">{{ $status }}</span></td>
                                 <td class="actions-cell">
                                     <div class="actions-buttons">
-                                        <a href="{{ route('agreements.edit',$a) }}" class="btn-yellow">View</a>
+                                        <a href="{{ route('agreements.edit', $a) }}" class="btn-yellow">View</a>
                                         @if(auth()->user() && auth()->user()->is_admin)
                                             @if($a->is_active)
-                                                <form method="POST" action="{{ route('agreements.terminate',$a) }}" onsubmit="return confirm('Terminate this agreement?');" class="inline-form">@csrf<button class="btn-red" type="submit">Terminate</button></form>
+                                                <form method="POST" action="{{ route('agreements.terminate', $a) }}" onsubmit="return confirm('Terminate this agreement?');" class="inline-form">
+                                                    @csrf
+                                                    <button class="btn-red" type="submit">Terminate</button>
+                                                </form>
                                             @else
-                                                <form method="POST" action="{{ route('agreements.renew',$a) }}" onsubmit="return confirm('Renew this agreement for another year?');" class="inline-form">@csrf<button class="btn-green" type="submit">Renew</button></form>
+                                                <form method="POST" action="{{ route('agreements.renew', $a) }}" onsubmit="return confirm('Renew this agreement for another year?');" class="inline-form">
+                                                    @csrf
+                                                    <button class="btn-green" type="submit">Renew</button>
+                                                </form>
                                             @endif
                                         @endif
                                     </div>
@@ -183,11 +221,13 @@
         });
 
         document.getElementById('btn-refresh').addEventListener('click', () => {
-            window.location.href="{{ route('agreements.index') }}";
+            window.location.href = "{{ route('agreements.index') }}";
         });
     </script>
 
 </x-app-layout>
+
+
 
 <style>
 /* 🌅 Container */

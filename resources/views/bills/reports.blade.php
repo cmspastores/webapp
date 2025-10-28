@@ -63,12 +63,12 @@
             <p><i class="fa-solid fa-money-bill-wave"></i> Total Revenue: ₱{{ number_format($totalRevenue,2) }}</p>
             <p><i class="fa-solid fa-clock"></i> Total Outstanding: ₱{{ number_format($totalOutstanding,2) }}</p>
 
-            {{-- Sales by Renter Type Table --}}
-            <h3 style="margin-top:24px;"><i class="fa-solid fa-list-check"></i> Sales by Renter Type</h3>
+            {{-- Sales by Room Type Table --}}
+            <h3 style="margin-top:24px;"><i class="fa-solid fa-list-check"></i> Sales by Room Type</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Renter Type</th>
+                        <th>Room Type</th>
                         <th>Amount (₱)</th>
                         <th>Percentage</th>
                     </tr>

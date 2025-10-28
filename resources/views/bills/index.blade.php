@@ -32,14 +32,29 @@
 
         <!-- 🔹 Ribbon Toggle -->
         <div class="ribbon-toggle" style="display:flex; gap:8px; margin-bottom:12px;">
-            <button type="button" class="btn-ribbon active" data-target="monthly">Dorm / Monthly Bills</button>
-            <button type="button" class="btn-ribbon" data-target="daily">Transient / Daily Bills</button>
+            <button type="button" class="btn-ribbon active" data-target="dorm">Dorm / Monthly Bills</button>
+            <button type="button" class="btn-ribbon" data-target="transient">Transient / Daily Bills</button>
         </div>
 
-        <!-- 🔹 Monthly / Dorm Bills Table -->
-        <div class="card table-card bill-table" id="monthly-table">
-            @if($bills->where('rate_unit','!=','daily')->isEmpty())
-                <p>No monthly billing records found.</p>
+        <!-- 🔹 Sort Bills by Agreement Room Type -->
+        @php
+            $allBills = collect($bills instanceof \Illuminate\Pagination\AbstractPaginator ? $bills->items() : $bills);
+
+            $dormBills = $allBills->filter(function($bill) {
+                $type = optional(optional($bill->agreement)->room)->roomType->name ?? $bill->rate_unit;
+                return strtolower($type) !== 'transient';
+            });
+
+            $transientBills = $allBills->filter(function($bill) {
+                $type = optional(optional($bill->agreement)->room)->roomType->name ?? $bill->rate_unit;
+                return strtolower($type) === 'transient';
+            });
+        @endphp
+
+        <!-- 🏠 Dorm / Monthly Bills Table -->
+        <div class="card table-card bill-table" id="dorm-table">
+            @if($dormBills->isEmpty())
+                <p>No dorm billing records found.</p>
             @else
                 <div class="table-wrapper">
                     <table class="bills-table">
@@ -55,13 +70,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($bills->where('rate_unit','!=','daily') as $bill)
+                            @foreach($dormBills as $bill)
                                 <tr>
                                     <td>{{ $bill->renter->full_name ?? '—' }}</td>
-                                    <td>{{ $bill->room->room_number ?? '—' }}</td>
-                                    <td>{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</td>
-                                    <td>₱{{ number_format($bill->amount_due,2) }}</td>
-                                    <td>₱{{ number_format($bill->balance,2) }}</td>
+                                    <td>
+                                        {{ $bill->room->room_number ?? '—' }}
+                                        {{ optional($bill->room->roomType)->name ? ' - ' . optional($bill->room->roomType)->name : '' }}
+                                    </td>
+                                    <td>{{ optional($bill->period_start)->format('M d, Y') }} — {{ optional($bill->period_end)->format('M d, Y') }}</td>
+                                    <td>₱{{ number_format($bill->amount_due, 2) }}</td>
+                                    <td>₱{{ number_format($bill->balance, 2) }}</td>
                                     <td><span class="status-badge {{ strtolower($bill->status) }}">{{ ucfirst($bill->status) }}</span></td>
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
@@ -81,9 +99,9 @@
             @endif
         </div>
 
-        <!-- 🔹 Transient / Daily Bills Table -->
-        <div class="card table-card bill-table" id="daily-table" style="display:none;">
-            @if($bills->where('rate_unit','daily')->isEmpty())
+        <!-- 🕓 Transient / Daily Bills Table -->
+        <div class="card table-card bill-table" id="transient-table" style="display:none;">
+            @if($transientBills->isEmpty())
                 <p>No transient billing records found.</p>
             @else
                 <div class="table-wrapper">
@@ -100,13 +118,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($bills->where('rate_unit','daily') as $bill)
+                            @foreach($transientBills as $bill)
                                 <tr>
                                     <td>{{ $bill->renter->full_name ?? '—' }}</td>
-                                    <td>{{ $bill->room->room_number ?? '—' }}</td>
-                                    <td>{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</td>
-                                    <td>₱{{ number_format($bill->amount_due,2) }}</td>
-                                    <td>₱{{ number_format($bill->balance,2) }}</td>
+                                    <td>
+                                        {{ $bill->room->room_number ?? '—' }}
+                                        {{ optional($bill->room->roomType)->name ? ' - ' . optional($bill->room->roomType)->name : '' }}
+                                    </td>
+                                    <td>{{ optional($bill->period_start)->format('M d, Y') }} — {{ optional($bill->period_end)->format('M d, Y') }}</td>
+                                    <td>₱{{ number_format($bill->amount_due, 2) }}</td>
+                                    <td>₱{{ number_format($bill->balance, 2) }}</td>
                                     <td><span class="status-badge {{ strtolower($bill->status) }}">{{ ucfirst($bill->status) }}</span></td>
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
@@ -126,33 +147,27 @@
             @endif
         </div>
 
-        <!-- 🔹 Pagination (applies to the whole collection) -->
+        <!-- 🔹 Pagination -->
         <div class="pagination" style="margin-top:12px;">
             {{ $bills->appends(request()->query())->links() }}
         </div>
 
     </div>
 
-    <!-- 🔹 JS for Refresh + Ribbon Toggle -->
+    <!-- 🔹 JS -->
     <script>
         document.getElementById('btn-refresh').addEventListener('click', () => {
             window.location.href = "{{ route('bills.index') }}";
         });
 
-        // Ribbon toggle logic
         const buttons = document.querySelectorAll('.btn-ribbon');
         const tables = document.querySelectorAll('.bill-table');
 
         buttons.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Remove active from all buttons
                 buttons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-
-                // Hide all tables
                 tables.forEach(t => t.style.display = 'none');
-
-                // Show the selected table
                 const target = btn.getAttribute('data-target');
                 document.getElementById(`${target}-table`).style.display = 'block';
             });
