@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Schema;
 
 class BillController extends Controller
 {
-    // list bills (paginated) ✅ updated for search & sort
+    // list bills (paginated) ✅ updated for search & sort & status filter
     public function index(Request $request)
     {
         $bills = Bill::with(['renter', 'room', 'agreement']);
@@ -21,6 +21,12 @@ class BillController extends Controller
             $search = $request->input('search');
             $bills = $bills->whereHas('renter', fn($q) => $q->where('full_name', 'like', "%{$search}%"))
                            ->orWhereHas('room', fn($q) => $q->where('room_number', 'like', "%{$search}%"));
+        }
+
+        // 🔹 Filter by status (unpaid / paid)
+        if ($request->filled('status')) {
+            $status = $request->input('status');
+            $bills = $bills->where('status', $status);
         }
 
         // ↕️ Sort by period_start

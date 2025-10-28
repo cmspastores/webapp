@@ -12,9 +12,11 @@
             <div class="left-toolbar">
                 <form method="GET" action="{{ route('bills.index') }}" class="search-toolbar">
                     <input type="text" name="search" placeholder="Search renter or room" value="{{ request('search') }}" class="search-input">
-                    <select name="sort" class="search-filter">
-                        <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Period Start ↑ Ascending</option>
-                        <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Period Start ↓ Descending</option>
+
+                    <select name="status" class="search-filter">
+                        <option value="">All Statuses</option>
+                        <option value="unpaid" {{ request('status') == 'unpaid' ? 'selected' : '' }}>Unpaid</option>
+                        <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Paid</option>
                     </select>
                     <button type="submit" class="btn-search">Search</button>
                 </form>
@@ -28,10 +30,16 @@
             </div>
         </div>
 
-        <!-- 🔹 Bills Table Card -->
-        <div class="card table-card">
-            @if($bills->isEmpty())
-                <p>No billing records found.</p>
+        <!-- 🔹 Ribbon Toggle -->
+        <div class="ribbon-toggle" style="display:flex; gap:8px; margin-bottom:12px;">
+            <button type="button" class="btn-ribbon active" data-target="monthly">Dorm / Monthly Bills</button>
+            <button type="button" class="btn-ribbon" data-target="daily">Transient / Daily Bills</button>
+        </div>
+
+        <!-- 🔹 Monthly / Dorm Bills Table -->
+        <div class="card table-card bill-table" id="monthly-table">
+            @if($bills->where('rate_unit','!=','daily')->isEmpty())
+                <p>No monthly billing records found.</p>
             @else
                 <div class="table-wrapper">
                     <table class="bills-table">
@@ -47,7 +55,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($bills as $bill)
+                            @foreach($bills->where('rate_unit','!=','daily') as $bill)
                                 <tr>
                                     <td>{{ $bill->renter->full_name ?? '—' }}</td>
                                     <td>{{ $bill->room->room_number ?? '—' }}</td>
@@ -69,20 +77,85 @@
                             @endforeach
                         </tbody>
                     </table>
-
-                    <!-- 🔹 Pagination -->
-                    <div class="pagination" style="margin-top:12px;">
-                        {{ $bills->appends(request()->query())->links() }}
-                    </div>
                 </div>
             @endif
         </div>
+
+        <!-- 🔹 Transient / Daily Bills Table -->
+        <div class="card table-card bill-table" id="daily-table" style="display:none;">
+            @if($bills->where('rate_unit','daily')->isEmpty())
+                <p>No transient billing records found.</p>
+            @else
+                <div class="table-wrapper">
+                    <table class="bills-table">
+                        <thead>
+                            <tr>
+                                <th>Renter</th>
+                                <th>Room</th>
+                                <th>Period</th>
+                                <th>Amount</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                                <th style="white-space:nowrap">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($bills->where('rate_unit','daily') as $bill)
+                                <tr>
+                                    <td>{{ $bill->renter->full_name ?? '—' }}</td>
+                                    <td>{{ $bill->room->room_number ?? '—' }}</td>
+                                    <td>{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</td>
+                                    <td>₱{{ number_format($bill->amount_due,2) }}</td>
+                                    <td>₱{{ number_format($bill->balance,2) }}</td>
+                                    <td><span class="status-badge {{ strtolower($bill->status) }}">{{ ucfirst($bill->status) }}</span></td>
+                                    <td class="actions-cell">
+                                        <div class="actions-buttons">
+                                            <a href="{{ route('bills.show', $bill) }}" class="btn-view">View</a>
+                                            <form action="{{ route('bills.destroy', $bill) }}" method="POST" class="inline-form" onsubmit="return confirm('Delete this bill?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn-delete" type="submit">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+
+        <!-- 🔹 Pagination (applies to the whole collection) -->
+        <div class="pagination" style="margin-top:12px;">
+            {{ $bills->appends(request()->query())->links() }}
+        </div>
+
     </div>
 
-    <!-- 🔹 JS for Refresh -->
+    <!-- 🔹 JS for Refresh + Ribbon Toggle -->
     <script>
         document.getElementById('btn-refresh').addEventListener('click', () => {
             window.location.href = "{{ route('bills.index') }}";
+        });
+
+        // Ribbon toggle logic
+        const buttons = document.querySelectorAll('.btn-ribbon');
+        const tables = document.querySelectorAll('.bill-table');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active from all buttons
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Hide all tables
+                tables.forEach(t => t.style.display = 'none');
+
+                // Show the selected table
+                const target = btn.getAttribute('data-target');
+                document.getElementById(`${target}-table`).style.display = 'block';
+            });
         });
     </script>
 </x-app-layout>
@@ -145,6 +218,10 @@
 .btn-view:hover { background:#6FC3A1; } 
 .btn-delete { background:#EF4444; color:#fff; } 
 .btn-delete:hover { background:#B91C1C; }
+
+/* 🔹 Ribbon Buttons */
+.btn-ribbon { padding:8px 16px; border-radius:12px; font-weight:700; border:none; cursor:pointer; transition:0.2s; background:#F4C38C; color:#5C3A21; }
+.btn-ribbon.active { background:#D97A4E; color:#fff; }
 
 /* 📱 Responsive Table Columns */
 @media (max-width:768px) { 
