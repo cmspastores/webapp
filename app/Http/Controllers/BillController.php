@@ -14,32 +14,36 @@ class BillController extends Controller
     // list bills (paginated) ✅ updated for search & sort & status filter
     public function index(Request $request)
     {
-        $bills = Bill::with(['renter', 'room', 'agreement']);
+        $billsQuery = Bill::with(['renter', 'room', 'agreement']);
 
         // 🔍 Search by renter name or room number
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $bills = $bills->whereHas('renter', fn($q) => $q->where('full_name', 'like', "%{$search}%"))
-                           ->orWhereHas('room', fn($q) => $q->where('room_number', 'like', "%{$search}%"));
+            $billsQuery = $billsQuery->whereHas('renter', fn($q) => $q->where('full_name', 'like', "%{$search}%"))
+                                     ->orWhereHas('room', fn($q) => $q->where('room_number', 'like', "%{$search}%"));
         }
 
         // 🔹 Filter by status (unpaid / paid)
         if ($request->filled('status')) {
             $status = $request->input('status');
-            $bills = $bills->where('status', $status);
+            $billsQuery = $billsQuery->where('status', $status);
         }
 
         // ↕️ Sort by period_start
         if ($request->input('sort') === 'asc') {
-            $bills = $bills->orderBy('period_start', 'asc');
+            $billsQuery = $billsQuery->orderBy('period_start', 'asc');
         } else { // default desc
-            $bills = $bills->orderBy('period_start', 'desc');
+            $billsQuery = $billsQuery->orderBy('period_start', 'desc');
         }
 
         // 🔹 Paginate
-        $bills = $bills->paginate(15)->appends($request->query());
+        $bills = $billsQuery->paginate(15)->appends($request->query());
 
-        return view('bills.index', compact('bills'));
+        // 🔹 NEW: Separate for ribbon tables
+        $monthlyBills = $bills->filter(fn($bill) => !optional($bill->room->roomType)->is_transient && ($bill->agreement->rate_unit ?? '') !== 'daily');
+        $transientBills = $bills->filter(fn($bill) => optional($bill->room->roomType)->is_transient || ($bill->agreement->rate_unit ?? '') === 'daily');
+
+        return view('bills.index', compact('bills', 'monthlyBills', 'transientBills'));
     }
 
     // show single bill / statement
@@ -158,7 +162,7 @@ class BillController extends Controller
         $totalRevenue = $bills->sum('amount_due');
         $totalOutstanding = $bills->where('status', 'unpaid')->sum('balance');
 
-        // 🔹 NEW: Sales Summary by Renter Type
+        // 🔹 Sales Summary by Renter Type
         $transientSales = $bills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')
                                  ->sum('amount_due');
 

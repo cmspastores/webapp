@@ -38,7 +38,7 @@
 
         <!-- 🔹 Monthly / Dorm Bills Table -->
         <div class="card table-card bill-table" id="monthly-table">
-            @if($bills->where('rate_unit','!=','daily')->isEmpty())
+            @if($monthlyBills->isEmpty())
                 <p>No monthly billing records found.</p>
             @else
                 <div class="table-wrapper">
@@ -55,7 +55,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($bills->where('rate_unit','!=','daily') as $bill)
+                            @foreach($monthlyBills as $bill)
                                 <tr>
                                     <td>{{ $bill->renter->full_name ?? '—' }}</td>
                                     <td>{{ $bill->room->room_number ?? '—' }}</td>
@@ -83,7 +83,7 @@
 
         <!-- 🔹 Transient / Daily Bills Table -->
         <div class="card table-card bill-table" id="daily-table" style="display:none;">
-            @if($bills->where('rate_unit','daily')->isEmpty())
+            @if($transientBills->isEmpty())
                 <p>No transient billing records found.</p>
             @else
                 <div class="table-wrapper">
@@ -100,7 +100,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($bills->where('rate_unit','daily') as $bill)
+                            @foreach($transientBills as $bill)
                                 <tr>
                                     <td>{{ $bill->renter->full_name ?? '—' }}</td>
                                     <td>{{ $bill->room->room_number ?? '—' }}</td>
@@ -145,20 +145,18 @@
 
         buttons.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Remove active from all buttons
                 buttons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
-                // Hide all tables
                 tables.forEach(t => t.style.display = 'none');
 
-                // Show the selected table
                 const target = btn.getAttribute('data-target');
                 document.getElementById(`${target}-table`).style.display = 'block';
             });
         });
     </script>
 </x-app-layout>
+
 
 <!-- 🔹 CSS -->
 <style>
