@@ -46,6 +46,61 @@
                 .welcome-card h3 { font-size:18px; }
                 .dashboard-container { grid-template-columns:1fr; }
             }
+
+            /* === 📱 Responsive Enhancements for Maximized/Minimized Screens === */
+
+/* Large screens: max-width >= 1300px, centered dashboard with 3-4 columns */
+@media (min-width:1301px) {
+    .dashboard-container { 
+        grid-template-columns:repeat(4, 1fr);
+        gap:32px; 
+        padding:32px; 
+    }
+    .card { padding:32px 28px; }
+    .welcome-card { padding:60px 40px; font-size:46px; }
+}
+
+/* Medium screens: 1025px - 1300px */
+@media (min-width:1025px) and (max-width:1300px) {
+    .dashboard-container {
+        grid-template-columns:repeat(3, 1fr);
+        gap:28px;
+        padding:28px;
+    }
+    .welcome-card { padding:55px 35px; font-size:42px; }
+}
+
+/* Small screens already have 1 column at <=768px, add better padding for 769px - 1024px */
+@media (min-width:769px) and (max-width:1024px) {
+    .dashboard-container { 
+        grid-template-columns:repeat(2, 1fr); 
+        gap:24px; 
+        padding:24px; 
+    }
+    .welcome-card { padding:50px 30px; font-size:38px; }
+}
+
+/* Extra small screens: <=480px */
+@media (max-width:480px){
+    .dashboard-container { grid-template-columns:1fr; padding:16px; gap:16px; }
+    .welcome-card { padding:30px 20px; font-size:28px; }
+    .welcome-card h3 { font-size:16px; }
+    .card { padding:20px 16px; }
+    .stats-list p { font-size:15px; }
+}
+
+/* Ensure icons inside cube-card scale nicely */
+.cube-card h3 span.icon-bg { width:32px; height:32px; font-size:16px; }
+
+/* Optional: prevent overflow horizontally on minimized screens */
+body, .dashboard-container { overflow-x:hidden; }
+
+
+
+
+
+
+
         </style>
     </x-slot>
 

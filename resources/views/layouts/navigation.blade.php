@@ -36,7 +36,51 @@
 .mobile-nav.show{max-height:200px;opacity:1;}
 .mobile-nav-link{padding:10px 16px;border-bottom:1px solid #E6A574;color:#5C3A21;text-decoration:none;font-weight:600;display:block;text-align:left;transition:color 0.3s ease;}
 .mobile-nav-link:hover,.mobile-nav-link.logout-btn:hover{color:#D98348!important;background:#FFF5EC!important;}
-@media(max-width:768px){.nav-right{display:none;}.nav-hamburger{display:block;}}
+
+/* === 📱 Responsive Enhancements for Navigation Bar === */
+
+/* Large screens (>1200px): keep nav right aligned, add spacing */
+@media(min-width:1201px){
+    .nav-container{justify-content:flex-end;padding:0 32px;}
+    .nav-user-btn{padding:8px 16px;font-size:16px;}
+    .nav-dropdown-content{min-width:160px;}
+}
+
+/* Medium screens (769px - 1200px): adjust spacing for slightly smaller screens */
+@media(min-width:769px) and (max-width:1200px){
+    .nav-container{justify-content:flex-end;padding:0 20px;}
+    .nav-user-btn{padding:6px 12px;font-size:15px;}
+    .nav-dropdown-content{min-width:150px;}
+}
+
+/* Small screens (≤768px): mobile behavior */
+@media(max-width:768px){
+    .nav-right{display:none;} /* hide desktop nav on mobile */
+    .nav-hamburger{display:block;font-size:22px; color:#FFF; margin-left:auto;}
+    .mobile-nav{max-height:0;opacity:0;transition:max-height 0.3s ease,opacity 0.3s ease;}
+    .mobile-nav.show{max-height:400px;opacity:1;} /* increase height for longer dropdowns */
+    .mobile-nav-link{padding:12px 16px;font-size:15px;}
+    .mobile-nav-link.logout-btn{background:transparent;}
+}
+
+/* Extra small screens (≤480px): more compact layout */
+@media(max-width:480px){
+    .nav-container{padding:0 12px;height:50px;}
+    .nav-user-btn{padding:5px 10px;font-size:14px;}
+    .nav-dropdown-content{min-width:130px;}
+    .nav-hamburger{font-size:20px;}
+    .mobile-nav-link{padding:10px 12px;font-size:14px;}
+}
+
+/* Dropdown hover fix for touch devices */
+@media (hover:none){
+    .nav-user-dropdown:hover .nav-dropdown-content{display:none;}
+}
+
+
+
+
+
 </style>
 
 <script>

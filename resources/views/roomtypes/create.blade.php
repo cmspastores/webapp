@@ -21,6 +21,50 @@ input:focus { border-color:#D97A4E; outline:none; }
 .btn-cancel:hover { background:#F4C38C; color:#5C3A21; }
 .error { color:#E07B7B; font-size:13px; margin-top:-6px; margin-bottom:16px; }
 .form-actions { display:flex; gap:16px; justify-content:flex-end; margin-top:20px; }
+
+/* === 📱 Responsive Enhancements === */
+
+/* Large screens (>1200px) */
+@media(min-width:1201px) {
+    .container { max-width:700px; padding:40px; }
+    .card { padding:40px; gap:28px; }
+    .rooms-header { font-size:36px; }
+    input, .custom-select-trigger { font-size:16px; padding:16px 20px; }
+    .btn { font-size:16px; padding:14px 22px; }
+    .form-actions { gap:20px; }
+}
+
+/* Medium screens (769px - 1200px) */
+@media(min-width:769px) and (max-width:1200px) {
+    .container { max-width:650px; padding:36px; }
+    .card { padding:36px; gap:26px; }
+    .rooms-header { font-size:32px; }
+    input, .custom-select-trigger { font-size:15px; padding:14px 18px; }
+    .btn { font-size:15px; padding:12px 20px; }
+    .form-actions { gap:18px; }
+}
+
+/* Small screens / tablets (481px - 768px) */
+@media(min-width:481px) and (max-width:768px) {
+    .container { max-width:100%; padding:28px; }
+    .card { padding:28px; gap:22px; }
+    .rooms-header { font-size:28px; }
+    input, .custom-select-trigger { font-size:14px; padding:12px 16px; }
+    .btn { font-size:14px; padding:10px 16px; width:100%; text-align:center; }
+    .form-actions { flex-direction:column; gap:12px; align-items:center; justify-content:center; }
+}
+
+/* Extra small screens / mobile (≤480px) */
+@media(max-width:480px) {
+    .container { padding:16px; }
+    .card { padding:16px; gap:16px; }
+    .rooms-header { font-size:24px; }
+    input, .custom-select-trigger { font-size:13px; padding:10px 12px; }
+    .btn { font-size:13px; padding:8px 12px; width:100%; text-align:center; }
+    .form-actions { flex-direction:column; gap:10px; align-items:center; justify-content:center; }
+}
+
+
     </style>
 
     <div class="container">

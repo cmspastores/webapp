@@ -90,6 +90,47 @@
 .sidebar.auto-collapsed ul li a{display:none!important;}
 }
 
+/* === 🌐 Enhanced Responsiveness === */
+
+/* Large screens (maximized) */
+@media(min-width:1600px){
+    .sidebar{width:18rem;}
+    .sidebar a:not(.sidebar-logo-link){padding:.8rem 1rem;}
+    .sidebar-section{margin:1.2rem;padding:1.2rem;}
+    .sidebar-footer{padding:1.2rem 0;}
+    .sidebar-toggle{width:2.8rem;height:2.8rem;}
+}
+
+/* Medium screens (already partially handled but refined) */
+@media(max-width:1200px) and (min-width:1025px){
+    .sidebar{width:14rem;}
+    .sidebar a:not(.sidebar-logo-link){padding:.6rem .8rem;}
+}
+
+/* Minimized / Mobile screens */
+@media(max-width:1024px){
+    /* Toggle button sits directly under visible sections in uncollapsed state */
+    .sidebar:not(.collapsed) .sidebar-footer{margin-top:0.5rem;align-self:center;}
+
+    /* Toggle button sits just under logo in collapsed state */
+    .sidebar.collapsed .sidebar-footer{margin-top:.3rem;align-self:center;}
+
+    /* Adjust padding for links and sections */
+    .sidebar a:not(.sidebar-logo-link){padding:.5rem .7rem;}
+    .sidebar-section{margin:.6rem;padding:.6rem;}
+    .sidebar-toggle{width:2.2rem;height:2.2rem;}
+}
+
+/* Extra small screens / mobile portrait */
+@media(max-width:600px){
+    .sidebar{width:100%;flex-direction:row;overflow-x:auto;min-height:auto;}
+    .sidebar-logo{padding:.5rem;}
+    .sidebar-section{display:flex;flex-direction:row;margin:0;padding:.5rem;overflow-x:auto;gap:.3rem;}
+    .sidebar-footer{justify-content:flex-start;padding:.3rem;}
+    .sidebar-toggle{width:2rem;height:2rem;margin-top:0;margin-left:.5rem;}
+}
+
+
 
 </style>
 
