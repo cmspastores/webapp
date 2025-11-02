@@ -49,38 +49,36 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'reservation_type' => 'required|in:transient,dorm',
-            'check_in_date'    => 'required|date',
-            'check_out_date'   => 'required|date|after_or_equal:check_in_date',
+            // agreement fields (from create view)
+            'agreement_room_id'      => 'required|exists:rooms,id',
+            'agreement_date'         => 'nullable|date',
+            'start_date'             => 'required|date',
+            'end_date'               => 'nullable|date|after_or_equal:start_date',
 
-            // agreement fields (we save to pending payload)
-            'agreement_room_id'        => 'required|exists:rooms,id',
-            'agreement_date'           => 'nullable|date',
-            'start_date'               => 'required|date',
-            'end_date'                 => 'nullable|date|after_or_equal:start_date',
-            'agreement_monthly_rent'   => 'nullable|numeric',
+            // renter fields (optional) — do NOT enforce unique email here (pending)
+            'first_name'             => 'nullable|string|max:255',
+            'last_name'              => 'nullable|string|max:255',
+            'dob'                    => 'nullable|date',
+            'email'                  => 'nullable|email',
+            'phone'                  => 'nullable|string|max:50',
+            'address'                => 'nullable|string|max:1000',
+            'emergency_contact'      => 'nullable|string|max:1000',
+            'guardian_name'          => 'nullable|string|max:255',
+            'guardian_phone'         => 'nullable|string|max:50',
+            'guardian_email'         => 'nullable|email',
 
-            // renter fields (optional) -> saved to pending payload
-            'first_name'        => 'nullable|string|max:255',
-            'last_name'         => 'nullable|string|max:255',
-            'dob'               => 'nullable|date',
-            'email'             => 'nullable|email',
-            'phone'             => 'nullable|string|max:50',
-            'address'           => 'nullable|string|max:1000',
-            'emergency_contact' => 'nullable|string|max:1000',
-            'guardian_name'     => 'nullable|string|max:255',
-            'guardian_phone'    => 'nullable|string|max:50',
-            'guardian_email'    => 'nullable|email',
+            // reservation dates
+            'check_in_date'          => 'required|date',
+            'check_out_date'         => 'required|date|after_or_equal:check_in_date',
         ]);
 
-        // Build pending payload to store with reservation
+        // build pending payload (agreement + renter data)
         $pending = [
             'agreement' => [
-                'room_id'      => $request->input('agreement_room_id'),
+                'room_id'       => $request->input('agreement_room_id'),
                 'agreement_date'=> $request->input('agreement_date'),
-                'start_date'   => $request->input('start_date'),
-                'end_date'     => $request->input('end_date'),
-                'monthly_rent' => $request->input('agreement_monthly_rent'),
+                'start_date'    => $request->input('start_date'),
+                'end_date'      => $request->input('end_date'),
             ],
             'renter' => $request->only([
                 'first_name','last_name','dob','email','phone',
@@ -88,15 +86,14 @@ class ReservationController extends Controller
             ]),
         ];
 
+        // create pending/unverified reservation (no agreement created yet)
         $reservation = Reservation::create([
-            'agreement_id'     => null, // pending
+            'agreement_id'     => null,
             'room_id'          => $request->input('agreement_room_id'),
             'first_name'       => $request->input('first_name', null),
             'last_name'        => $request->input('last_name', null),
-            'reservation_type' => $request->input('reservation_type'),
             'check_in_date'    => $request->input('check_in_date'),
             'check_out_date'   => $request->input('check_out_date'),
-            // set default status to unverified for pending entries
             'status'           => 'unverified',
             'pending_payload'  => $pending,
         ]);
@@ -105,7 +102,7 @@ class ReservationController extends Controller
             return response()->json($reservation, Response::HTTP_CREATED);
         }
 
-        return redirect()->route('reservation.index')->with('success', 'Reservation saved as pending. Confirm to create agreement & renter.');
+        return redirect()->route('reservation.index')->with('success', 'Reservation saved as unverified (pending).');
     }
 
     /**
@@ -168,7 +165,6 @@ class ReservationController extends Controller
             });
         } catch (QueryException $e) {
             // handle db integrity (e.g. duplicate email) gracefully
-            $msg = $e->getMessage();
             if ($e->getCode() === '23000') {
                 return redirect()->back()->with('error', 'Database integrity error while confirming reservation.');
             }
@@ -211,11 +207,17 @@ class ReservationController extends Controller
     /**
      * Remove the specified reservation from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->delete();
 
-        return response()->json(['message' => 'Reservation deleted successfully.']);
+        // If the client expects JSON (API/AJAX), return JSON
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['message' => 'Reservation deleted successfully.']);
+        }
+
+        // Normal web request -> redirect back to index with flash message
+        return redirect()->route('reservation.index')->with('success', 'Reservation deleted successfully.');
     }
 }

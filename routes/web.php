@@ -8,6 +8,9 @@ use App\Http\Controllers\RoomTypeController;
 use App\Http\Controllers\RentersController;
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\BillController;
+
+use App\Models\BillCharge;
+
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
@@ -50,15 +53,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('renters', RentersController::class);
 
-    // This defines:
-    // GET /renters -> index (renters.index)
-    // GET /renters/create -> create (renters.create)
-    // POST /renters -> store (renters.store)
-    // GET /renters/{renter} -> show (renters.show)
-    // GET /renters/{renter}/edit -> edit (renters.edit)
-    // PUT /renters/{renter} -> update (renters.update)
-    // DELETE /renters/{renter} -> destroy (renters.destroy) ✅
-
     // Reservation Management
     Route::resource('reservation', ReservationController::class);
 
@@ -77,22 +71,27 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('admin');
     
     // ============================
-    // Bills Management
+    // Bills Management 
     // ============================
+
+    // 🔹 Reports route first
+    Route::get('/bills/reports', [BillController::class, 'reports'])
+         ->name('bills.reports');
+
     // Generate all bills (explicit endpoint)
     Route::post('/bills/generate-all', [\App\Http\Controllers\BillController::class, 'generateAll'])
         ->name('bills.generateAll')
         ->middleware('auth'); // adjust middleware as needed
 
-    // Resource routes for bills (index, create, store, show, destroy etc.)
-    Route::resource('bills', \App\Http\Controllers\BillController::class);
-    
     // create/destroy bill charges
     Route::post('bills/{bill}/charges', [\App\Http\Controllers\BillChargeController::class, 'store'])
         ->name('bills.charges.store');
 
     Route::delete('bills/{bill}/charges/{charge}', [\App\Http\Controllers\BillChargeController::class, 'destroy'])
         ->name('bills.charges.destroy');
+
+    // Resource routes for bills (index, create, store, show, destroy etc.)
+    Route::resource('bills', \App\Http\Controllers\BillController::class);
 
     // ============================
     // Settings (All users)
