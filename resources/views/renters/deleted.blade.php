@@ -11,12 +11,19 @@
     <div class="search-refresh">
         <form method="GET" action="{{ route('renters.deleted') }}" class="search-container">
             <input type="text" name="q" value="{{ request('q') }}" placeholder="Search archive..." class="search-input">
-            <select name="filter" class="search-filter">     
-                <option value="all" {{ request('filter') == 'all' ? 'selected' : '' }}>All</option>
-                <option value="name" {{ request('filter') == 'name' ? 'selected' : '' }}>Name</option>
-                <option value="email" {{ request('filter') == 'email' ? 'selected' : '' }}>Email</option>
-                <option value="phone" {{ request('filter') == 'phone' ? 'selected' : '' }}>Phone</option>
-            </select>
+
+            <!-- 🔹 Custom Dropdown Filter -->
+            <div class="custom-dropdown">
+                <div class="selected">{{ request('filter') ? ucfirst(request('filter')) : 'All' }}</div>
+                <div class="dropdown-options">
+                    <div class="dropdown-option" data-value="all">All</div>
+                    <div class="dropdown-option" data-value="name">Name</div>
+                    <div class="dropdown-option" data-value="email">Email</div>
+                    <div class="dropdown-option" data-value="phone">Phone</div>
+                </div>
+                <input type="hidden" name="filter" value="{{ request('filter', 'all') }}">
+            </div>
+
             <button type="submit" class="btn-search">Search</button>
         </form>
 
@@ -35,7 +42,10 @@
                         <th class="hidden-id">ID</th>
                         <th>Full Name</th>
                         <th>Email</th>
-                        <th>Phone</th>
+                        <th>Phone Number</th>
+                        <th>Emergency Contact</th>
+                        <th>Address</th>
+                        <th>Date of Birth</th>
                         <th>Date Created</th>
                         <th>Actions</th>
                     </tr>
@@ -47,6 +57,9 @@
                         <td>{{ $renter->full_name }}</td>
                         <td>{{ $renter->email ?? '-' }}</td>
                         <td>{{ $renter->phone ?? '-' }}</td>
+                        <td>{{ $renter->emergency_contact ?? '-' }}</td>
+                        <td>{{ $renter->address ?? '-' }}</td>
+                        <td>{{ $renter->dob ? \Carbon\Carbon::parse($renter->dob)->format('M d, Y') : '-' }}</td>
                         <td>{{ $renter->created_at_formatted }}</td>
                         <td class="actions-cell">
                             <form action="{{ route('renters.restore', $renter->renter_id) }}" method="POST" class="inline-form" onsubmit="return confirm('Restore this renter?');">
@@ -57,7 +70,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="text-center">No archived renters found.</td></tr>
+                    <tr><td colspan="9" class="text-center">No archived renters found.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -83,8 +96,16 @@
 /* 🔹 Search + Controls */
 .search-refresh { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:16px; gap:10px; }
 .search-container { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
-.search-input, .search-filter { padding:8px 12px; border-radius:8px; border:1px solid #E6A574; font-size:14px; background:#fff; }
-.refresh-new-container { display:flex; gap:6px; justify-content:flex-end; }
+.search-input { padding:8px 12px; border-radius:8px; border:1px solid #E6A574; font-size:14px; background:#fff; }
+
+/* 🔹 Custom Dropdown Filter */
+.custom-dropdown { position: relative; min-width:160px; cursor:pointer; }
+.custom-dropdown .selected { padding:8px 12px; border:1px solid #E6A574; border-radius:8px; background:#fff; color:#5C3A21; transition:0.2s; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+.custom-dropdown .selected.active { border-color:#D97A4E; }
+.dropdown-options { display:none; position:absolute; top:100%; left:0; width:100%; background:#fff; border:1px solid #E6A574; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.1); z-index:10; }
+.custom-dropdown .selected.active + .dropdown-options { display:block; }
+.dropdown-option { padding:8px 12px; cursor:pointer; font-weight:500; color:#5C3A21; transition:0.2s; white-space:nowrap; }
+.dropdown-option:hover { background:#D97A4E; color:#fff; }
 
 /* 🔹 Buttons */
 .btn-back { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; text-decoration:none; box-shadow:0 4px 10px rgba(0,0,0,0.15); transition:0.2s; }
@@ -121,15 +142,47 @@
 .text-center { text-align:center; }
 
 /* 🔹 Responsive */
-@media (max-width:768px) { .renter-table th, .renter-table td { font-size:12px; padding:8px 10px; } }
-@media (max-width:480px) { .renter-table th, .renter-table td { font-size:11px; padding:4px 6px; } }
-@media (max-width:360px) { .renter-table th, .renter-table td { font-size:10px; padding:3px 4px; } }
-
+@media (max-width:768px) { 
+    .renter-table th:nth-child(4), .renter-table td:nth-child(4), 
+    .renter-table th:nth-child(5), .renter-table td:nth-child(5) { display:none; } 
+}
+@media (max-width:480px) { 
+    .renter-table th, .renter-table td { font-size:11px; padding:4px 6px; } 
+    .renter-table th:nth-child(6), .renter-table td:nth-child(6) { display:none; } 
+}
+@media (max-width:360px) { 
+    .renter-table th, .renter-table td { font-size:10px; padding:3px 4px; } 
+    .renter-table th:nth-child(4), .renter-table td:nth-child(4) { display:none; } 
+}
 </style>
 
+<!-- 🔹 JS -->
 <script>
 document.getElementById('btn-refresh').addEventListener('click', () => {
     window.location.href = "{{ route('renters.deleted') }}";
+});
+
+// 🔹 Custom Dropdown Logic
+document.querySelectorAll('.custom-dropdown').forEach(dd => {
+    const selected = dd.querySelector('.selected');
+    const options = dd.querySelectorAll('.dropdown-option');
+    const hiddenInput = dd.querySelector('input[type="hidden"]');
+
+    selected.addEventListener('click', () => {
+        selected.classList.toggle('active');
+    });
+
+    options.forEach(opt => {
+        opt.addEventListener('click', () => {
+            selected.textContent = opt.textContent;
+            hiddenInput.value = opt.dataset.value;
+            selected.classList.remove('active');
+        });
+    });
+
+    document.addEventListener('click', e => {
+        if (!dd.contains(e.target)) selected.classList.remove('active');
+    });
 });
 </script>
 

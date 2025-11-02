@@ -16,10 +16,17 @@
         <div class="toolbar-row">
             <form method="GET" action="{{ route('agreements.archived') }}" class="search-toolbar">
                 <input type="text" name="search" placeholder="Search renter or room" value="{{ request('search') }}" class="search-input">
-                <select name="sort" class="search-filter">
-                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Room Number ↑ Ascending</option>
-                    <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Room Number ↓ Descending</option>
-                </select>
+
+                <!-- 🔹 Custom Dropdown for Sort -->
+                <div class="custom-dropdown">
+                    <div class="selected">{{ request('sort') == 'desc' ? 'Room Number ↓ Descending' : 'Room Number ↑ Ascending' }}</div>
+                    <div class="dropdown-options">
+                        <div class="dropdown-option" data-value="asc">Room Number ↑ Ascending</div>
+                        <div class="dropdown-option" data-value="desc">Room Number ↓ Descending</div>
+                    </div>
+                    <input type="hidden" name="sort" value="{{ request('sort', 'asc') }}">
+                </div>
+
                 <button type="submit" class="btn-search">Search</button>
             </form>
 
@@ -139,7 +146,7 @@
         </div>
     </div>
 
-    <!-- 🔹 JS for Table Toggle & Refresh -->
+    <!-- 🔹 JS for Table Toggle, Refresh & Dropdown -->
     <script>
         const btnDorm = document.getElementById('btn-dorm');
         const btnTransient = document.getElementById('btn-transient');
@@ -163,6 +170,29 @@
         document.getElementById('btn-refresh').addEventListener('click', () => {
             window.location.href="{{ route('agreements.archived') }}";
         });
+
+        // 🔹 Custom dropdown logic
+        document.querySelectorAll('.custom-dropdown').forEach(dd => {
+            const selected = dd.querySelector('.selected');
+            const options = dd.querySelectorAll('.dropdown-option');
+            const hiddenInput = dd.querySelector('input[type="hidden"]');
+
+            selected.addEventListener('click', () => {
+                selected.classList.toggle('active');
+            });
+
+            options.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    selected.textContent = opt.textContent;
+                    hiddenInput.value = opt.dataset.value;
+                    selected.classList.remove('active');
+                });
+            });
+
+            document.addEventListener('click', e => {
+                if (!dd.contains(e.target)) selected.classList.remove('active');
+            });
+        });
     </script>
 </x-app-layout>
 
@@ -181,7 +211,18 @@
 .toolbar-actions { display:flex; align-items:center; gap:6px; margin-left:auto; flex:0 0 auto; }
 
 /* 🔍 Search */
-.search-input, .search-filter { padding:8px 12px; border-radius:8px; border:1px solid #E6A574; font-size:14px; background:#fff; color:#5C3A21; font-family:'Figtree',sans-serif; }
+.search-input { padding:8px 12px; border-radius:8px; border:1px solid #E6A574; font-size:14px; background:#fff; color:#5C3A21; font-family:'Figtree',sans-serif; }
+
+/* 🔹 Custom Dropdown */
+.custom-dropdown { position: relative; width: auto; min-width: 220px; cursor: pointer; }
+.custom-dropdown .selected { padding: 8px 12px; border: 1px solid #E6A574; border-radius: 8px; background: #fff; color: #5C3A21; transition: 0.2s; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.custom-dropdown .selected.active { border-color: #D97A4E; }
+.dropdown-options { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #E6A574; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 10; }
+.custom-dropdown .selected.active + .dropdown-options { display: block; }
+.dropdown-option { padding: 8px 12px; cursor: pointer; font-weight: 500; color: #5C3A21; transition: 0.2s; white-space: nowrap; }
+.dropdown-option:hover { background: #E6A574; color: #fff; }
+
+/* 🔹 Buttons */
 .btn-search { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:600; border:none; border-radius:10px; padding:8px 16px; font-size:15px; cursor:pointer; transition:0.2s; }
 .btn-search:hover { background:#D97A4E; color:#fff; }
 

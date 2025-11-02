@@ -53,15 +53,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('renters', RentersController::class);
 
-    // This defines:
-    // GET /renters -> index (renters.index)
-    // GET /renters/create -> create (renters.create)
-    // POST /renters -> store (renters.store)
-    // GET /renters/{renter} -> show (renters.show)
-    // GET /renters/{renter}/edit -> edit (renters.edit)
-    // PUT /renters/{renter} -> update (renters.update)
-    // DELETE /renters/{renter} -> destroy (renters.destroy) ✅
-
     // Reservation Management
     Route::resource('reservation', ReservationController::class);
 
@@ -92,9 +83,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('bills.generateAll')
         ->middleware('auth'); // adjust middleware as needed
 
-    // Resource routes for bills (index, create, store, show, destroy etc.)
-    Route::resource('bills', \App\Http\Controllers\BillController::class);
-    
     // create/destroy bill charges
     Route::post('bills/{bill}/charges', [\App\Http\Controllers\BillChargeController::class, 'store'])
         ->name('bills.charges.store');
@@ -102,13 +90,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('bills/{bill}/charges/{charge}', [\App\Http\Controllers\BillChargeController::class, 'destroy'])
         ->name('bills.charges.destroy');
 
+    // Resource routes for bills (index, create, store, show, destroy etc.)
     Route::resource('bills', \App\Http\Controllers\BillController::class);
-
-
-
-
-
-
 
     // ============================
     // Settings (All users)

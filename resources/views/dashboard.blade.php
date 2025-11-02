@@ -1,39 +1,51 @@
 <x-app-layout>
     <x-slot name="header">
-        <!-- 🌐 Load Font Awesome -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papXq4YQd3z+V9K2xHDQ2FVYQeFQYszgiZhn4QF6iXqFlZTf7/IJ0rkIF0WQfgfp+Xv6q4B7XOmF8N0S9vXMQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <!-- 🌐 Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
         <style>
             /* 🌴 Hide default Jetstream header */
-            header { display: none; }
+            header { display:none; }
 
             /* 🌅 Body & Background */
-            body { background: linear-gradient(180deg,#FFF3E0,#FFFDF8); color:#2C2C2C; font-family:'Figtree',sans-serif; margin:0; padding:0; position:relative; }
-            body::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:400px; height:400px; background:url('/path-to-logo.svg') no-repeat center center; background-size:contain; opacity:0.08; pointer-events:none; z-index:0; }
+            body { background:linear-gradient(180deg,#FFF3E0,#FFFDF8); color:#2C2C2C; font-family:'Figtree',sans-serif; margin:0; padding:0; position:relative; overflow-x:hidden; }
+            body::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:420px; height:420px; background:url('/path-to-logo.svg') no-repeat center center; background-size:contain; opacity:0.08; pointer-events:none; z-index:0; }
 
             /* 🏠 Dashboard Container */
-            .dashboard-container { padding:16px; max-width:1200px; margin:0 auto; display:grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap:16px; z-index:1; }
+            .dashboard-container { padding:24px; max-width:1300px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:24px; z-index:1; position:relative; }
 
-            /* 📦 Cube-style Cards */
-            .card { background: linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); padding:24px 20px; transition: transform .2s ease, box-shadow .2s ease; text-align:center; position:relative; overflow:hidden; }
-            .card:hover { transform: translateY(-4px); box-shadow:0 15px 30px rgba(0,0,0,0.18); }
+            /* 📦 Cards */
+            .card { background:linear-gradient(145deg,#FFFDFB,#FFF8F0); border-radius:18px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.12); padding:28px 24px; transition:transform .2s ease, box-shadow .2s ease; text-align:center; position:relative; overflow:hidden; }
+            .card:hover { transform:translateY(-5px); box-shadow:0 15px 35px rgba(0,0,0,0.16); }
 
-            /* 🎯 Welcome + Dashboard Title */
-            .welcome-card { grid-column: 1/-1; padding:40px 20px; }
-            .welcome-card h2 { font-size:36px; font-weight:900; color:#5C3A21; margin-bottom:12px; text-shadow:2px 2px 6px rgba(0,0,0,0.2); }
-            .welcome-card h3 { font-size:20px; font-weight:800; color:#5C3A21; margin-bottom:8px; }
+            /* 🏖️ Welcome Section */
+            .welcome-card { grid-column:1/-1; padding:50px 30px; background:linear-gradient(135deg,#FFE8C6,#FFF7EB); text-align:center; border:2px solid #E6A574; border-radius:20px; box-shadow:0 12px 30px rgba(0,0,0,0.15); }
+            .welcome-card h2 { font-size:42px; font-weight:900; color:#5C3A21; margin-bottom:12px; text-shadow:2px 2px 6px rgba(0,0,0,0.25); }
+            .welcome-card h3 { font-size:22px; font-weight:700; color:#5C3A21; margin-bottom:12px; }
+            .welcome-card p { font-size:17px; color:#5C3A21; font-weight:500; }
 
-            /* 📊 Stats & Lists Titles same as welcome h3 */
-            .cube-card h3 { font-size:20px; font-weight:800; color:#5C3A21; margin-bottom:12px; display:flex; align-items:center; gap:8px; justify-content:center; }
+            /* 📊 Section Titles */
+            .cube-card h3 { font-size:22px; font-weight:800; color:#5C3A21; margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:10px; text-transform:uppercase; letter-spacing:0.5px; }
 
-            /* 📊 Stats & Lists Content */
-            .stats-list p { margin:8px 0; font-weight:500; text-align:left; display:flex; align-items:center; gap:8px; font-size:16px; }
-            .recent-list ul { margin:0; padding-left:20px; text-align:left; list-style:none; }
-            .recent-list li { margin-bottom:4px; display:flex; align-items:center; gap:6px; }
-            .recent-list li::before { content:"\f0da"; font-family:"Font Awesome 6 Free"; font-weight:900; color:#5C3A21; }
+            /* ⚡ Quick Stats */
+            .stats-list p { margin:14px 0; font-weight:600; font-size:17px; display:flex; align-items:center; justify-content:space-between; background:#FFF4E3; padding:10px 14px; border-radius:10px; border:1px solid #E6A574; box-shadow:inset 0 1px 3px rgba(0,0,0,0.05); }
+            .stats-list p strong { color:#D97A4E; font-size:18px; }
+            .stats-list i { color:#D97A4E; }
 
-            /* 🔹 Cube layout for stats and recent cards */
-            .cube-card { display:flex; flex-direction:column; justify-content:flex-start; height:100%; }
+            /* 🧍 Recent Lists (no hover color now) */
+            .recent-list ul { margin:0; padding:0; list-style:none; text-align:left; }
+            .recent-list li { background:#FFF9F3; margin-bottom:8px; padding:10px 14px; border:1px solid #E6A574; border-radius:10px; font-weight:500; color:#5C3A21; display:flex; align-items:center; gap:10px; cursor:default; }
+            .recent-list li::before { content:"\f0da"; font-family:"Font Awesome 6 Free"; font-weight:900; color:#D97A4E; }
+
+            /* 🔹 Icon Highlights */
+            .icon-bg { background:#FFF3E5; padding:10px; border-radius:12px; display:inline-flex; justify-content:center; align-items:center; box-shadow:inset 0 2px 4px rgba(0,0,0,0.05); }
+
+            /* 📱 Responsive */
+            @media(max-width:768px){
+                .welcome-card h2 { font-size:32px; }
+                .welcome-card h3 { font-size:18px; }
+                .dashboard-container { grid-template-columns:1fr; }
+            }
         </style>
     </x-slot>
 
@@ -48,42 +60,40 @@
 
     <div class="dashboard-container">
 
-        <!-- 🟢 Welcome Card -->
+        <!-- 🌞 Welcome -->
         <div class="card welcome-card">
             <h2>Dashboard</h2>
-            <h3>
-                {{ $userLoginCount > 1 ? 'Welcome back' : 'Welcome' }}, {{ auth()->user()->name }}!
-            </h3>
-            <p>You have logged in to this site a total of <strong>{{ $userLoginCount }}</strong> {{ $loginWord }}.</p>
+            <h3>{{ $userLoginCount > 1 ? 'Welcome back' : 'Welcome' }}, {{ auth()->user()->name }}!</h3>
+            <p>You’ve logged in <strong>{{ $userLoginCount }}</strong> {{ $loginWord }} in total. </p>
         </div>
 
-        <!-- 📊 Quick Stats Cube -->
+        <!-- 📈 Quick Stats -->
         <div class="card cube-card stats-list">
-            <h3><i class="fa-solid fa-chart-pie"></i> Quick Stats</h3>
-            <p><i class="fa-solid fa-house" style="color:#5C3A21;"></i> Total Rooms: <strong>{{ $roomsCount }}</strong></p>
-            <p><i class="fa-solid fa-users" style="color:#5C3A21;"></i> Total Renters: <strong>{{ $rentersCount }}</strong></p>
+            <h3><span class="icon-bg"><i class="fa-solid fa-chart-pie"></i></span> Quick Stats</h3>
+            <p><span><i class="fa-solid fa-house"></i> Total Rooms</span> <strong>{{ $roomsCount }}</strong></p>
+            <p><span><i class="fa-solid fa-users"></i> Total Renters</span> <strong>{{ $rentersCount }}</strong></p>
         </div>
 
-        <!-- 📝 Recent Renters Cube -->
+        <!-- 🧾 Recent Renters -->
         <div class="card cube-card recent-list">
-            <h3><i class="fa-solid fa-user"></i> Recent Renters</h3>
+            <h3><span class="icon-bg"><i class="fa-solid fa-user"></i></span> Recent Renters</h3>
             <ul>
                 @forelse($recentRenters as $renter)
-                    <li>{{ $renter->full_name }}@if(isset($renter->room)) - Room: {{ $renter->room->room_number }}@endif</li>
+                    <li><i class="fa-solid fa-id-badge"></i> {{ $renter->full_name }}@if(isset($renter->room)) — Room: {{ $renter->room->room_number }}@endif</li>
                 @empty
-                    <li>No renters found.</li>
+                    <li><i class="fa-solid fa-circle-exclamation"></i> No renters found.</li>
                 @endforelse
             </ul>
         </div>
 
-        <!-- 🏘️ Recent Rooms Cube -->
+        <!-- 🏘️ Recent Rooms -->
         <div class="card cube-card recent-list">
-            <h3><i class="fa-solid fa-door-closed"></i> Recent Rooms</h3>
+            <h3><span class="icon-bg"><i class="fa-solid fa-door-closed"></i></span> Recent Rooms</h3>
             <ul>
                 @forelse($recentRooms as $room)
-                    <li>Room {{ $room->room_number }}</li>
+                    <li><i class="fa-solid fa-key"></i> Room {{ $room->room_number }}</li>
                 @empty
-                    <li>No rooms found.</li>
+                    <li><i class="fa-solid fa-circle-exclamation"></i> No rooms found.</li>
                 @endforelse
             </ul>
         </div>
