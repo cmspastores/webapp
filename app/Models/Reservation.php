@@ -25,12 +25,14 @@ class Reservation extends Model
         'check_out_date',
         'status',
         'pending_payload',
+        'is_archived',
     ];
 
     protected $casts = [
         'check_in_date' => 'date',
         'check_out_date' => 'date',
         'pending_payload' => 'array',
+        'is_archived' => 'boolean',
     ];
 
     protected $with = ['agreement', 'agreement.renter'];
@@ -53,5 +55,13 @@ class Reservation extends Model
     public function getRenterAttribute()
     {
         return $this->agreement ? $this->agreement->renter : null;
+    }
+
+    /**
+     * Scope: only archived pending reservations (no agreement)
+     */
+    public function scopeArchivedPending($query)
+    {
+        return $query->whereNull('agreement_id')->where('is_archived', true);
     }
 }

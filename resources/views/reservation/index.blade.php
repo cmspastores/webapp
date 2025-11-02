@@ -9,6 +9,7 @@
         <!-- 🔹 Create Button -->
         <div class="toolbar-row">
             <a href="{{ route('reservation.create') }}" class="btn-new">+ Create Reservation</a>
+            <a href="{{ route('reservation.archived') }}" class="btn-archive">View Archives</a>
         </div>
 
         {{-- Pending Reservations --}}
@@ -53,6 +54,12 @@
                                             <button type="submit" class="btn-confirm" title="Confirm reservation">Confirm</button>
                                         </form>
 
+                                        {{-- Archive pending reservation (available to all authenticated users) --}}
+                                        <form method="POST" action="{{ route('reservation.archive', $reservation) }}" style="display:inline" onsubmit="return confirm('Archive this pending reservation? You can view archived items from the Archive page.');">
+                                            @csrf
+                                            <button type="submit" class="btn-delete" title="Archive pending reservation">Archive</button>
+                                        </form>
+
                                         {{-- Delete pending reservation --}}
                                         <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" style="display:inline" onsubmit="return confirm('Delete this pending reservation?');">
                                             @csrf
@@ -88,6 +95,7 @@
                                 <th>Check-In</th>
                                 <th>Check-Out</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -109,6 +117,17 @@
                                     <td>{{ $reservation->check_out_date ? $reservation->check_out_date->format('Y-m-d') : '-' }}</td>
 
                                     <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
+
+                                    <td style="display:flex;gap:6px;align-items:center;justify-content:center">
+                                        {{-- Only admins can delete confirmed reservations --}}
+                                        @if(auth()->user() && (auth()->user()->is_admin ?? false))
+                                            <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" style="display:inline" onsubmit="return confirm('Delete this confirmed reservation? This will permanently remove the reservation and its link to the agreement.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-delete" title="Delete confirmed reservation">Delete</button>
+                                            </form>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -129,9 +148,24 @@
 .reservations-header { font-size:24px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; margin-bottom:8px; }
 
 /* 🔹 Toolbar */
-.toolbar-row { display:flex; justify-content:flex-start; margin-bottom:16px; }
+.toolbar-row { display:flex; justify-content:flex-start; margin-bottom:16px; gap:8px; }
 .btn-new { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-decoration:none; transition:0.2s; border:none; cursor:pointer; }
 .btn-new:hover { background:#D97A4E; color:#fff; }
+
+/* Archive button (subtle secondary) */
+.btn-archive {
+    background: #F3F4F6;
+    color: #374151;
+    border-radius:10px;
+    padding:10px 14px;
+    font-weight:700;
+    text-decoration:none;
+    border:1px solid #E5E7EB;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+.btn-archive:hover { background:#EDEFF2; color:#1F2937; }
 
 /* 📋 Table Card */
 .card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; padding:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); }

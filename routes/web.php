@@ -60,11 +60,29 @@ Route::middleware(['auth'])->group(function () {
     // DELETE /renters/{renter} -> destroy (renters.destroy) ✅
 
     // Reservation Management
+    // Specific reservation actions must be defined BEFORE the resource route
+    // so static paths like /reservation/archived do not get captured by
+    // the resource show route (reservation/{reservation}).
+    Route::post('reservation/{reservation}/confirm', [ReservationController::class, 'confirm'])
+        ->name('reservation.confirm');
+    Route::post('reservation/{reservation}/archive', [ReservationController::class, 'archive'])
+        ->name('reservation.archive');
+    Route::get('reservation/archived', [ReservationController::class, 'archived'])
+        ->name('reservation.archived');
+
     Route::resource('reservation', ReservationController::class);
 
     // Confirm pending reservation (create renter + agreement and link)
     Route::post('reservation/{reservation}/confirm', [ReservationController::class, 'confirm'])
         ->name('reservation.confirm');
+
+    // Archive a pending reservation (available to non-admin users)
+    Route::post('reservation/{reservation}/archive', [ReservationController::class, 'archive'])
+        ->name('reservation.archive');
+
+    // View archived pending reservations
+    Route::get('reservation/archived', [ReservationController::class, 'archived'])
+        ->name('reservation.archived');
 
     // Rental Agreements Management
     Route::get('/agreements/archived', [AgreementController::class, 'archived'])->name('agreements.archived');

@@ -22,6 +22,7 @@ class ReservationController extends Controller
         // Pending reservations: not yet linked to an agreement and have pending payload
         $pendingReservations = Reservation::whereNull('agreement_id')
             ->whereNotNull('pending_payload')
+            ->where('is_archived', false)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -31,6 +32,35 @@ class ReservationController extends Controller
             ->get();
 
         return view('reservation.index', compact('pendingReservations', 'confirmedReservations'));
+    }
+    
+    /**
+     * Archive a pending reservation (available to non-admin users).
+     */
+    public function archive(Request $request, Reservation $reservation)
+    {
+        // only allow archiving of pending reservations (no agreement)
+        if ($reservation->agreement_id) {
+            return redirect()->back()->with('error', 'Only pending reservations can be archived.');
+        }
+
+        $reservation->is_archived = true;
+        $reservation->save();
+
+        return redirect()->back()->with('success', 'Reservation archived.');
+    }
+
+    /**
+     * Show archived pending reservations.
+     */
+    public function archived()
+    {
+        $archivedReservations = Reservation::whereNull('agreement_id')
+            ->where('is_archived', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('reservation.archive', compact('archivedReservations'));
     }
 
     /**
@@ -210,6 +240,19 @@ class ReservationController extends Controller
     public function destroy(Request $request, $id)
     {
         $reservation = Reservation::findOrFail($id);
+
+        // If reservation is confirmed (linked to an agreement), require admin
+        if ($reservation->agreement_id) {
+            $user = $request->user();
+            // Safely check is_admin flag; adjust if your app uses a different admin indicator
+            if (! $user || ! ($user->is_admin ?? false)) {
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['message' => 'Only admins can delete confirmed reservations.'], 403);
+                }
+                return redirect()->back()->with('error', 'Only administrators can delete confirmed reservations.');
+            }
+        }
+
         $reservation->delete();
 
         // If the client expects JSON (API/AJAX), return JSON
