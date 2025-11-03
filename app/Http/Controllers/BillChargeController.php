@@ -20,6 +20,7 @@ class BillChargeController extends Controller
         $charge = BillCharge::create(array_merge($data, ['bill_id' => $bill->id]));
 
         // Recompute bill totals (this uses Bill::recomputeTotalsFromCharges)
+        $bill->refresh();
         $bill->recomputeTotalsFromCharges(true);
 
         return redirect()->back()->with('success', 'Charge added to bill.');

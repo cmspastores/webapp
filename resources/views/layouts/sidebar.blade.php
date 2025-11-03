@@ -16,6 +16,7 @@
             <li><a href="{{ route('reservation.index') }}" class="{{ request()->routeIs('reservation.*') ? 'active' : '' }}">Reservations</a></li>
             <li><a href="{{ route('agreements.index') }}" class="{{ request()->routeIs('agreements.*') ? 'active' : '' }}">Agreement Registrations</a></li>
             <li><a href="{{ route('bills.index') }}" class="{{ request()->routeIs('bills.*') ? 'active' : '' }}">Billings</a></li>
+            <li><a href="{{ route('payments.index') }}" class="{{ request()->routeIs('payments.*') ? 'active' : '' }}">Payments</a></li>
         </ul>
     </div>
 
