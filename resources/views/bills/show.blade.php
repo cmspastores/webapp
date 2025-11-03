@@ -82,6 +82,9 @@
             <div><i class="fas fa-house"></i> Base rent: ₱{{ number_format($bill->base_amount ?? 0,2) }}</div>
             <div><i class="fas fa-hand-holding-dollar"></i> Charges: ₱{{ number_format($bill->total_charges ?? 0,2) }}</div>
             <div><i class="fas fa-money-bill-wave"></i> Total due: ₱{{ number_format($bill->amount_due, 2) }}</div>
+
+            <!-- Payments -->
+            <a href="{{ route('payments.create', ['bill_id' => $bill->id]) }}" class="btn-pay">Make Payment</a>
         </div>
 
         <!-- Back Button -->

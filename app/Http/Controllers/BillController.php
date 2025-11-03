@@ -106,11 +106,11 @@ class BillController extends Controller
                 'period_end' => $periodEnd->toDateString(),
                 'due_date' => $dueDate,
                 'amount_due' => $base,
+                'base_amount' => $base,
                 'balance' => $base,
                 'status' => 'unpaid',
             ];
 
-            if ($hasBaseAmountColumn) { $billData['base_amount'] = $base; }
             Bill::create($billData);
             $created++;
         };

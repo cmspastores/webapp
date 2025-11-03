@@ -10,7 +10,7 @@ use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\BillController;
 
 use App\Models\BillCharge;
-
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\SettingsController;
 use App\Models\LoginLog;
@@ -110,6 +110,15 @@ Route::middleware(['auth'])->group(function () {
 
     // Resource routes for bills (index, create, store, show, destroy etc.)
     Route::resource('bills', \App\Http\Controllers\BillController::class);
+
+    // ============================
+    // Payments Management
+    // ============================
+    Route::get('payments', [PaymentController::class,'index'])->name('payments.index');
+    Route::get('payments/create', [PaymentController::class,'create'])->name('payments.create');
+    Route::post('payments', [PaymentController::class,'store'])->name('payments.store');
+    Route::get('payments/{payment}', [PaymentController::class,'show'])->name('payments.show');
+    Route::delete('payments/{payment}', [PaymentController::class,'destroy'])->name('payments.destroy');
 
     // ============================
     // Settings (All users)

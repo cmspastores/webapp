@@ -61,39 +61,91 @@ class Bill extends Model
     }
 
     /**
-     * Recompute amount_due and balance from base_amount + charges
-     * - baseAmount should be the rent the bill was created for (existing 'amount_due' before charges)
-     * - When adding charges, we'll recalc amount_due = base + sum(charges)
-     *   and balance = amount_due - (payments already applied) . If you don't store payments yet,
-     *   we will just increase balance by charge amount.
+     * Recompute amount_due and balance from base_amount + charges.
+     * If a dedicated base_amount column exists, use it. Otherwise we treat
+     * the original amount_due that existed before any charges as the base.
+     *
+     * This method ensures that status is updated accordingly:
+     * - balance == 0 => status = 'paid'
+     * - 0 < balance < amount_due => status = 'partially_paid'
+     * - balance == amount_due => status = 'unpaid'
      */
-    public function recomputeTotalsFromCharges($forceSave = true)
+    public function recomputeTotalsFromCharges(bool $save = true)
     {
-        // Determine base rent stored in DB. Decide where base is stored:
-        // If you want to keep a dedicated 'base_amount' column, we should add it.
-        // For now assume the bill originally had amount_due equal to base; but we'll preserve base in 'base_amount' on first change.
-        if (! isset($this->base_amount)) {
-            // if migration doesn't have base_amount, we'll fallback to current amount_due only for recalculation
+        // total charges
+        $totalCharges = $this->charges()->sum('amount') ?: 0.00;
+
+        // Determine base: prefer base_amount column if exists (check attribute), otherwise try using stored base meta
+        if (array_key_exists('base_amount', $this->attributes) && !is_null($this->base_amount)) {
+            $base = (float)$this->base_amount;
+        } else {
+            // If base_amount column doesn't exist, we will attempt to find a base stored in meta
+            // If none, assume the current amount_due minus current charges is the base (best effort)
+            $base = max(0.00, (float)$this->amount_due - $this->charges()->sum('amount'));
+            // persist base into attribute if DB has column (best effort)
+            if (array_key_exists('base_amount', $this->attributes) && is_null($this->base_amount)) {
+                $this->base_amount = $base;
+            }
         }
 
-        $base = $this->base_amount ?? $this->amount_due; // if you added base_amount column, it will be used.
-        $totalCharges = $this->charges()->sum('amount');
+        $newAmountDue = round($base + (float)$totalCharges, 2);
 
-        // new total due
-        $newAmountDue = round((float)$base + (float)$totalCharges, 2);
+        // Determine how to compute new balance:
+        // If you track payments separately, you'd compute payments_total and subtract.
+        // We don't have payments_total; we keep current paid amount as (old amount_due - balance).
+        $previousAmountDue = (float) ($this->getOriginal('amount_due') ?? $this->amount_due);
+        $previousBalance = (float)$this->balance;
 
-        // If you track payments, balance = newAmountDue - payments_total
-        // currently we only have 'balance' column; to be safe we'll adjust balance by diff:
-        $diff = $newAmountDue - $this->amount_due;
+        // amount already paid (if any)
+        $alreadyPaid = max(0.00, $previousAmountDue - $previousBalance);
 
+        // new balance is newAmountDue - alreadyPaid (can't go below 0)
+        $newBalance = round(max(0.00, $newAmountDue - $alreadyPaid), 2);
+
+        // assign
         $this->amount_due = $newAmountDue;
-        // increase balance by diff (if bill had been partially paid, this preserves that logic)
-        $this->balance = round((float)$this->balance + $diff, 2);
+        $this->balance = $newBalance;
 
-        if ($forceSave) {
-            $this->save();
+        // update status
+        if ($newBalance <= 0) {
+            $this->status = 'paid';
+            $this->balance = 0.00;
+        } elseif ($newBalance < $newAmountDue) {
+            $this->status = 'partially_paid';
+        } else {
+            $this->status = 'unpaid';
         }
+
+        if ($save) $this->save();
 
         return $this;
+    }
+
+    // applies amount to this bill, returns amount actually applied (<= $amount)
+    public function applyPaymentAmount(float $amount): float
+    {
+        $amount = round($amount, 2);
+        if ($amount <= 0) return 0.0;
+
+        $apply = min($amount, $this->balance);
+        $this->balance = round($this->balance - $apply, 2);
+
+        // If the bill has charges, check status more carefully
+        if ($this->balance <= 0) {
+            if ($this->charges()->count() > 0) {
+                $this->status = 'paid';
+            } else {
+                // If no charges and rent is fully paid, mark as paid
+                $this->status = 'paid';
+            }
+            $this->balance = 0.00;
+        } elseif ($this->balance < $this->amount_due) {
+            $this->status = 'partially_paid';
+        } else {
+            $this->status = 'unpaid';
+        }
+
+        $this->save();
+        return $apply;
     }
 }
