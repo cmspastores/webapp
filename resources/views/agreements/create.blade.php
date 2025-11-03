@@ -198,4 +198,45 @@
 
     /* Error Messages */
     .error { color:#e07b7b; font-size:12px; margin-top:4px; }
+
+    /* === 📱 Responsive Enhancements for Agreements Create Form === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px) {
+  .container { padding:24px; }
+  .form-card .form-grid { grid-template-columns:repeat(2,1fr); gap:16px; }
+  .form-card input, .form-card select { width:250px; font-size:14px; padding:8px 12px; }
+  .form-card .full-width input { width:350px; font-size:14px; padding:8px 12px; }
+  .btn-confirm, .btn-back { font-size:14px; padding:8px 16px; min-width:120px; }
+}
+
+/* 🖥️ Medium screens (769px–1200px) */
+@media (min-width:769px) and (max-width:1200px) {
+  .container { padding:20px; }
+  .form-card .form-grid { grid-template-columns:repeat(2,1fr); gap:14px; }
+  .form-card input, .form-card select { width:200px; font-size:13px; padding:6px 10px; }
+  .form-card .full-width input { width:300px; font-size:13px; padding:6px 10px; }
+  .btn-confirm, .btn-back { font-size:13px; padding:6px 14px; }
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px) {
+  .container { padding:16px; }
+  .form-card .form-grid { grid-template-columns:1fr; gap:12px; }
+  .form-card > .form-grid > div, .form-card .full-width { flex-direction:column; align-items:flex-start; }
+  .form-card input, .form-card select { width:100%; font-size:13px; padding:6px 10px; }
+  .form-card .full-width input { width:100%; }
+  .btn-confirm, .btn-back { width:100%; font-size:13px; padding:8px 12px; }
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px) {
+  .container { padding:12px; }
+  .form-card .form-grid { grid-template-columns:1fr; gap:10px; }
+  .form-card > .form-grid > div, .form-card .full-width { flex-direction:column; align-items:flex-start; }
+  .form-card input, .form-card select { width:100%; font-size:12px; padding:6px 8px; }
+  .form-card .full-width input { width:100%; }
+  .btn-confirm, .btn-back { width:100%; font-size:12px; padding:6px 10px; }
+}
+
 </style>

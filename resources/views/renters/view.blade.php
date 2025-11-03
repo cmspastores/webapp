@@ -81,6 +81,64 @@
 .btn-back:hover { background:#F4C38C; color:#5C3A21; }
 @media (max-width:1024px) { .detail-grid { grid-template-columns:1fr; } .label { text-align:left; } }
 @media (max-width:768px) { .header-title { font-size:22px; } .section-title { font-size:15px; } .label,.value { font-size:14px; } }
+
+/* === 📱 Responsive Enhancements for Renter Details View === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px) {
+  .container { max-width:1200px; padding:24px; }
+  .header-title { font-size:32px; }
+  .section-title { font-size:20px; }
+  .label { font-size:16px; }
+  .value { font-size:15px; }
+  .action-container { justify-content:flex-end; }
+  .btn-back { font-size:14px; padding:8px 18px; }
+}
+
+/* 🖥️ Medium screens (1025px–1200px) */
+@media (min-width:1025px) and (max-width:1200px) {
+  .container { padding:20px; max-width:1100px; }
+  .header-title { font-size:28px; }
+  .section-title { font-size:18px; }
+  .label { font-size:15px; }
+  .value { font-size:14px; }
+  .btn-back { font-size:13px; padding:7px 16px; }
+}
+
+/* 📱 Small screens / tablets (769px–1024px) */
+@media (min-width:769px) and (max-width:1024px) {
+  .container { padding:18px; max-width:1000px; }
+  .header-title { font-size:26px; }
+  .section-title { font-size:17px; }
+  .label, .value { font-size:14px; }
+  .detail-grid { grid-template-columns:1fr; }
+  .label { text-align:left; }
+  .btn-back { font-size:13px; padding:6px 14px; }
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px) {
+  .container { padding:16px; }
+  .header-title { font-size:24px; text-align:center; }
+  .section-title { font-size:16px; }
+  .label, .value { font-size:13px; }
+  .detail-grid { grid-template-columns:1fr; row-gap:8px; column-gap:8px; }
+  .action-container { justify-content:center; }
+  .btn-back { font-size:12px; padding:6px 12px; width:100%; justify-content:center; }
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px) {
+  .container { padding:12px; }
+  .header-title { font-size:20px; text-align:center; }
+  .section-title { font-size:15px; }
+  .label, .value { font-size:12px; }
+  .detail-grid { grid-template-columns:1fr; row-gap:6px; column-gap:6px; }
+  .action-container { flex-direction:column; gap:6px; align-items:center; }
+  .btn-back { width:100%; font-size:12px; padding:5px 10px; }
+}
+
+
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">

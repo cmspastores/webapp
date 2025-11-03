@@ -155,4 +155,61 @@
     .error { color:#e07b7b; font-size:12px; margin-top:4px; }
 
     .form-actions { margin-top:12px; display:flex; gap:8px; }
+
+    /* === 📱 Responsive Enhancements === */
+
+/* 🖥️ Large screens (>1200px) */
+@media (min-width:1201px) {
+    .container { max-width:1200px; padding:24px; }
+    .form-card { padding:28px; }
+    .form-card .form-grid { gap:16px; }
+    .form-card label { font-size:16px; }
+    .form-card input, .form-card select { font-size:15px; padding:10px 14px; width:240px; }
+    .form-card .full-width input { width:380px; }
+    .btn-confirm, .btn-back { font-size:15px; padding:10px 18px; }
+    .img-preview { width:220px; height:220px; }
+}
+
+/* 💻 Medium screens (769px - 1200px) */
+@media (min-width:769px) and (max-width:1200px) {
+    .container { max-width:900px; padding:20px; }
+    .form-card { padding:22px; }
+    .form-card .form-grid { gap:14px; }
+    .form-card input, .form-card select { width:220px; font-size:14px; padding:8px 12px; }
+    .form-card .full-width input { width:320px; }
+    .btn-confirm, .btn-back { font-size:14px; padding:8px 14px; }
+    .img-preview { width:200px; height:200px; }
+}
+
+/* 📱 Small screens / tablets (481px - 768px) */
+@media (min-width:481px) and (max-width:768px) {
+    .container { width:100%; padding:18px; }
+    .form-card { padding:18px; }
+    .form-card .form-grid { grid-template-columns:1fr; gap:12px; }
+    .form-card label { min-width:auto; width:100%; text-align:left; margin-bottom:4px; }
+    .form-card input, .form-card select { width:100%; }
+    .form-card .full-width input { width:100%; }
+    .roomtype-row { flex-direction:column; align-items:flex-start; gap:6px; }
+    .img-wrapper { flex-direction:column; align-items:center; gap:6px; }
+    .img-preview { width:100%; max-width:280px; height:auto; }
+    .btn-confirm, .btn-back { width:100%; font-size:14px; padding:10px 14px; text-align:center; }
+    .file-input { width:100%; text-align:center; }
+    .form-card .form-grid > div { flex-direction:column; align-items:flex-start; }
+}
+
+/* 📲 Extra small screens / mobile (≤480px) */
+@media (max-width:480px) {
+    .container { padding:12px; }
+    .form-card { padding:14px; border-radius:12px; }
+    .form-card .form-grid { grid-template-columns:1fr; gap:10px; }
+    .form-card label { width:100%; font-size:14px; margin-bottom:3px; }
+    .form-card input, .form-card select { width:100%; font-size:13px; padding:8px 10px; }
+    .form-card .full-width input { width:100%; }
+    .roomtype-row { flex-direction:column; align-items:stretch; gap:6px; }
+    .img-wrapper { flex-direction:column; align-items:center; }
+    .img-preview { width:100%; max-width:240px; height:auto; }
+    .btn-confirm, .btn-back { width:100%; font-size:13px; padding:8px 12px; text-align:center; }
+    .file-input { width:100%; font-size:13px; text-align:center; }
+}
+
 </style>

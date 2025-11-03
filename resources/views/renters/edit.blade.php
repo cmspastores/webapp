@@ -37,5 +37,49 @@
 .btn-confirm { background:#E6A574; color:#5C3A21; padding:6px 14px; border-radius:6px; }
 .btn-confirm:hover { background:#F4C38C; }
 .form-buttons { display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+
+
+/* === 📱 Responsive Enhancements for Renter Edit Form === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px) {
+  .container { padding:24px; }
+  .form-card .form-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
+  .form-card input { font-size:14px; padding:8px 12px; }
+  .btn-confirm, .btn-back { font-size:14px; padding:8px 16px; min-width:100px; }
+  .form-buttons { justify-content:flex-end; }
+}
+
+/* 🖥️ Medium screens (769px–1200px) */
+@media (min-width:769px) and (max-width:1200px) {
+  .container { padding:20px; }
+  .form-card .form-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+  .form-card input { font-size:13px; padding:6px 10px; }
+  .btn-confirm, .btn-back { font-size:13px; padding:6px 14px; }
+  .form-buttons { justify-content:flex-end; gap:8px; }
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px) {
+  .container { padding:16px; }
+  .form-card .form-grid { grid-template-columns:1fr; gap:10px; }
+  .full-width { grid-column:span 1; }
+  .form-card input { font-size:13px; padding:6px 10px; width:100%; }
+  .btn-confirm, .btn-back { width:100%; font-size:13px; padding:8px 12px; }
+  .form-buttons { flex-direction:column; gap:8px; align-items:center; }
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px) {
+  .container { padding:12px; }
+  .form-card .form-grid { grid-template-columns:1fr; gap:8px; }
+  .full-width { grid-column:span 1; }
+  .form-card input { font-size:12px; padding:6px 8px; width:100%; }
+  .btn-confirm, .btn-back { width:100%; font-size:12px; padding:6px 10px; }
+  .form-buttons { flex-direction:column; gap:6px; align-items:center; }
+}
+
+
+
 </style>
 </x-app-layout>

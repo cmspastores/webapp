@@ -80,4 +80,42 @@
 
     /* Error Messages */
     .error { color:#e07b7b; font-size:12px; margin-top:4px; }
+
+    /* === 📱 Responsive Enhancements for Bills Create Form === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px) {
+  .container { padding:24px; }
+  .form-card .form-grid { grid-template-columns:repeat(2,1fr); gap:16px; }
+  .form-card input, .form-card select { font-size:14px; padding:8px 12px; }
+  .btn-confirm, .btn-back { font-size:14px; padding:8px 18px; min-width:140px; }
+}
+
+/* 🖥️ Medium screens (769px–1200px) */
+@media (min-width:769px) and (max-width:1200px) {
+  .container { padding:20px; }
+  .form-card .form-grid { grid-template-columns:repeat(2,1fr); gap:14px; }
+  .form-card input, .form-card select { font-size:13px; padding:6px 10px; }
+  .btn-confirm, .btn-back { font-size:13px; padding:6px 16px; }
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px) {
+  .container { padding:16px; }
+  .form-card .form-grid { grid-template-columns:1fr; gap:12px; }
+  .form-card .form-grid > div { width:100%; }
+  .form-card input, .form-card select { width:100%; font-size:13px; padding:6px 10px; }
+  .btn-confirm, .btn-back { width:100%; font-size:13px; padding:8px 12px; }
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px) {
+  .container { padding:12px; }
+  .form-card .form-grid { grid-template-columns:1fr; gap:10px; }
+  .form-card .form-grid > div { width:100%; }
+  .form-card input, .form-card select { width:100%; font-size:12px; padding:6px 8px; }
+  .btn-confirm, .btn-back { width:100%; font-size:12px; padding:6px 10px; }
+}
+
+
 </style>

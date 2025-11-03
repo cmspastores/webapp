@@ -148,6 +148,59 @@
 /* Responsive */
 @media(max-width:1024px){.detail-grid{grid-template-columns:1fr;}.label{text-align:left;}}
 @media(max-width:768px){.section-title{font-size:15px;}.label,.value{font-size:14px;}.add-charge-form input{flex:1 1 100%;}}
+
+/* === 📱 Responsive Enhancements for Bills Show Blade === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px) {
+  .container { padding:24px; max-width:1400px; }
+  .card { padding:24px; }
+  .section-card, .charges-card { padding:20px; }
+  .section-title, .charges-title { font-size:18px; }
+  .detail-grid { column-gap:16px; row-gap:8px; }
+  .add-charge-form input { padding:8px 12px; font-size:14px; min-width:160px; }
+  .btn-back, .btn-confirm, .btn-red { padding:8px 16px; font-size:14px; }
+  .totals-display { font-size:16px; gap:8px; }
+}
+
+/* 🖥️ Medium screens (769px–1200px) */
+@media (min-width:769px) and (max-width:1200px) {
+  .container { padding:20px; }
+  .card { padding:20px; }
+  .section-card, .charges-card { padding:18px; }
+  .section-title, .charges-title { font-size:17px; }
+  .detail-grid { column-gap:14px; row-gap:7px; }
+  .add-charge-form input { padding:6px 10px; font-size:13px; min-width:150px; }
+  .btn-back, .btn-confirm, .btn-red { padding:7px 14px; font-size:13px; }
+  .totals-display { font-size:15px; gap:7px; }
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px) {
+  .container { padding:16px; }
+  .detail-grid { grid-template-columns:1fr; }
+  .label { text-align:left; }
+  .section-title, .charges-title { font-size:15px; }
+  .label, .value { font-size:14px; }
+  .add-charge-form input { flex:1 1 100%; min-width:0; font-size:13px; }
+  .btn-back, .btn-confirm, .btn-red { width:100%; font-size:13px; padding:8px 12px; }
+  .totals-display { font-size:14px; }
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px) {
+  .container { padding:12px; }
+  .detail-grid { grid-template-columns:1fr; }
+  .label { text-align:left; }
+  .section-title, .charges-title { font-size:14px; }
+  .label, .value { font-size:13px; }
+  .add-charge-form input { flex:1 1 100%; min-width:0; font-size:12px; }
+  .btn-back, .btn-confirm, .btn-red { width:100%; font-size:12px; padding:6px 10px; }
+  .totals-display { font-size:13px; gap:5px; }
+  .charges-table th, .charges-table td { padding:6px 8px; font-size:12px; }
+}
+
+
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">

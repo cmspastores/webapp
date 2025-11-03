@@ -157,9 +157,92 @@
 .text-center { text-align:center; }
 .alert-success { background:#E6FFE9; border:1px solid #4C9F70; color:#2F6249; font-weight:600; border-radius:10px; padding:10px 14px; margin-bottom:14px; }
 .alert-error { background:#FFF4E1; border:1px solid #E6A574; color:#5C3A21; font-weight:600; border-radius:10px; padding:10px 14px; margin-bottom:14px; }
-@media (max-width:768px) { .renter-table th:nth-child(4), .renter-table td:nth-child(4), .renter-table th:nth-child(5), .renter-table td:nth-child(5) { display:none; } }
-@media (max-width:480px) { .renter-table th, .renter-table td { font-size:11px; padding:4px 6px; } .renter-table th:nth-child(6), .renter-table td:nth-child(6) { display:none; } }
-@media (max-width:360px) { .renter-table th, .renter-table td { font-size:10px; padding:3px 4px; } .renter-table th:nth-child(4), .renter-table td:nth-child(4) { display:none; } }
+
+
+
+
+/* === 📱 Full Responsive Enhancements for Renters Index with Sidebar === */
+
+/* === 🔹 Sidebar Toggle States === */
+body.sidebar-expanded .sidebar { width:240px; flex-shrink:0; transition: width 0.3s ease; }
+body.sidebar-collapsed .sidebar { width:80px; flex-shrink:0; transition: width 0.3s ease; }
+
+body.sidebar-expanded .container { margin-left:240px; transition: margin-left 0.3s ease; }
+body.sidebar-collapsed .container { margin-left:80px; transition: margin-left 0.3s ease; }
+
+/* 🖥️ Large screens (>1200px) */
+@media(min-width:1201px) {
+    body { display:flex; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; max-width:1160px; padding:28px; }
+    .renters-header { font-size:28px; }
+    .renter-table th, .renter-table td { font-size:15px; padding:14px 18px; }
+    .btn-new, .btn-refresh, .btn-search, .btn-view, .btn-edit, .btn-delete { font-size:15px; padding:10px 18px; }
+    .search-refresh { flex-direction:row; justify-content:space-between; align-items:center; gap:12px; }
+    .search-container { gap:12px; flex-wrap:nowrap; flex:1; }
+    .refresh-new-container { display:flex; gap:10px; flex-shrink:0; flex-wrap:nowrap; justify-content:flex-end; }
+    .table-wrapper { max-height:650px; overflow-x:visible; scrollbar-width:thin; }
+}
+
+/* 💻 Medium screens (769px - 1200px) */
+@media(min-width:769px) and (max-width:1200px) {
+    body { display:flex; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; width:100%; padding:22px; max-width:840px; }
+    .renters-header { font-size:26px; }
+    .renter-table th, .renter-table td { font-size:14px; padding:12px 14px; }
+    .btn-new, .btn-refresh, .btn-search, .btn-view, .btn-edit, .btn-delete { font-size:14px; padding:8px 16px; }
+    .search-refresh { flex-direction:row; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; }
+    .search-container { gap:10px; flex:1; }
+    .refresh-new-container { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; }
+    .table-wrapper { max-height:520px; overflow-x:auto; scrollbar-width:thin; }
+}
+
+/* 📱 Small screens / tablets (481px - 768px) */
+@media(min-width:481px) and (max-width:768px) {
+    body { display:flex; flex-direction:row; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; width:100%; padding:16px; }
+    .renters-header { font-size:22px; text-align:center; }
+    .search-refresh { flex-direction:column; align-items:center; gap:10px; }
+    .search-container, .refresh-new-container { width:100%; justify-content:center; flex-wrap:wrap; }
+    .btn-new, .btn-refresh, .btn-search { width:100%; font-size:13px; padding:8px 12px; text-align:center; }
+    .refresh-new-container { flex-direction:column; align-items:center; gap:8px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .renter-table { min-width:100%; display:block; overflow-x:auto; table-layout:auto; }
+    .renter-table th, .renter-table td { font-size:12px; padding:8px 10px; white-space:nowrap; }
+    .renter-table th:nth-child(4), .renter-table td:nth-child(4), .renter-table th:nth-child(5), .renter-table td:nth-child(5) { display:none; }
+    .table-wrapper { max-height:400px; overflow-x:auto; scrollbar-width:thin; }
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media(max-width:480px) {
+    body { display:flex; flex-direction:row; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; width:100%; padding:12px; }
+    .renters-header { font-size:20px; text-align:center; }
+    .search-refresh { flex-direction:column; align-items:center; gap:8px; }
+    .search-container, .refresh-new-container { width:100%; flex-direction:column; gap:6px; }
+    .btn-new, .btn-refresh, .btn-search { width:100%; font-size:12px; padding:6px 10px; text-align:center; }
+    .refresh-new-container { flex-direction:column; align-items:center; gap:6px; display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .renter-table { min-width:100%; display:block; overflow-x:auto; table-layout:auto; }
+    .renter-table th, .renter-table td { font-size:11px; padding:6px 8px; white-space:nowrap; }
+    .renter-table th:nth-child(6), .renter-table td:nth-child(6) { display:none; }
+    .table-wrapper { max-height:300px; overflow-x:auto; scrollbar-width:thin; }
+}
+
+/* 📟 Tiny screens / mini mobile (≤360px) */
+@media(max-width:360px) {
+    .renter-table th, .renter-table td { font-size:10px; padding:4px 6px; }
+    .renter-table th:nth-child(4), .renter-table td:nth-child(4) { display:none; }
+    .table-wrapper { max-height:250px; overflow-x:auto; scrollbar-width:thin; }
+}
+
+/* === 🔹 Buttons Flex Fix Across All Screens === */
+.refresh-new-container { display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; }
+.refresh-new-container .btn-new, .refresh-new-container .btn-refresh, .refresh-new-container a.btn-new { flex:0 1 auto; white-space:nowrap; text-align:center; }
+@media(max-width:768px) { .refresh-new-container { flex-direction:column; align-items:center; width:100%; } }
+
+
 </style>
 
 <!-- 🔹 JS -->

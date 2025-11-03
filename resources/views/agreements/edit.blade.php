@@ -214,4 +214,52 @@
     .btn-cancel { background:#b54b4b; color:#fff; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s; }
     .btn-cancel:hover { background:#d46a6a; }
     .error { color:#e07b7b; font-size:12px; margin-top:4px; }
+
+    /* === 📱 Responsive Enhancements for Agreements Edit Form === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px) {
+  .container { padding:24px; }
+  .form-card .form-grid { grid-template-columns:repeat(2,1fr); gap:16px; }
+  .form-card input, .form-card select, .wide-input { width:250px; font-size:14px; padding:8px 12px; }
+  .form-card .full-width input { width:350px; }
+  .soa-table th, .soa-table td { font-size:14px; padding:10px 12px; }
+  .btn-confirm, .btn-back, .btn-cancel, .btn-view-bill { font-size:14px; padding:8px 16px; min-width:120px; }
+}
+
+/* 🖥️ Medium screens (769px–1200px) */
+@media (min-width:769px) and (max-width:1200px) {
+  .container { padding:20px; }
+  .form-card .form-grid { grid-template-columns:repeat(2,1fr); gap:14px; }
+  .form-card input, .form-card select, .wide-input { width:200px; font-size:13px; padding:6px 10px; }
+  .form-card .full-width input { width:300px; }
+  .soa-table th, .soa-table td { font-size:13px; padding:8px 10px; }
+  .btn-confirm, .btn-back, .btn-cancel, .btn-view-bill { font-size:13px; padding:6px 14px; }
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px) {
+  .container { padding:16px; }
+  .form-card .form-grid { grid-template-columns:1fr; gap:12px; }
+  .form-card > .form-grid > div, .form-card .full-width { flex-direction:column; align-items:flex-start; }
+  .form-card input, .form-card select, .wide-input { width:100%; font-size:13px; padding:6px 10px; }
+  .form-card .full-width input { width:100%; }
+  .soa-table { font-size:13px; }
+  .soa-table th, .soa-table td { padding:6px 8px; }
+  .btn-confirm, .btn-back, .btn-cancel, .btn-view-bill { width:100%; font-size:13px; padding:8px 12px; }
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px) {
+  .container { padding:12px; }
+  .form-card .form-grid { grid-template-columns:1fr; gap:10px; }
+  .form-card > .form-grid > div, .form-card .full-width { flex-direction:column; align-items:flex-start; }
+  .form-card input, .form-card select, .wide-input { width:100%; font-size:12px; padding:6px 8px; }
+  .form-card .full-width input { width:100%; }
+  .soa-table { font-size:12px; overflow-x:auto; display:block; }
+  .soa-table th, .soa-table td { padding:5px 6px; white-space:nowrap; }
+  .btn-confirm, .btn-back, .btn-cancel, .btn-view-bill { width:100%; font-size:12px; padding:6px 10px; }
+}
+
+
 </style>

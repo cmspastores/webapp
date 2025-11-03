@@ -141,19 +141,109 @@
 .inline-form { display:inline; }
 .text-center { text-align:center; }
 
-/* 🔹 Responsive */
-@media (max-width:768px) { 
-    .renter-table th:nth-child(4), .renter-table td:nth-child(4), 
-    .renter-table th:nth-child(5), .renter-table td:nth-child(5) { display:none; } 
+
+/* === 🔹 Sidebar Toggle States === */
+body.sidebar-expanded .sidebar { width:240px; flex-shrink:0; transition: width 0.3s ease; }
+body.sidebar-collapsed .sidebar { width:80px; flex-shrink:0; transition: width 0.3s ease; }
+
+body.sidebar-expanded .container { margin-left:240px; transition: margin-left 0.3s ease; }
+body.sidebar-collapsed .container { margin-left:80px; transition: margin-left 0.3s ease; }
+
+/* === 🔹 Sidebar Toggle States === */
+body.sidebar-expanded .sidebar { width:240px; flex-shrink:0; transition: width 0.3s ease; }
+body.sidebar-collapsed .sidebar { width:80px; flex-shrink:0; transition: width 0.3s ease; }
+
+body.sidebar-expanded .container { margin-left:240px; transition: margin-left 0.3s ease; }
+body.sidebar-collapsed .container { margin-left:80px; transition: margin-left 0.3s ease; }
+
+/* === 📱 Full Responsive Enhancements for Deleted Renters Table === */
+
+/* 🖥️ Large screens (>1200px) */
+@media(min-width:1201px) {
+    body { display:flex; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; max-width:1160px; padding:28px; }
+    .table-wrapper { max-height:650px; overflow-x:auto; }
+    .renter-table { width:100%; min-width:1000px; table-layout:auto; }
 }
-@media (max-width:480px) { 
-    .renter-table th, .renter-table td { font-size:11px; padding:4px 6px; } 
-    .renter-table th:nth-child(6), .renter-table td:nth-child(6) { display:none; } 
+
+/* 💻 Medium screens (769px - 1200px) */
+@media(min-width:769px) and (max-width:1200px) {
+    body { display:flex; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; width:100%; padding:22px; max-width:840px; }
+    .table-wrapper { max-height:520px; overflow-x:auto; }
+    .renter-table { width:100%; min-width:900px; table-layout:auto; }
 }
-@media (max-width:360px) { 
-    .renter-table th, .renter-table td { font-size:10px; padding:3px 4px; } 
-    .renter-table th:nth-child(4), .renter-table td:nth-child(4) { display:none; } 
+
+/* 📱 Small screens / tablets (481px - 768px) */
+@media(min-width:481px) and (max-width:768px) {
+    body { display:flex; flex-direction:row; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; width:100%; padding:16px; }
+    .table-wrapper { max-height:400px; overflow-x:auto; }
+    .renter-table { width:100%; min-width:800px; table-layout:auto; }
+    .renter-table th:nth-child(4), .renter-table td:nth-child(4),
+    .renter-table th:nth-child(5), .renter-table td:nth-child(5) { display:none; }
 }
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media(max-width:480px) {
+    body { display:flex; flex-direction:row; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; width:100%; padding:12px; }
+    .table-wrapper { max-height:300px; overflow-x:auto; }
+    .renter-table { width:100%; min-width:700px; table-layout:auto; }
+    .renter-table th:nth-child(4), .renter-table td:nth-child(4),
+    .renter-table th:nth-child(5), .renter-table td:nth-child(5),
+    .renter-table th:nth-child(6), .renter-table td:nth-child(6) { display:none; }
+}
+
+/* 📟 Tiny screens / mini mobile (≤360px) */
+@media(max-width:360px) {
+    body { display:flex; flex-direction:row; }
+    .sidebar { position:relative; z-index:1; }
+    .container { flex:1; width:100%; padding:10px; }
+    .table-wrapper { max-height:250px; overflow-x:auto; }
+    .renter-table { width:100%; min-width:600px; table-layout:auto; }
+    .renter-table th:nth-child(4), .renter-table td:nth-child(4) { display:none; }
+}
+
+/* === 🔹 Buttons Flex Fix Across All Screens === */
+.refresh-new-container {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:flex-end;
+    align-items:center;
+}
+.refresh-new-container .btn-new,
+.refresh-new-container .btn-refresh,
+.refresh-new-container a.btn-new,
+.refresh-new-container .btn-back {
+    flex:1 1 auto;
+    min-width:120px;
+    text-align:center;
+    white-space:nowrap;
+}
+@media(max-width:768px) {
+    .refresh-new-container {
+        flex-direction:column;
+        align-items:stretch;
+        width:100%;
+    }
+    .refresh-new-container .btn-new,
+    .refresh-new-container .btn-refresh,
+    .refresh-new-container a.btn-new,
+    .refresh-new-container .btn-back {
+        flex:1 1 100%;
+        width:100%;
+    }
+}
+
+
+
+
 </style>
 
 <!-- 🔹 JS -->

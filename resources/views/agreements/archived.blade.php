@@ -271,4 +271,69 @@
 
 /* Pagination */
 .pagination { margin-top:16px; display:flex; justify-content:flex-end; gap:6px; flex-wrap:wrap; }
+
+
+/* === 📱 Responsive Enhancements for Agreements Page (Sidebar intact + container/table responsive) === */
+
+/* 🖥️ Large screens (>1200px) */
+@media(min-width:1201px) {
+    body { display:flex; }
+    .sidebar { width:250px; flex-shrink:0; }
+    .container { flex:1; max-width:1100px; padding:20px; }
+    .table-wrapper { overflow-x: visible; }
+    .agreements-table { min-width:1200px; width:auto; }
+}
+
+/* 💻 Medium screens (769px - 1200px) */
+@media(min-width:769px) and (max-width:1200px) {
+    body { display:flex; }
+    .sidebar { width:220px; flex-shrink:0; }
+    .container { flex:1; width:100%; padding:16px; }
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .agreements-table { min-width:900px; width:auto; }
+    .search-toolbar, .toolbar-actions { flex-wrap: wrap; gap:6px; }
+}
+
+/* 📱 Small screens / tablets (481px - 768px) */
+@media(min-width:481px) and (max-width:768px) {
+    body { display:flex; flex-direction:row; }
+    .sidebar { width:180px; flex-shrink:0; }
+    .container { flex:1; width:100%; padding:12px; }
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .agreements-table { min-width:700px; font-size:13px; width:auto; }
+
+    /* Hide less-important columns */
+    .agreements-table thead th:nth-child(4), 
+    .agreements-table thead th:nth-child(5), 
+    .agreements-table thead th:nth-child(6),
+    .agreements-table tbody td:nth-child(4),
+    .agreements-table tbody td:nth-child(5),
+    .agreements-table tbody td:nth-child(6) {
+        display: none;
+    }
+}
+
+/* 📞 Extra small / mobile (≤480px) */
+@media(max-width:480px) {
+    body { display:flex; flex-direction:row; }
+    .sidebar { width:150px; flex-shrink:0; }
+    .container { flex:1; width:100%; padding:8px; }
+    .agreements-header { font-size:16px; }
+    .btn-search, .btn-refresh, .btn-new, .btn-archive, .btn-toggle { font-size:12px; padding:6px 6px; }
+
+    /* Table fully scrollable and shrunk */
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; width:100%; }
+    .agreements-table { min-width:600px; width:auto; font-size:12px; }
+
+    /* Hide additional less-important columns */
+    .agreements-table thead th:nth-child(3),
+    .agreements-table thead th:nth-child(7),
+    .agreements-table tbody td:nth-child(3),
+    .agreements-table tbody td:nth-child(7) {
+        display: none;
+    }
+}
+
+
+
 </style>

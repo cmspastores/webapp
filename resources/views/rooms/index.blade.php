@@ -149,6 +149,81 @@
 .custom-dropdown .selected.active+.dropdown-options{display:block;}
 .dropdown-option{padding:8px 12px;cursor:pointer;font-weight:500;color:#5C3A21;transition:0.2s;}
 .dropdown-option:hover{background:#E6A574;color:#fff;}
+
+/* === 📱 Responsive Enhancements for Rooms Index === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px) {
+  .room-table { table-layout:fixed; width:100%; border-collapse:collapse; word-wrap:break-word; }
+  .room-table th, .room-table td { font-size:14px; padding:12px 16px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
+  .btn-edit, .btn-delete { font-size:13px; padding:6px 12px; min-width:75px; }
+  .btn-new, .btn-refresh, .btn-search { font-size:15px; padding:10px 18px; }
+  .pagination { justify-content:flex-end; gap:8px; }
+  .card.table-card { overflow-x:auto; transition:width 0.3s ease, padding 0.3s ease; }
+}
+
+/* 🖥️ Medium screens (769px–1200px) */
+@media (min-width:769px) and (max-width:1200px) {
+  .container { padding:20px; transition:max-width 0.3s ease; }
+  .room-table { table-layout:fixed; width:100%; border-collapse:collapse; }
+  .room-table th, .room-table td { font-size:13px; padding:10px 12px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
+  .btn-edit, .btn-delete { font-size:12px; padding:5px 10px; min-width:70px; }
+  .btn-new, .btn-refresh, .btn-search { font-size:14px; padding:8px 14px; }
+  .search-container, .refresh-new-container { flex-wrap:wrap; justify-content:center; }
+  .pagination { justify-content:center; gap:6px; }
+  .card.table-card { overflow-x:auto; transition:width 0.3s ease, padding 0.3s ease; }
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px) {
+  .container { padding:16px; }
+  .rooms-header { font-size:22px; text-align:center; border:none; }
+  .search-refresh { flex-direction:column; align-items:center; gap:10px; }
+  .search-container, .refresh-new-container { width:100%; justify-content:center; }
+  .btn-new, .btn-refresh, .btn-search { width:100%; text-align:center; font-size:13px; padding:8px 12px; }
+  .room-table { min-width:100%; display:block; overflow-x:auto; table-layout:auto; }
+  .room-table th, .room-table td { font-size:12px; padding:8px 10px; white-space:nowrap; }
+  .btn-edit, .btn-delete { font-size:11px; padding:4px 8px; min-width:60px; }
+  .pagination { justify-content:center; gap:5px; }
+  .card.table-card { overflow-x:auto; scrollbar-width:thin; }
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px) {
+  .container { padding:12px; }
+  .rooms-header { font-size:20px; text-align:center; }
+  .search-refresh { flex-direction:column; align-items:center; gap:8px; }
+  .search-container { width:100%; justify-content:center; flex-direction:column; gap:8px; }
+  .custom-dropdown, .search-input { width:100%; }
+  .btn-new, .btn-refresh, .btn-search { width:100%; font-size:12px; padding:6px 10px; }
+  .room-table { min-width:100%; display:block; overflow-x:auto; table-layout:auto; }
+  .room-table th, .room-table td { font-size:11px; padding:6px 8px; white-space:nowrap; }
+  .btn-edit, .btn-delete { font-size:10px; padding:3px 7px; min-width:55px; }
+  .pagination { justify-content:center; flex-wrap:wrap; gap:4px; }
+}
+
+/* === 🧩 Sidebar Collapse Compatibility Fix === */
+body.sidebar-collapsed .container { max-width:calc(100% - 80px); transition:max-width 0.3s ease; }
+body.sidebar-expanded .container { max-width:calc(100% - 240px); transition:max-width 0.3s ease; }
+
+body.sidebar-collapsed .card.table-card,
+body.sidebar-expanded .card.table-card {
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+
+.room-table thead tr,
+.room-table tbody tr {
+  display:table;
+  width:100%;
+  table-layout:fixed;
+}
+
+@media (max-width:768px) {
+  .room-table th, .room-table td { white-space:normal; text-overflow:unset; }
+}
+
+
 </style>
 
 <!-- 🔹 JS Dropdown & Refresh -->
