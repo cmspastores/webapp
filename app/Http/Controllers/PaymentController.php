@@ -9,12 +9,42 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        $payments = Payment::with(['agreement','bill','items'])->orderBy('payment_date','desc')->paginate(25);
+        $query = Payment::with(['agreement','bill','items'])->orderBy('payment_date','desc');
+
+        // 🔹 Search by payer name
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('payer_name', 'like', "%{$search}%");
+        }
+
+        // 🔹 Filter by agreement
+        if ($request->filled('agreement_id')) {
+            $query->where('agreement_id', $request->input('agreement_id'));
+        }
+
+        // 🔹 Filter by bill
+        if ($request->filled('bill_id')) {
+            $query->where('bill_id', $request->input('bill_id'));
+        }
+
+        // 🔹 Filter by payment status (unallocated = leftover)
+        if ($request->filled('status')) {
+            $status = $request->input('status');
+            if ($status === 'unallocated') {
+                $query->where('unallocated_amount', '>', 0);
+            } elseif ($status === 'allocated') {
+                $query->where('unallocated_amount', '=', 0);
+            }
+        }
+
+        $payments = $query->paginate(25)->withQueryString();
+
         return view('payments.index', compact('payments'));
     }
 
@@ -148,7 +178,7 @@ class PaymentController extends Controller
                 ->with('success', "Payment recorded and allocated. Unallocated: ₱" . number_format($payment->unallocated_amount, 2));
         } catch (\Throwable $e) {
             DB::rollBack();
-            \Log::error('Payment store error: ' . $e->getMessage());
+            Log::error('Payment store error: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Failed to store payment: ' . $e->getMessage()]);
         }
     }

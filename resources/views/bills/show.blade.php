@@ -152,6 +152,13 @@
 @media(max-width:1024px){.detail-grid{grid-template-columns:1fr;}.label{text-align:left;}}
 @media(max-width:768px){.section-title{font-size:15px;}.label,.value{font-size:14px;}.add-charge-form input{flex:1 1 100%;}}
 
+
+
+/* === 🧩 Sidebar Collapse Compatibility Fix === */
+body.sidebar-collapsed .container { max-width:calc(100% - 80px); transition:max-width 0.3s ease; }
+body.sidebar-expanded .container { max-width:calc(100% - 240px); transition:max-width 0.3s ease; }
+body.sidebar-collapsed .table-wrapper, body.sidebar-expanded .table-wrapper { overflow-x:auto; scrollbar-width:thin; }
+
 /* === 📱 Responsive Enhancements for Bills Show Blade === */
 
 /* 💻 Large screens (>1200px) */

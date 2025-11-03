@@ -79,8 +79,8 @@ tbody tr:hover { background:#FFF4E1; transition: background .2s; }
 
     <div class="reports-container">
         <div class="card">
-            <a href="{{ route('bills.index') }}" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
-            <a href="{{ route('bills.reports') }}" class="btn-refresh"><i class="fa-solid fa-rotate-right"></i> Refresh</a>
+            <a href="{{ route('bills.index') }}" class="btn-back"></i> Back</a>
+            <a href="{{ route('bills.reports') }}" class="btn-refresh"></i> Refresh</a>
 
             <h3><i class="fa-solid fa-chart-line"></i> Unpaid Bills Report</h3>
 
@@ -117,7 +117,7 @@ tbody tr:hover { background:#FFF4E1; transition: background .2s; }
                     <input type="hidden" name="year" value="{{ $year }}">
                 </div>
 
-                <button type="submit"><i class="fa-solid fa-filter"></i> Apply</button>
+                <button type="submit"></i> Apply</button>
             </form>
 
             <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Unpaid: ₱{{ number_format($totalOutstandingCombined,2) }}</p>
