@@ -148,6 +148,29 @@ class AgreementController extends Controller
             ]);
         }
 
+        // --- Auto-create first bill for dorm agreements (monthly billing)
+        if ($roomType && !$roomType->is_transient) {
+            $periodStart = Carbon::parse($agreement->start_date)->startOfMonth();
+            $periodEnd   = (clone $periodStart)->endOfMonth();
+            $dueDate     = $periodEnd->copy()->addDays(7)->endOfDay();
+
+            $baseAmount  = round((float)($agreement->monthly_rent ?? ($agreement->rate ?? 0)), 2);
+
+            \App\Models\Bill::create([
+                'agreement_id' => $agreement->agreement_id,
+                'renter_id'    => $agreement->renter_id,
+                'room_id'      => $agreement->room_id,
+                'period_start' => $periodStart->toDateString(),
+                'period_end'   => $periodEnd->toDateString(),
+                'due_date'     => $dueDate,
+                'amount_due'   => $baseAmount,
+                'base_amount'  => $baseAmount,
+                'balance'      => $baseAmount,
+                'status'       => 'unpaid',
+                'notes'        => 'Auto-generated first monthly bill for dorm agreement',
+            ]);
+        }
+
         // 🔹 Recalculate shared rent only for dorms
         if (!$roomType->is_transient) {
             $this->recalcRoomAgreementRents($room);
