@@ -68,6 +68,14 @@ class BillController extends Controller
             'agreement_id' => 'nullable|exists:agreements,agreement_id',
         ]);
 
+        // require an agreement for the "generate for selected agreement" flow
+        if (empty($data['agreement_id'])) {
+            // If you want to allow "generate all", use the dedicated generateAll() route.
+            return back()
+                ->withInput()
+                ->withErrors(['agreement_id' => 'Please select an agreement. To generate for all dorm agreements use the "Generate All Dorms" button.']);
+        }
+
         $year = (int)$data['year'];
         $month = (int)$data['month'];
         $periodStart = Carbon::create($year, $month, 1)->startOfDay();
@@ -76,68 +84,129 @@ class BillController extends Controller
         $skipped = 0;
         $hasBaseAmountColumn = Schema::hasColumn('bills', 'base_amount');
 
-        $createBill = function ($agreement, $periodStart, $periodEnd) use (&$created, &$skipped, $hasBaseAmountColumn) {
-            $room = $agreement->room ?? $agreement->load('room')->room;
-            $roomType = $room->roomType ?? null;
-            $isTransient = (($agreement->rate_unit ?? null) === 'daily') || ($roomType && ($roomType->is_transient ?? false));
-
-            $exists = Bill::where('agreement_id', $agreement->agreement_id)
-                ->where('period_start', $periodStart->toDateString())
-                ->where('period_end', $periodEnd->toDateString())
-                ->exists();
-
-            if ($exists) { $skipped++; return; }
-
-            // compute base amount (rent portion) depending on transient or dorm
-            if ($isTransient) {
-                $days = $periodEnd->copy()->startOfDay()->diffInDays($periodStart->copy()->startOfDay()) + 1;
-                $dailyRate = $agreement->rate ?? $room->room_price ?? ($agreement->monthly_rent ? ($agreement->monthly_rent / 30) : 0);
-                $base = round((float)$dailyRate * (float)$days, 2);
-                $dueDate = $periodEnd->copy()->setTime(12, 0, 0);
-            } else {
-                $base = round((float)($agreement->monthly_rent ?? ($agreement->rate ?? 0)), 2);
-                $dueDate = $periodEnd->copy()->addDays(7)->endOfDay();
-            }
-
-            $billData = [
-                'agreement_id' => $agreement->agreement_id,
-                'renter_id' => $agreement->renter_id,
-                'room_id' => $agreement->room_id,
-                'period_start' => $periodStart->toDateString(),
-                'period_end' => $periodEnd->toDateString(),
-                'due_date' => $dueDate,
-                'amount_due' => $base,
-                'base_amount' => $base,
-                'balance' => $base,
-                'status' => 'unpaid',
-            ];
-
-            Bill::create($billData);
-            $created++;
-        };
-
-        if (!empty($data['agreement_id'])) {
-            $agreement = Agreement::findOrFail($data['agreement_id']);
-            if (! $agreement->is_active || $agreement->start_date > $periodEnd->toDateString() || $agreement->end_date < $periodStart->toDateString()) {
-                return back()->withInput()->withErrors(['agreement_id' => 'Selected agreement is not active for that period.']);
-            }
-            $createBill($agreement, $periodStart, $periodEnd);
-        } else {
-            $agreements = Agreement::where('is_active', true)
-                ->whereDate('start_date', '<=', $periodEnd->toDateString())
-                ->whereDate('end_date', '>=', $periodStart->toDateString())
-                ->get();
-            foreach ($agreements as $agreement) { $createBill($agreement, $periodStart, $periodEnd); }
+        // Single agreement flow
+        $agreement = Agreement::findOrFail($data['agreement_id']);
+        if (! $agreement->is_active || $agreement->start_date > $periodEnd->toDateString() || $agreement->end_date < $periodStart->toDateString()) {
+            return back()->withInput()->withErrors(['agreement_id' => 'Selected agreement is not active for that period.']);
         }
+
+        $this->createBillForAgreement($agreement, $periodStart, $periodEnd, $hasBaseAmountColumn, $created, $skipped);
 
         return redirect()->route('bills.index')
             ->with('success', "Bills generated: {$created}, skipped (already exist): {$skipped}");
     }
 
+    /**
+     * Generate bills for all active DORM agreements for a given month/year.
+     * This does not call store() because store() expects agreement_id.
+     */
     public function generateAll(Request $request)
     {
-        $r = $request->merge(['agreement_id' => null]);
-        return $this->store($r);
+        $year = (int) $request->input('year', now()->year);
+        $month = (int) $request->input('month', now()->month);
+
+        $periodStart = Carbon::create($year, $month, 1)->startOfDay();
+        $periodEnd = (clone $periodStart)->endOfMonth()->endOfDay();
+
+        $created = 0;
+        $skipped = 0;
+        $hasBaseAmountColumn = Schema::hasColumn('bills', 'base_amount');
+
+        // Find active agreements overlapping the selected period that are DORM (non-transient)
+        $agreements = Agreement::where('is_active', true)
+            ->whereDate('start_date', '<=', $periodEnd->toDateString())
+            ->whereDate('end_date', '>=', $periodStart->toDateString())
+            ->whereHas('room.roomType', function ($q) {
+                $q->where('is_transient', false);
+            })
+            ->get();
+
+        foreach ($agreements as $agreement) {
+            $this->createBillForAgreement($agreement, $periodStart, $periodEnd, $hasBaseAmountColumn, $created, $skipped);
+        }
+
+        return redirect()->route('bills.index')
+            ->with('success', "Bills generated: {$created}, skipped (already exist or invalid): {$skipped}");
+    }
+
+    /**
+     * Create a single bill for the given agreement for the provided period.
+     * $periodStart / $periodEnd can be Carbon or date string. This function
+     * will compute dorm anchoring if needed. It updates $created/$skipped counters by reference.
+     */
+    private function createBillForAgreement(\App\Models\Agreement $agreement, $periodStart, $periodEnd, bool $hasBaseAmountColumn, int &$created, int &$skipped)
+    {
+        // Normalize to Carbon
+        $periodStart = \Carbon\Carbon::parse($periodStart)->startOfDay();
+        $periodEnd = \Carbon\Carbon::parse($periodEnd)->endOfDay();
+
+        $room = $agreement->room ?? $agreement->load('room')->room;
+        $roomType = $room->roomType ?? null;
+        $isTransient = (($agreement->rate_unit ?? null) === 'daily') || ($roomType && ($roomType->is_transient ?? false));
+
+        // If dorm (not transient), align to agreement start-day anchor
+        if (! $isTransient) {
+            $startDay = \Carbon\Carbon::parse($agreement->start_date)->day;
+            $firstOfMonth = \Carbon\Carbon::create($periodStart->year, $periodStart->month, 1);
+            $daysInMonth = $firstOfMonth->daysInMonth;
+            $anchorDay = min($startDay, $daysInMonth);
+
+            $periodStart = \Carbon\Carbon::create($periodStart->year, $periodStart->month, $anchorDay)->startOfDay();
+            $periodEnd = (clone $periodStart)->addMonth()->subSecond(); // the day before next anchor
+        }
+
+        $periodStartStr = $periodStart->toDateTimeString();
+        $periodEndStr = $periodEnd->toDateTimeString();
+
+        // Check duplicate using exact datetimes (matches unique index that stores datetimes)
+        $exists = \App\Models\Bill::where('agreement_id', $agreement->agreement_id)
+            ->where('period_start', $periodStartStr)
+            ->where('period_end', $periodEndStr)
+            ->exists();
+
+        if ($exists) {
+            $skipped++;
+            return;
+        }
+
+        // compute base amount / due date
+        if ($isTransient) {
+            $days = $periodEnd->copy()->startOfDay()->diffInDays($periodStart->copy()->startOfDay()) + 1;
+            $dailyRate = $agreement->rate ?? $room->room_price ?? ($agreement->monthly_rent ? ($agreement->monthly_rent / 30) : 0);
+            $base = round((float)$dailyRate * (float)$days, 2);
+            $dueDate = $periodEnd->copy()->setTime(12, 0, 0);
+        } else {
+            $base = round((float)($agreement->monthly_rent ?? ($agreement->rate ?? 0)), 2);
+            $dueDate = (clone $periodStart)->addMonth()->startOfDay();
+        }
+
+        $billData = [
+            'agreement_id' => $agreement->agreement_id,
+            'renter_id' => $agreement->renter_id,
+            'room_id' => $agreement->room_id,
+            'period_start' => $periodStartStr,
+            'period_end' => $periodEndStr,
+            'due_date' => $dueDate,
+            'amount_due' => $base,
+            'balance' => $base,
+            'status' => 'unpaid',
+        ];
+
+        if ($hasBaseAmountColumn) {
+            $billData['base_amount'] = $base;
+        }
+
+        try {
+            \App\Models\Bill::create($billData);
+            $created++;
+        } catch (\Illuminate\Database\QueryException $e) {
+            $code = $e->errorInfo[1] ?? null;
+            if ($code == 1062) { // duplicate entry
+                $skipped++;
+            } else {
+                throw $e;
+            }
+        }
     }
 
     public function destroy(Bill $bill)

@@ -10,7 +10,7 @@
                     <div>
                         <label for="agreement_id">Select Agreement</label>
                         <select name="agreement_id" id="agreement_id">
-                            <option value="">-- Choose Agreement (or leave blank to generate all) --</option>
+                            <option value="">-- Select Agreement --</option>
                             @foreach ($agreements as $agreement)
                                 <option value="{{ $agreement->agreement_id }}">
                                     Agreement #{{ $agreement->agreement_id }} —
@@ -53,7 +53,7 @@
                 @csrf
                 <input type="hidden" name="year" value="{{ now()->year }}">
                 <input type="hidden" name="month" value="{{ now()->month }}">
-                <button type="submit" class="btn-confirm" style="margin-top:20px;">Generate Bills for All Active Agreements (This Month)</button>
+                <button type="submit" class="btn-confirm" style="margin-top:20px;">Generate Bills for All Active Dorm Agreements (This Month)</button>
             </form>
         </div>
     </div>
