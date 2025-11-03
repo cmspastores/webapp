@@ -41,6 +41,55 @@ table.room-types-table tbody tr:hover { background:#FFF4E1; transition:backgroun
 .pagination a:hover { background:#F4C38C; color:#5C3A21; }
 .pagination .active { background:#E6A574; color:#fff; border:none; }
 
+/* === 📱 Responsive Enhancements (Updated for button shrink) === */
+
+/* Large screens (>1200px) */
+@media(min-width:1201px) {
+    .room-types-container { max-width:1200px; padding:28px; }
+    .room-types-header { font-size:28px; }
+    .btn-new { font-size:16px; padding:10px 18px; }
+    table.room-types-table th, table.room-types-table td { font-size:15px; padding:14px 18px; }
+    .btn-action { font-size:14px; padding:6px 14px; min-width:75px; }
+    .pagination { justify-content:flex-end; gap:8px; }
+}
+
+/* Medium screens (769px - 1200px) */
+@media(min-width:769px) and (max-width:1200px) {
+    .room-types-container { max-width:1000px; padding:24px; }
+    .room-types-header { font-size:26px; }
+    .btn-new { font-size:15px; padding:9px 16px; }
+    table.room-types-table th, table.room-types-table td { font-size:14px; padding:12px 16px; }
+    .btn-action { font-size:13px; padding:5px 12px; min-width:70px; }
+    .pagination { justify-content:flex-end; gap:6px; }
+}
+
+/* Small screens / tablets (481px - 768px) */
+@media(min-width:481px) and (max-width:768px) {
+    .room-types-container { max-width:100%; padding:20px; }
+    .room-types-header { font-size:22px; text-align:center; }
+    .add-roomtype-wrapper { justify-content:center; margin-bottom:10px; }
+    .btn-new { width:100%; text-align:center; padding:8px 12px; font-size:14px; min-width:auto; }
+    table.room-types-table th, table.room-types-table td { font-size:13px; padding:10px 12px; }
+    .btn-action { font-size:12px; padding:4px 8px; min-width:auto; flex:1; }
+    table.room-types-table td { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    table.room-types-table { table-layout:fixed; width:100%; }
+    .pagination { justify-content:center; flex-wrap:wrap; gap:6px; }
+}
+
+/* Extra small screens / mobile (≤480px) */
+@media(max-width:480px) {
+    .room-types-container { padding:12px; }
+    .room-types-header { font-size:20px; text-align:center; }
+    .add-roomtype-wrapper { flex-direction:column; align-items:center; margin-bottom:8px; }
+    .btn-new { width:100%; font-size:13px; padding:6px 10px; min-width:auto; }
+    table.room-types-table th, table.room-types-table td { font-size:12px; padding:8px 10px; }
+    .btn-action { font-size:11px; padding:3px 6px; min-width:auto; flex:1; }
+    table.room-types-table td { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    table.room-types-table { table-layout:fixed; width:100%; }
+    .pagination { justify-content:center; margin-top:10px; gap:4px; }
+}
+
+
 </style>
 
 <div class="room-types-container">
