@@ -20,6 +20,8 @@
                             <div class="dropdown-option" data-value="">All Statuses</div>
                             <div class="dropdown-option" data-value="unpaid">Unpaid</div>
                             <div class="dropdown-option" data-value="paid">Paid</div>
+                            <div class="dropdown-option" data-value="partially_paid">Partially Paid</div>
+                            <div class="dropdown-option" data-value="overpayment">Overpayment</div>
                         </div>
                         <input type="hidden" name="status" value="{{ request('status') }}">
                     </div>
@@ -62,13 +64,33 @@
                         </thead>
                         <tbody>
                             @foreach($monthlyBills as $bill)
+                                @php
+                                    // 🔹 Determine status based on balance and unallocated (overpayment)
+                                    if($bill->unallocated > 0){
+                                        $statusText = 'Overpayment';
+                                        $statusClass = 'overpayment';
+                                    } elseif($bill->balance == 0){
+                                        $statusText = 'Paid';
+                                        $statusClass = 'paid';
+                                    } elseif($bill->balance > 0 && $bill->balance < $bill->amount_due){
+                                        $statusText = 'Partially Paid';
+                                        $statusClass = 'partially_paid';
+                                    } else {
+                                        $statusText = 'Unpaid';
+                                        $statusClass = 'unpaid';
+                                    }
+                                @endphp
                                 <tr>
                                     <td>{{ $bill->renter->full_name ?? '—' }}</td>
                                     <td>{{ $bill->room->room_number ?? '—' }}</td>
                                     <td>{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</td>
                                     <td>₱{{ number_format($bill->amount_due,2) }}</td>
                                     <td>₱{{ number_format($bill->balance,2) }}</td>
-                                    <td><span class="status-badge {{ strtolower($bill->status) }}">{{ ucfirst($bill->status) }}</span></td>
+                                    <td>
+                                        <span class="status-badge {{ $statusClass }}">
+                                            {{ $statusText }}
+                                        </span>
+                                    </td>
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
                                             <a href="{{ route('bills.show', $bill) }}" class="btn-view">View</a>
@@ -107,13 +129,32 @@
                         </thead>
                         <tbody>
                             @foreach($transientBills as $bill)
+                                @php
+                                    if($bill->unallocated > 0){
+                                        $statusText = 'Overpayment';
+                                        $statusClass = 'overpayment';
+                                    } elseif($bill->balance == 0){
+                                        $statusText = 'Paid';
+                                        $statusClass = 'paid';
+                                    } elseif($bill->balance > 0 && $bill->balance < $bill->amount_due){
+                                        $statusText = 'Partially Paid';
+                                        $statusClass = 'partially_paid';
+                                    } else {
+                                        $statusText = 'Unpaid';
+                                        $statusClass = 'unpaid';
+                                    }
+                                @endphp
                                 <tr>
                                     <td>{{ $bill->renter->full_name ?? '—' }}</td>
                                     <td>{{ $bill->room->room_number ?? '—' }}</td>
                                     <td>{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</td>
                                     <td>₱{{ number_format($bill->amount_due,2) }}</td>
                                     <td>₱{{ number_format($bill->balance,2) }}</td>
-                                    <td><span class="status-badge {{ strtolower($bill->status) }}">{{ ucfirst($bill->status) }}</span></td>
+                                    <td>
+                                        <span class="status-badge {{ $statusClass }}">
+                                            {{ $statusText }}
+                                        </span>
+                                    </td>
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
                                             <a href="{{ route('bills.show', $bill) }}" class="btn-view">View</a>
@@ -178,7 +219,6 @@
                     hiddenInput.value = opt.dataset.value;
                     selected.classList.remove('active');
 
-                    // Mark active in dropdown visually
                     options.forEach(o => o.classList.remove('active'));
                     opt.classList.add('active');
                 });
@@ -188,13 +228,15 @@
                 if (!dd.contains(e.target)) selected.classList.remove('active');
             });
 
-            // Set initial active
             options.forEach(o => {
                 if(o.dataset.value === hiddenInput.value) o.classList.add('active');
             });
         });
     </script>
 </x-app-layout>
+
+
+
 
 <!-- 🔹 CSS -->
 <style>
@@ -226,7 +268,9 @@
 .status-badge { padding:4px 10px; border-radius:20px; font-weight:600; font-size:13px; display:inline-block; } 
 .status-badge.paid { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; } 
 .status-badge.unpaid { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; } 
-.status-badge.pending { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; }
+.status-badge.pending { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; } 
+.status-badge.partially_paid { background:#D1D5DB; color:#374151; border:1px solid #A3A3A3; } 
+.status-badge.overpayment { background:#D1FAE5; color:#065F46; border:1px solid #34D399; }
 .actions-buttons { display:flex; gap:6px; justify-content:center; flex-wrap:nowrap; align-items:center; width:100%; }
 .inline-form { display:inline-block; margin-left:6px; } 
 .btn-view, .btn-delete { padding:6px 12px; border-radius:6px; font-weight:600; font-size:13px; cursor:pointer; border:none; transition:0.2s; text-decoration:none; text-align:center; } 
@@ -255,6 +299,12 @@
   .toolbar-actions { width:100%; flex-direction:row; gap:8px; }
   .btn-fullwidth { width:auto; flex:1; }
 }
+
+/* === Sidebar Collapse Compatibility === */
+body.sidebar-collapsed .container { max-width:calc(100% - 80px); transition:max-width 0.3s ease; }
+body.sidebar-expanded .container { max-width:calc(100% - 240px); transition:max-width 0.3s ease; }
+body.sidebar-collapsed .table-wrapper, body.sidebar-expanded .table-wrapper { overflow-x:auto; scrollbar-width:thin; }
+
 
 /* === 📱 Responsive Enhancements for Bills Index === */
 

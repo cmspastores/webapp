@@ -96,30 +96,22 @@
 </div>
 
 <style>
-/* Container wrapper */
+/* Container */
 .container{max-width:900px;margin:0 auto;padding:16px;}
 
-/* Main card styling */
+/* Main card */
 .card{background:linear-gradient(135deg,#FFFDFB,#FFF8F0);border-radius:16px;border:2px solid #E6A574;padding:20px;box-shadow:0 6px 16px rgba(0,0,0,0.12);}
 
-/* Section card (Bill Info) */
+/* Section card */
 .section-card{background:rgba(255,255,255,0.95);border-radius:12px;border:1px solid #E6A574;padding:16px;margin-bottom:16px;}
-
-/* Section title */
 .section-title{font-family:'Figtree',sans-serif;font-weight:800;font-size:17px;color:#D97A4E;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-
-/* Grid for labels & values */
 .detail-grid{display:grid;grid-template-columns:max-content 1fr;row-gap:6px;column-gap:12px;align-items:center;}
 .label{font-weight:900;color:#5C3A21;display:flex;align-items:center;gap:6px;text-align:right;}
 .value{font-weight:500;color:#3A2C1F;word-break:break-word;}
 
-/* Charges card wrapper */
+/* Charges card */
 .charges-card{border-radius:16px;border:2px solid #E6A574;padding:16px;background:linear-gradient(135deg,#FFFDFB,#FFF8F0);margin-top:12px;box-shadow:0 6px 16px rgba(0,0,0,0.1);}
-
-/* Charges title */
 .charges-title{font-family:'Figtree',sans-serif;font-weight:800;font-size:16px;color:#D97A4E;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-
-/* Charges table styling */
 .charges-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:12px;overflow:hidden;margin-bottom:12px;}
 .charges-table th,.charges-table td{padding:10px 12px;border-bottom:1px solid #E6A574;border-right:1px solid #E6A574;text-align:left;}
 .charges-table th:first-child,.charges-table td:first-child{border-left:none;}
@@ -137,14 +129,16 @@
 .btn-red{background:#b54b4b;color:#fff;padding:5px 12px;border-radius:6px;font-weight:600;border:none;cursor:pointer;transition:0.2s;}
 .btn-red:hover{background:#d46a6a;}
 
-/* Totals display with centered content */
+/* Totals display */
 .totals-display{margin-top:12px;font-weight:700;color:#3A2C1F;text-align:center;display:flex;flex-direction:column;gap:6px;}
 .totals-display i{margin-right:6px;}
 
+/* Make Payment button */
+.btn-pay{background:#D97A4E;color:#FFF5EC;padding:8px 20px;border-radius:8px;font-weight:700;text-decoration:none;display:inline-block;margin:8px auto 0 auto;transition:0.2s;}
+.btn-pay:hover{background:#F4C38C;color:#5C3A21;}
+
 /* Action container */
 .action-container{display:flex;justify-content:flex-end;margin-top:16px;}
-
-/* Back button */
 .btn-back{font-family:'Figtree',sans-serif;font-weight:600;border:none;cursor:pointer;transition:0.2s;background:#D97A4E;color:#FFF5EC;padding:6px 14px;border-radius:6px;text-decoration:none;display:flex;align-items:center;gap:6px;}
 .btn-back:hover{background:#F4C38C;color:#5C3A21;}
 
@@ -152,12 +146,11 @@
 @media(max-width:1024px){.detail-grid{grid-template-columns:1fr;}.label{text-align:left;}}
 @media(max-width:768px){.section-title{font-size:15px;}.label,.value{font-size:14px;}.add-charge-form input{flex:1 1 100%;}}
 
-
-
-/* === 🧩 Sidebar Collapse Compatibility Fix === */
+/* Sidebar collapse fix */
 body.sidebar-collapsed .container { max-width:calc(100% - 80px); transition:max-width 0.3s ease; }
 body.sidebar-expanded .container { max-width:calc(100% - 240px); transition:max-width 0.3s ease; }
 body.sidebar-collapsed .table-wrapper, body.sidebar-expanded .table-wrapper { overflow-x:auto; scrollbar-width:thin; }
+
 
 /* === 📱 Responsive Enhancements for Bills Show Blade === */
 

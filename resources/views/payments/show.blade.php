@@ -86,7 +86,7 @@
 /* === Responsive Enhancements === */
 @media (max-width:1024px) { .detail-grid { grid-template-columns:1fr; } .label { text-align:left; } }
 @media (max-width:768px) { .header-title { font-size:22px; } .section-title { font-size:15px; } .label,.value { font-size:14px; } }
-</style>
+
 
 
 
