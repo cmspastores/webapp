@@ -116,12 +116,21 @@ class ReservationController extends Controller
             ]),
         ];
 
+        // determine reservation type from the selected room (transient/dorm)
+        $room = Room::find($request->input('agreement_room_id'));
+        $reservationType = null;
+        if ($room) {
+            $rt = $room->roomType;
+            $reservationType = ($rt && ($rt->is_transient ?? false)) ? 'transient' : 'dorm';
+        }
+
         // create pending/unverified reservation (no agreement created yet)
         $reservation = Reservation::create([
             'agreement_id'     => null,
             'room_id'          => $request->input('agreement_room_id'),
             'first_name'       => $request->input('first_name', null),
             'last_name'        => $request->input('last_name', null),
+            'reservation_type' => $reservationType,
             'check_in_date'    => $request->input('check_in_date'),
             'check_out_date'   => $request->input('check_out_date'),
             'status'           => 'unverified',
@@ -175,15 +184,40 @@ class ReservationController extends Controller
                 $start = $agr['start_date'] ?? now()->toDateString();
                 $end = $agr['end_date'] ?? Carbon::parse($start)->addYear()->toDateString();
 
-                $agreement = Agreement::create([
+                // determine room rate and unit
+                $roomForAgreement = Room::find($agr['room_id']);
+                $rate = null;
+                $rateUnit = null;
+                if ($roomForAgreement) {
+                    $rate = $roomForAgreement->room_price;
+                    // if room type is transient or reservation type says transient -> daily
+                    $rt = $roomForAgreement->roomType;
+                    $isTransientRoom = ($rt && ($rt->is_transient ?? false)) || ($reservation->reservation_type === 'transient');
+                    $rateUnit = $isTransientRoom ? 'daily' : 'monthly';
+                }
+
+                $agreementData = [
                     'renter_id'     => $renterId,
                     'room_id'       => $agr['room_id'],
                     'agreement_date'=> $agr['agreement_date'] ?? now()->toDateString(),
                     'start_date'    => $start,
                     'end_date'      => $end,
-                    'monthly_rent'  => ($reservation->reservation_type === 'dorm') ? ($agr['monthly_rent'] ?? null) : null,
-                    'is_active'     => true,
-                ]);
+                    'status'        => 'active',
+                ];
+
+                // use the computed $rate and $isTransientRoom from above
+                if (!empty($isTransientRoom)) {
+                    $agreementData['rate'] = $rate ?? 0;
+                    $agreementData['rate_unit'] = 'daily';
+                } else {
+                    // monthly
+                    $agreementData['monthly_rent'] = $rate ?? 0;
+                    // also set rate fields for consistency
+                    $agreementData['rate'] = $rate ?? 0;
+                    $agreementData['rate_unit'] = 'monthly';
+                }
+
+                $agreement = Agreement::create($agreementData);
 
                 // Link agreement to reservation
                 $reservation->agreement_id = $agreement->agreement_id;

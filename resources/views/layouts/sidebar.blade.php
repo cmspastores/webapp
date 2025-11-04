@@ -21,7 +21,8 @@
     </div>
 
     <div class="sidebar-section sidebar-bottom">
-        @if(auth()->user() && auth()->user()->is_admin)
+        @php $currentUser = auth()->user(); @endphp
+        @if($currentUser && ($currentUser->is_admin ?? false))
             <p class="sidebar-label">Admin Settings</p>
             <ul>
                 <li><a href="{{ route('settings.users') }}" class="{{ request()->routeIs('settings.users') ? 'active' : '' }}">User Management</a></li>
@@ -39,7 +40,7 @@
 <style>
 
 /* === 🌅 Base Sidebar Container === */
-.sidebar{background:linear-gradient(180deg,#FFF5EC,#F7E1B5);border-right:2px solid #E6A574;min-height:100vh;width:16rem;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;color:#5C3A21;transition:width .3s ease;box-sizing:border-box;position:relative;overflow:hidden;}
+.sidebar{background:linear-gradient(180deg,#FFF5EC,#F7E1B5);border-right:2px solid #E6A574;/* allow the sidebar to stretch with the page content */height:auto;width:16rem;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;align-self:stretch;color:#5C3A21;transition:width .3s ease;box-sizing:border-box;position:relative;overflow:auto;}
 
 /* === 🖼️ Logo Section === */
 .sidebar-logo{display:flex;justify-content:center;align-items:center;padding:1.5rem 0;}

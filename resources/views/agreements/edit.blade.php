@@ -60,9 +60,10 @@
                     <div class="full-width" style="flex-direction:column; gap:6px;">
                         @php
                             $isTransient = optional($agreement->room->roomType)->is_transient || ($agreement->rate_unit === 'daily');
+                            $rateAmount = $agreement->rate ?? $agreement->monthly_rent ?? 0;
                             $displayRate = $isTransient
-                                ? '₱' . number_format($agreement->rate ?? 0, 2) . ' / day'
-                                : '₱' . number_format($agreement->monthly_rent ?? $agreement->rate ?? 0, 2) . ' / month';
+                                ? '₱' . number_format($rateAmount, 2) . ' / day'
+                                : '₱' . number_format($rateAmount, 2) . ' / month';
                         @endphp
 
                         <div style="display:flex; align-items:center; gap:8px; width:100%;">

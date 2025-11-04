@@ -236,12 +236,31 @@
 .btn-toggle:hover { opacity:0.9; transform:translateY(-2px); }
 .btn-toggle + .btn-toggle { margin-left:8px; }
 
-/* 📋 Table Card */
 .card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); padding:16px; border:none; overflow:hidden; }
-.table-wrapper { width:100%; overflow-x:auto; max-width:100%; scrollbar-color:#E6A574 #FFF8F0; scrollbar-width:thin; }
-.table-wrapper::-webkit-scrollbar { height:8px; }
-.table-wrapper::-webkit-scrollbar-thumb { background:#E6A574; border-radius:10px; }
+.table-wrapper {
+    width:100%;
+    overflow-x:auto;
+    overflow-y:auto;
+    max-width:100%;
+    -webkit-overflow-scrolling: touch;
+    /* Firefox */
+    scrollbar-color: #E6A574 #FFF8F0;
+    scrollbar-width: thin;
+}
+
+/* WebKit (Chrome, Edge, Safari) horizontal + vertical scrollbars */
+.table-wrapper::-webkit-scrollbar { height:8px; width:8px; }
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg,#E6A574,#F4C38C);
+    border-radius:10px;
+    border: 2px solid transparent; /* nicer inset look */
+    background-clip: padding-box;
+}
 .table-wrapper::-webkit-scrollbar-track { background:#FFF8F0; border-radius:10px; }
+.table-wrapper::-webkit-scrollbar-corner { background: transparent; }
+
+/* Hover/focus states */
+.table-wrapper::-webkit-scrollbar-thumb:hover { filter:brightness(0.95); }
 
 /* 📑 Agreements Table */
 .agreements-table { width:1200px; min-width:100%; border-collapse:separate; border-spacing:0; text-align:center; table-layout:auto; background:transparent; border-radius:12px; overflow:hidden; }

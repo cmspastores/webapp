@@ -35,7 +35,7 @@
                         <tbody>
                             @foreach($pendingReservations as $reservation)
                                 <tr>
-                                    <td>{{ $reservation->created_at->format('Y-m-d') }}</td>
+                                    <td>{{ $reservation->created_at->format('M d, Y g:i A') }}</td>
                                     <td>{{ $reservation->room_id }}</td>
                                     <td>{{ $reservation->pending_payload['renter']['first_name'] ?? '-' }} {{ $reservation->pending_payload['renter']['last_name'] ?? '' }}</td>
                                     <td>
@@ -44,10 +44,11 @@
                                             <div>{{ $reservation->pending_payload['renter']['phone'] }}</div>
                                         @endif
                                     </td>
-                                    <td>{{ $reservation->check_in_date ? $reservation->check_in_date->format('Y-m-d') : '-' }}</td>
-                                    <td>{{ $reservation->check_out_date ? $reservation->check_out_date->format('Y-m-d') : '-' }}</td>
+                                    <td>{{ $reservation->check_in_date ? \Carbon\Carbon::parse($reservation->check_in_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ $reservation->check_out_date ? \Carbon\Carbon::parse($reservation->check_out_date)->format('M d, Y') : '-' }}</td>
                                     <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
-                                    <td style="display:flex;gap:6px;align-items:center;justify-content:center">
+                                    <td class="actions-cell">
+                                        <div class="actions-buttons">
                                         {{-- Confirm button --}}
                                         <form method="POST" action="{{ route('reservation.confirm', $reservation) }}" style="display:inline">
                                             @csrf
@@ -66,6 +67,7 @@
                                             @method('DELETE')
                                             <button type="submit" class="btn-delete" title="Delete pending reservation">Delete</button>
                                         </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -111,14 +113,15 @@
                                         @endif
                                     </td>
                                     <td>{{ optional($reservation->agreement)->agreement_number ?? (optional($reservation->agreement)->agreement_id ? 'Agreement #' . optional($reservation->agreement)->agreement_id : '-') }}</td>
-                                    <td>{{ $reservation->agreement && $reservation->agreement->start_date ? $reservation->agreement->start_date->format('Y-m-d') : '-' }}</td>
-                                    <td>{{ $reservation->agreement && $reservation->agreement->end_date ? $reservation->agreement->end_date->format('Y-m-d') : '-' }}</td>
-                                    <td>{{ $reservation->check_in_date ? $reservation->check_in_date->format('Y-m-d') : '-' }}</td>
-                                    <td>{{ $reservation->check_out_date ? $reservation->check_out_date->format('Y-m-d') : '-' }}</td>
+                                    <td>{{ $reservation->agreement && $reservation->agreement->start_date ? \Carbon\Carbon::parse($reservation->agreement->start_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ $reservation->agreement && $reservation->agreement->end_date ? \Carbon\Carbon::parse($reservation->agreement->end_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ $reservation->check_in_date ? \Carbon\Carbon::parse($reservation->check_in_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ $reservation->check_out_date ? \Carbon\Carbon::parse($reservation->check_out_date)->format('M d, Y') : '-' }}</td>
 
                                     <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
 
-                                    <td style="display:flex;gap:6px;align-items:center;justify-content:center">
+                                    <td class="actions-cell">
+                                        <div class="actions-buttons">
                                         {{-- Only admins can delete confirmed reservations --}}
                                         @if(auth()->user() && (auth()->user()->is_admin ?? false))
                                             <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" style="display:inline" onsubmit="return confirm('Delete this confirmed reservation? This will permanently remove the reservation and its link to the agreement.');">
@@ -127,6 +130,7 @@
                                                 <button type="submit" class="btn-delete" title="Delete confirmed reservation">Delete</button>
                                             </form>
                                         @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -141,7 +145,7 @@
 
 <style>
 /* 🌅 Container */
-.container { max-width:960px; margin:0 auto; padding:20px; font-family:'Figtree',sans-serif; display:flex; flex-direction:column; gap:12px; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); }
+.container { max-width:1100px; margin:0 auto; padding:20px; font-family:'Figtree',sans-serif; display:flex; flex-direction:column; gap:12px; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); }
 
 /* 🏷️ Header */
 .reservations-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
@@ -172,7 +176,7 @@
 
 /* 📑 Table */
 .table-wrapper { overflow-x:auto; }
-.reservations-table { width:100%; border-collapse:separate; border-spacing:0; text-align:center; border-radius:12px; overflow:hidden; }
+.reservations-table { width:100%; min-width:1100px; border-collapse:separate; border-spacing:0; text-align:center; border-radius:12px; overflow:hidden; }
 .reservations-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; }
 .reservations-table th, .reservations-table td { padding:12px 16px; font-size:14px; border-bottom:1px solid #D97A4E; border-right:1px solid #D97A4E; }
 .reservations-table th:first-child, .reservations-table td:first-child { border-left:none; }
@@ -222,4 +226,8 @@ a.btn-delete { display: inline-flex; align-items:center; justify-content:center;
 
 /* ensure the button inside form inline layout keeps spacing */
 td form { display: inline-block; margin: 0 4px; }
+
+/* Actions wrapper for reservation tables to avoid using display:flex on TD */
+.actions-buttons { display:flex; gap:6px; align-items:center; justify-content:center; flex-wrap:wrap; }
+.actions-cell { white-space:nowrap; }
 </style>
