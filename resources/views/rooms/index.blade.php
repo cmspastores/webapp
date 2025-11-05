@@ -94,6 +94,28 @@
     </div>
 </div>
 
+
+<!-- 🔹 JS Dropdown & Refresh -->
+<script>
+// 🔁 Refresh button functionality
+document.getElementById('btn-refresh').addEventListener('click',()=>{window.location.href="{{ route('rooms.index') }}";});
+// 🧭 Custom dropdown toggle logic
+document.querySelectorAll('.custom-dropdown').forEach(dd=>{
+    const selected=dd.querySelector('.selected');
+    const options=dd.querySelectorAll('.dropdown-option');
+    const hiddenInput=dd.querySelector('input[type="hidden"]');
+    selected.addEventListener('click',()=>{selected.classList.toggle('active');});
+    options.forEach(opt=>{
+        opt.addEventListener('click',()=>{
+            selected.textContent=opt.textContent;
+            hiddenInput.value=opt.dataset.value;
+            selected.classList.remove('active');
+        });
+    });
+    document.addEventListener('click',e=>{if(!dd.contains(e.target))selected.classList.remove('active');});
+});
+</script>
+
 <!-- 🔹 CSS -->
 <style>
 /* 🌴 Base Container */
@@ -156,7 +178,7 @@
 @media (min-width:1201px) {
   .room-table { table-layout:fixed; width:100%; border-collapse:collapse; word-wrap:break-word; }
   .room-table th, .room-table td { font-size:14px; padding:12px 16px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
-  .btn-edit, .btn-delete { font-size:13px; padding:6px 12px; min-width:75px; }
+  .btn-edit, .btn-delete { font-size:11px; padding:4px 8px; min-width:60px; } /* Always small, consistent */
   .btn-new, .btn-refresh, .btn-search { font-size:15px; padding:10px 18px; }
   .pagination { justify-content:flex-end; gap:8px; }
   .card.table-card { overflow-x:auto; transition:width 0.3s ease, padding 0.3s ease; }
@@ -167,7 +189,7 @@
   .container { padding:20px; transition:max-width 0.3s ease; }
   .room-table { table-layout:fixed; width:100%; border-collapse:collapse; }
   .room-table th, .room-table td { font-size:13px; padding:10px 12px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
-  .btn-edit, .btn-delete { font-size:12px; padding:5px 10px; min-width:70px; }
+  .btn-edit, .btn-delete { font-size:11px; padding:4px 8px; min-width:60px; } /* consistent small buttons */
   .btn-new, .btn-refresh, .btn-search { font-size:14px; padding:8px 14px; }
   .search-container, .refresh-new-container { flex-wrap:wrap; justify-content:center; }
   .pagination { justify-content:center; gap:6px; }
@@ -183,7 +205,7 @@
   .btn-new, .btn-refresh, .btn-search { width:100%; text-align:center; font-size:13px; padding:8px 12px; }
   .room-table { min-width:100%; display:block; overflow-x:auto; table-layout:auto; }
   .room-table th, .room-table td { font-size:12px; padding:8px 10px; white-space:nowrap; }
-  .btn-edit, .btn-delete { font-size:11px; padding:4px 8px; min-width:60px; }
+  .btn-edit, .btn-delete { font-size:11px; padding:4px 8px; min-width:60px; } /* always small */
   .pagination { justify-content:center; gap:5px; }
   .card.table-card { overflow-x:auto; scrollbar-width:thin; }
 }
@@ -198,9 +220,11 @@
   .btn-new, .btn-refresh, .btn-search { width:100%; font-size:12px; padding:6px 10px; }
   .room-table { min-width:100%; display:block; overflow-x:auto; table-layout:auto; }
   .room-table th, .room-table td { font-size:11px; padding:6px 8px; white-space:nowrap; }
-  .btn-edit, .btn-delete { font-size:10px; padding:3px 7px; min-width:55px; }
+  .btn-edit, .btn-delete { font-size:11px; padding:4px 8px; min-width:60px; } /* consistent small buttons */
   .pagination { justify-content:center; flex-wrap:wrap; gap:4px; }
 }
+
+
 
 /* === 🧩 Sidebar Collapse Compatibility Fix === */
 body.sidebar-collapsed .container { max-width:calc(100% - 80px); transition:max-width 0.3s ease; }
@@ -209,8 +233,31 @@ body.sidebar-expanded .container { max-width:calc(100% - 240px); transition:max-
 body.sidebar-collapsed .card.table-card,
 body.sidebar-expanded .card.table-card {
   overflow-x:auto;
+  width: 100%;
   scrollbar-width:thin;
+  transition: width 0.3s ease, padding 0.3s ease;
 }
+
+.room-table {
+    min-width: 100%;
+}
+
+.room-table td:last-child {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap; 
+}
+
+.room-table td .btn-edit,
+.room-table td .btn-delete {
+    min-width: auto; 
+    width: auto;      
+    padding: 4px 6px; 
+    font-size: 11px;
+    white-space: nowrap; 
+}
+
 
 .room-table thead tr,
 .room-table tbody tr {
@@ -224,27 +271,9 @@ body.sidebar-expanded .card.table-card {
 }
 
 
+
 </style>
 
-<!-- 🔹 JS Dropdown & Refresh -->
-<script>
-// 🔁 Refresh button functionality
-document.getElementById('btn-refresh').addEventListener('click',()=>{window.location.href="{{ route('rooms.index') }}";});
-// 🧭 Custom dropdown toggle logic
-document.querySelectorAll('.custom-dropdown').forEach(dd=>{
-    const selected=dd.querySelector('.selected');
-    const options=dd.querySelectorAll('.dropdown-option');
-    const hiddenInput=dd.querySelector('input[type="hidden"]');
-    selected.addEventListener('click',()=>{selected.classList.toggle('active');});
-    options.forEach(opt=>{
-        opt.addEventListener('click',()=>{
-            selected.textContent=opt.textContent;
-            hiddenInput.value=opt.dataset.value;
-            selected.classList.remove('active');
-        });
-    });
-    document.addEventListener('click',e=>{if(!dd.contains(e.target))selected.classList.remove('active');});
-});
-</script>
+
 
 </x-app-layout>
