@@ -6,6 +6,7 @@ use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\Agreement;
 use App\Models\Renters;
+use App\Models\Bill;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -14,78 +15,54 @@ use Carbon\Carbon;
 
 class ReservationController extends Controller
 {
-    /**
-     * Display a listing of the reservations.
-     */
     public function index()
     {
-        // Pending reservations: not yet linked to an agreement and have pending payload
         $pendingReservations = Reservation::whereNull('agreement_id')
             ->whereNotNull('pending_payload')
             ->where('is_archived', false)
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->get();
 
-        // Confirmed / linked reservations
         $confirmedReservations = Reservation::whereNotNull('agreement_id')
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->get();
 
         return view('reservation.index', compact('pendingReservations', 'confirmedReservations'));
     }
-    
-    /**
-     * Archive a pending reservation (available to non-admin users).
-     */
+
     public function archive(Request $request, Reservation $reservation)
     {
-        // only allow archiving of pending reservations (no agreement)
         if ($reservation->agreement_id) {
-            return redirect()->back()->with('error', 'Only pending reservations can be archived.');
+            return back()->with('error', 'Only pending reservations can be archived.');
         }
 
-        $reservation->is_archived = true;
-        $reservation->save();
-
-        return redirect()->back()->with('success', 'Reservation archived.');
+        $reservation->update(['is_archived' => true]);
+        return back()->with('success', 'Reservation archived successfully.');
     }
 
-    /**
-     * Show archived pending reservations.
-     */
     public function archived()
     {
         $archivedReservations = Reservation::whereNull('agreement_id')
             ->where('is_archived', true)
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->get();
 
         return view('reservation.archive', compact('archivedReservations'));
     }
 
-    /**
-     * Show the form for creating a new reservation.
-     */
     public function create()
     {
         $rooms = Room::all();
         return view('reservation.create', compact('rooms'));
     }
 
-    /**
-     * Store reservation first (pending). Do NOT create renter/agreement yet.
-     * Save renter+agreement form data to pending_payload for later confirmation.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // agreement fields (from create view)
             'agreement_room_id'      => 'required|exists:rooms,id',
             'agreement_date'         => 'nullable|date',
             'start_date'             => 'required|date',
             'end_date'               => 'nullable|date|after_or_equal:start_date',
-
-            // renter fields (optional) — do NOT enforce unique email here (pending)
             'first_name'             => 'nullable|string|max:255',
             'last_name'              => 'nullable|string|max:255',
             'dob'                    => 'nullable|date',
@@ -96,16 +73,16 @@ class ReservationController extends Controller
             'guardian_name'          => 'nullable|string|max:255',
             'guardian_phone'         => 'nullable|string|max:50',
             'guardian_email'         => 'nullable|email',
-
-            // reservation dates
             'check_in_date'          => 'required|date',
             'check_out_date'         => 'required|date|after_or_equal:check_in_date',
         ]);
 
-        // build pending payload (agreement + renter data)
+        $room = Room::find($validated['agreement_room_id']);
+        $reservationType = ($room && ($room->roomType->is_transient ?? false)) ? 'transient' : 'dorm';
+
         $pending = [
             'agreement' => [
-                'room_id'       => $request->input('agreement_room_id'),
+                'room_id'       => $room->id,
                 'agreement_date'=> $request->input('agreement_date'),
                 'start_date'    => $request->input('start_date'),
                 'end_date'      => $request->input('end_date'),
@@ -116,20 +93,11 @@ class ReservationController extends Controller
             ]),
         ];
 
-        // determine reservation type from the selected room (transient/dorm)
-        $room = Room::find($request->input('agreement_room_id'));
-        $reservationType = null;
-        if ($room) {
-            $rt = $room->roomType;
-            $reservationType = ($rt && ($rt->is_transient ?? false)) ? 'transient' : 'dorm';
-        }
-
-        // create pending/unverified reservation (no agreement created yet)
         $reservation = Reservation::create([
             'agreement_id'     => null,
-            'room_id'          => $request->input('agreement_room_id'),
-            'first_name'       => $request->input('first_name', null),
-            'last_name'        => $request->input('last_name', null),
+            'room_id'          => $room->id,
+            'first_name'       => $request->input('first_name'),
+            'last_name'        => $request->input('last_name'),
             'reservation_type' => $reservationType,
             'check_in_date'    => $request->input('check_in_date'),
             'check_out_date'   => $request->input('check_out_date'),
@@ -141,160 +109,147 @@ class ReservationController extends Controller
             return response()->json($reservation, Response::HTTP_CREATED);
         }
 
-        return redirect()->route('reservation.index')->with('success', 'Reservation saved as unverified (pending).');
+        return redirect()->route('reservation.index')->with('success', 'Reservation saved as pending.');
     }
 
-    /**
-     * Confirm a pending reservation: create renter (if data present) and agreement,
-     * then link them to the reservation.
-     */
     public function confirm(Request $request, Reservation $reservation)
     {
         if ($reservation->agreement_id) {
-            return redirect()->back()->with('error', 'Reservation already confirmed.');
+            return back()->with('error', 'Reservation already confirmed.');
         }
 
         $payload = $reservation->pending_payload ?? [];
-
-        if (empty($payload) || empty($payload['agreement'])) {
-            return redirect()->back()->with('error', 'No pending data to confirm.');
+        if (empty($payload['agreement']) || empty($payload['renter'])) {
+            return back()->with('error', 'Incomplete pending data.');
         }
 
         try {
             DB::transaction(function () use ($reservation, $payload) {
-                $renterId = null;
+                // 🧍 Create or get Renter
+                $renterData = $payload['renter'];
+                $renter = Renters::firstOrCreate(
+                    ['email' => $renterData['email'] ?? null],
+                    $renterData
+                );
 
-                $renterData = $payload['renter'] ?? [];
+                // 📄 Create Agreement
+                $agreementData = $payload['agreement'];
+                $room = Room::find($agreementData['room_id']);
+                $isTransient = ($room->roomType->is_transient ?? false) || $reservation->reservation_type === 'transient';
 
-                // Create renter if at least one name or email present
-                if (!empty($renterData['first_name']) || !empty($renterData['last_name']) || !empty($renterData['email'])) {
-                    // prevent duplicate email violations
-                    if (!empty($renterData['email']) && Renters::where('email', $renterData['email'])->exists()) {
-                        throw new \Exception('duplicate_renter_email');
-                    }
+                $agreement = Agreement::create([
+                    'renter_id'      => $renter->renter_id,
+                    'room_id'        => $room->id,
+                    'agreement_date' => $agreementData['agreement_date'] ?? now()->toDateString(),
+                    'start_date'     => $agreementData['start_date'] ?? now()->toDateString(),
+                    'end_date'       => $agreementData['end_date'] ?? Carbon::now()->addYear()->toDateString(),
+                    'rate'           => $room->room_price ?? 0,
+                    'rate_unit'      => $isTransient ? 'daily' : 'monthly',
+                    'monthly_rent'   => $isTransient ? null : $room->room_price,
+                    'is_active'      => true,
+                ]);
 
-                    $r = Renters::create(array_merge($renterData, [
-                        // ensure full_name/unique_id handled by model boot if not provided
-                    ]));
-                    $renterId = $r->renter_id;
-                }
-
-                $agr = $payload['agreement'];
-                // compute end_date if missing (auto 1 year)
-                $start = $agr['start_date'] ?? now()->toDateString();
-                $end = $agr['end_date'] ?? Carbon::parse($start)->addYear()->toDateString();
-
-                // determine room rate and unit
-                $roomForAgreement = Room::find($agr['room_id']);
-                $rate = null;
-                $rateUnit = null;
-                if ($roomForAgreement) {
-                    $rate = $roomForAgreement->room_price;
-                    // if room type is transient or reservation type says transient -> daily
-                    $rt = $roomForAgreement->roomType;
-                    $isTransientRoom = ($rt && ($rt->is_transient ?? false)) || ($reservation->reservation_type === 'transient');
-                    $rateUnit = $isTransientRoom ? 'daily' : 'monthly';
-                }
-
-                $agreementData = [
-                    'renter_id'     => $renterId,
-                    'room_id'       => $agr['room_id'],
-                    'agreement_date'=> $agr['agreement_date'] ?? now()->toDateString(),
-                    'start_date'    => $start,
-                    'end_date'      => $end,
-                    'status'        => 'active',
-                ];
-
-                // use the computed $rate and $isTransientRoom from above
-                if (!empty($isTransientRoom)) {
-                    $agreementData['rate'] = $rate ?? 0;
-                    $agreementData['rate_unit'] = 'daily';
+                // 💰 Create Bills
+                if ($isTransient) {
+                    $this->createTransientBill($agreement);
                 } else {
-                    // monthly
-                    $agreementData['monthly_rent'] = $rate ?? 0;
-                    // also set rate fields for consistency
-                    $agreementData['rate'] = $rate ?? 0;
-                    $agreementData['rate_unit'] = 'monthly';
+                    $this->createDormBill($agreement);
+                    $this->recalcRoomAgreementRents($room);
                 }
 
-                $agreement = Agreement::create($agreementData);
-
-                // Link agreement to reservation
-                $reservation->agreement_id = $agreement->agreement_id;
-                $reservation->room_id = $agreement->room_id;
-                // mark as verified once confirmed
-                $reservation->status = 'verified';
-                $reservation->pending_payload = null;
-                $reservation->save();
+                // 🔗 Update Reservation
+                $reservation->update([
+                    'agreement_id'    => $agreement->agreement_id,
+                    'room_id'         => $agreement->room_id,
+                    'status'          => 'verified',
+                    'pending_payload' => null,
+                ]);
             });
+
         } catch (QueryException $e) {
-            // handle db integrity (e.g. duplicate email) gracefully
             if ($e->getCode() === '23000') {
-                return redirect()->back()->with('error', 'Database integrity error while confirming reservation.');
-            }
-            throw $e;
-        } catch (\Exception $e) {
-            if ($e->getMessage() === 'duplicate_renter_email') {
-                return redirect()->back()->with('error', 'Renter email already exists. Please edit the reservation and provide a different email.');
+                return back()->with('error', 'Database integrity error while confirming reservation.');
             }
             throw $e;
         }
 
-        return redirect()->route('reservation.index')->with('success', 'Reservation confirmed and agreement/renter created.');
+        return redirect()->route('reservation.index')->with('success', 'Reservation confirmed with Agreement and Bills.');
     }
 
-    /**
-     * Display the specified reservation.
-     */
-    public function show($id)
+    private function createTransientBill(Agreement $agreement)
     {
-        $reservation = Reservation::findOrFail($id);
-        return response()->json($reservation);
-    }
+        $periodStart = Carbon::parse($agreement->start_date)->startOfDay();
+        $periodEnd = Carbon::parse($agreement->end_date)->startOfDay();
+        $days = $periodStart->diffInDays($periodEnd) + 1;
+        $amount = round(($agreement->rate ?? 0) * $days, 2);
+        $dueDate = $periodEnd->copy()->setTime(12, 0, 0);
 
-    /**
-     * Update the specified reservation in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        $reservation = Reservation::findOrFail($id);
-
-        $validated = $request->validate([
-            'last_name' => 'sometimes|string|max:255',
+        Bill::create([
+            'agreement_id' => $agreement->agreement_id,
+            'renter_id'    => $agreement->renter_id,
+            'room_id'      => $agreement->room_id,
+            'period_start' => $periodStart,
+            'period_end'   => $periodEnd,
+            'due_date'     => $dueDate,
+            'amount_due'   => $amount,
+            'balance'      => $amount,
+            'status'       => 'unpaid',
+            'notes'        => 'Auto-generated bill for transient stay',
         ]);
-
-        $reservation->update($validated);
-
-        return response()->json($reservation);
     }
 
-    /**
-     * Remove the specified reservation from storage.
-     */
+    private function createDormBill(Agreement $agreement)
+    {
+        $periodStart = Carbon::parse($agreement->start_date)->startOfMonth();
+        $periodEnd = (clone $periodStart)->endOfMonth();
+        $dueDate = (clone $periodEnd)->addDays(7)->endOfDay();
+        $baseAmount = round((float)($agreement->monthly_rent ?? $agreement->rate ?? 0), 2);
+
+        Bill::create([
+            'agreement_id' => $agreement->agreement_id,
+            'renter_id'    => $agreement->renter_id,
+            'room_id'      => $agreement->room_id,
+            'period_start' => $periodStart,
+            'period_end'   => $periodEnd,
+            'due_date'     => $dueDate,
+            'amount_due'   => $baseAmount,
+            'base_amount'  => $baseAmount,
+            'balance'      => $baseAmount,
+            'status'       => 'unpaid',
+            'notes'        => 'Auto-generated first monthly bill for dorm agreement',
+        ]);
+    }
+
+    private function recalcRoomAgreementRents($roomOrId)
+    {
+        $room = $roomOrId instanceof Room ? $roomOrId : Room::find($roomOrId);
+        if (!$room) return;
+
+        $capacity = max(1, (int)($room->number_of_occupants ?? 1));
+        $activeCount = Agreement::where('room_id', $room->id)->where('is_active', true)->count();
+
+        $divisor = max(1, min($activeCount, $capacity));
+        $perPerson = $room->room_price / $divisor;
+
+        Agreement::where('room_id', $room->id)
+            ->where('is_active', true)
+            ->update(['monthly_rent' => $perPerson]);
+    }
+
     public function destroy(Request $request, $id)
     {
         $reservation = Reservation::findOrFail($id);
 
-        // If reservation is confirmed (linked to an agreement), require admin
-        if ($reservation->agreement_id) {
-            $user = $request->user();
-            // Safely check is_admin flag; adjust if your app uses a different admin indicator
-            if (! $user || ! ($user->is_admin ?? false)) {
-                if ($request->wantsJson() || $request->ajax()) {
-                    return response()->json(['message' => 'Only admins can delete confirmed reservations.'], 403);
-                }
-                return redirect()->back()->with('error', 'Only administrators can delete confirmed reservations.');
-            }
+        if ($reservation->agreement_id && !optional($request->user())->is_admin) {
+            return back()->with('error', 'Only admins can delete confirmed reservations.');
         }
 
         $reservation->delete();
 
-        // If the client expects JSON (API/AJAX), return JSON
-        if ($request->wantsJson() || $request->ajax()) {
+        if ($request->wantsJson()) {
             return response()->json(['message' => 'Reservation deleted successfully.']);
         }
 
-        // Normal web request -> redirect back to index with flash message
         return redirect()->route('reservation.index')->with('success', 'Reservation deleted successfully.');
     }
 }
