@@ -195,7 +195,9 @@ class AgreementController extends Controller
         $totalDue = $bills->sum('amount_due');
         $totalBalance = $bills->sum('balance');
 
-        return view('agreements.show', compact('agreement', 'bills', 'totalDue', 'totalBalance'));
+        $totalUnallocated = \App\Models\Payment::where('agreement_id', $agreement->agreement_id)->sum('unallocated_amount');
+
+        return view('agreements.show', compact('agreement', 'bills', 'totalDue', 'totalBalance', 'totalUnallocated'));
     }
 
     /**
@@ -210,7 +212,9 @@ class AgreementController extends Controller
         $totalDue = $bills->sum('amount_due');
         $totalBalance = $bills->sum('balance');
 
-        return view('agreements.edit', compact('agreement', 'renters', 'rooms', 'bills', 'totalDue', 'totalBalance'));
+        $totalUnallocated = \App\Models\Payment::where('agreement_id', $agreement->agreement_id)->sum('unallocated_amount');
+
+        return view('agreements.edit', compact('agreement', 'renters', 'rooms', 'bills', 'totalDue', 'totalBalance', 'totalUnallocated'));
     }
 
     /**
