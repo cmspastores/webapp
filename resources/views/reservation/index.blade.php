@@ -1,19 +1,21 @@
 <x-app-layout>
     <div class="container">
-        <!-- 🔹 Header -->
+        <!-- 🔹 Header Row -->
         <div class="reservations-header-row">
-            <div class="reservations-header">Archived Pending Reservations</div>
+            <div class="reservations-header">Reservations</div>
         </div>
 
-        <!-- 🔹 Back Button Below Header, Right-Aligned -->
+        <!-- 🔹 Create + Archive Buttons -->
         <div class="toolbar-row">
-            <a href="{{ route('reservation.index') }}" class="btn-new">Back</a>
+            <a href="{{ route('reservation.create') }}" class="btn-new">+ Create Reservation</a>
+            <a href="{{ route('reservation.archived') }}" class="btn-archive">View Archives</a>
         </div>
 
-        <!-- 🔹 Table Card -->
-        <div class="card table-card">
-            @if(empty($archivedReservations) || $archivedReservations->isEmpty())
-                <p>No archived pending reservations.</p>
+        {{-- Pending Reservations --}}
+        <div class="card table-card" style="margin-bottom:18px;">
+            <h3 style="margin:0 0 12px 0; color:#5C3A21;">Pending Reservations</h3>
+            @if(empty($pendingReservations) || $pendingReservations->isEmpty())
+                <p>No pending reservations.</p>
             @else
                 <div class="table-wrapper">
                     <table class="reservations-table">
@@ -26,10 +28,11 @@
                                 <th>Check-In</th>
                                 <th>Check-Out</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($archivedReservations as $reservation)
+                            @foreach($pendingReservations as $reservation)
                                 <tr>
                                     <td>{{ $reservation->created_at->format('M d, Y g:i A') }}</td>
                                     <td>{{ $reservation->room_id }}</td>
@@ -43,6 +46,86 @@
                                     <td>{{ $reservation->check_in_date ? \Carbon\Carbon::parse($reservation->check_in_date)->format('M d, Y') : '-' }}</td>
                                     <td>{{ $reservation->check_out_date ? \Carbon\Carbon::parse($reservation->check_out_date)->format('M d, Y') : '-' }}</td>
                                     <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
+                                    <td class="actions-cell">
+                                        <div class="actions-buttons">
+                                            {{-- Confirm button --}}
+                                            <form method="POST" action="{{ route('reservation.confirm', $reservation) }}" style="display:inline">
+                                                @csrf
+                                                <button type="submit" class="btn-confirm" title="Confirm reservation">Confirm</button>
+                                            </form>
+                                            {{-- Archive pending reservation --}}
+                                            <form method="POST" action="{{ route('reservation.archive', $reservation) }}" style="display:inline" onsubmit="return confirm('Archive this pending reservation? You can view archived items from the Archive page.');">
+                                                @csrf
+                                                <button type="submit" class="btn-delete" title="Archive pending reservation">Archive</button>
+                                            </form>
+                                            {{-- Delete pending reservation --}}
+                                            <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" style="display:inline" onsubmit="return confirm('Delete this pending reservation?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-delete" title="Delete pending reservation">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+
+        {{-- Confirmed Reservations --}}
+        <div class="card table-card">
+            <h3 style="margin:0 0 12px 0; color:#5C3A21;">Confirmed Reservations</h3>
+            @if(empty($confirmedReservations) || $confirmedReservations->isEmpty())
+                <p>No confirmed reservations.</p>
+            @else
+                <div class="table-wrapper">
+                    <table class="reservations-table">
+                        <thead>
+                            <tr>
+                                <th>Room ID</th>
+                                <th>Guest</th>
+                                <th>Renter</th>
+                                <th>Renter Contact</th>
+                                <th>Agreement #</th>
+                                <th>Agreement Start</th>
+                                <th>Agreement End</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($confirmedReservations as $reservation)
+                                <tr>
+                                    <td>{{ $reservation->room_id }}</td>
+                                    <td>{{ $reservation->first_name }} {{ $reservation->last_name }}</td>
+                                    <td>{{ optional($reservation->renter)->full_name ?? '-' }}</td>
+                                    <td>
+                                        {{ optional($reservation->renter)->email ?? '-' }}
+                                        @if(optional($reservation->renter)->phone)
+                                            <div>{{ optional($reservation->renter)->phone }}</div>
+                                        @endif
+                                    </td>
+                                    <td>{{ optional($reservation->agreement)->agreement_number ?? (optional($reservation->agreement)->agreement_id ? 'Agreement #' . optional($reservation->agreement)->agreement_id : '-') }}</td>
+                                    <td>{{ $reservation->agreement && $reservation->agreement->start_date ? \Carbon\Carbon::parse($reservation->agreement->start_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ $reservation->agreement && $reservation->agreement->end_date ? \Carbon\Carbon::parse($reservation->agreement->end_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ $reservation->check_in_date ? \Carbon\Carbon::parse($reservation->check_in_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ $reservation->check_out_date ? \Carbon\Carbon::parse($reservation->check_out_date)->format('M d, Y') : '-' }}</td>
+                                    <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
+                                    <td class="actions-cell">
+                                        <div class="actions-buttons">
+                                            @if(auth()->user() && (auth()->user()->is_admin ?? false))
+                                                <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" style="display:inline" onsubmit="return confirm('Delete this confirmed reservation? This will permanently remove the reservation and its link to the agreement.');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn-delete" title="Delete confirmed reservation">Delete</button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -58,17 +141,17 @@
 .container { max-width:1100px; margin:0 auto; padding:20px; font-family:'Figtree',sans-serif; display:flex; flex-direction:column; gap:12px; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); }
 
 /* 🏷️ Header */
-.reservations-header-row { display:flex; justify-content:flex-start; align-items:center; margin-bottom:8px; }
-.reservations-header { font-size:24px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; }
+.reservations-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.reservations-header { font-size:24px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; margin-bottom:8px; }
 
-/* 🔹 Toolbar Below Header, Right-Aligned */
-.toolbar-row { display:flex; justify-content:flex-end; margin-bottom:16px; gap:8px; }
+/* 🔹 Toolbar */
+.toolbar-row { display:flex; justify-content:flex-start; margin-bottom:16px; gap:8px; }
 
 /* 🔹 Buttons */
 .btn-new { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-decoration:none; transition:0.2s; border:none; cursor:pointer; }
 .btn-new:hover { background:#D97A4E; color:#fff; }
 
-/* 🗄️ Archive button same as Renters */
+/* 🔹 Archive button updated to match "Create" button */
 .btn-archive { background:linear-gradient(90deg,#E6A574,#F4C38C) !important; color:#5C3A21 !important; font-weight:700; border-radius:10px; padding:10px 14px; text-decoration:none; border:none; display:inline-flex; align-items:center; justify-content:center; transition:0.2s; cursor:pointer; }
 .btn-archive:hover { background:#D97A4E !important; color:#fff !important; }
 
