@@ -123,7 +123,7 @@ class AgreementController extends Controller
             $periodEndDate = Carbon::parse($agreement->end_date)->startOfDay();
 
             // inclusive days: diffInDays returns 0 for same day, so +1 to count both endpoints
-            $days = $periodStart->diffInDays($periodEndDate) + 1;
+            $days = $periodStart->diffInDays($periodEndDate);
             if ($days < 1) $days = 1;
 
             // daily rate — prefer the agreement->rate (if set by your code), else room price fallback
