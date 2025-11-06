@@ -181,7 +181,8 @@ class BillController extends Controller
         }
 
         try {
-            Bill::create($billData);
+            // create and attempt to consume any existing unallocated payments for this agreement
+            $bill = $this->createBillAndConsumeUnallocated($billData, $agreement);
             $created++;
         } catch (\Illuminate\Database\QueryException $e) {
             $code = $e->errorInfo[1] ?? null;
@@ -191,6 +192,51 @@ class BillController extends Controller
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Create a bill and immediately consume any unallocated payments for the same agreement.
+     *
+     * @param array $billData
+     * @param \App\Models\Agreement $agreement
+     * @return \App\Models\Bill
+     */
+    private function createBillAndConsumeUnallocated(array $billData, \App\Models\Agreement $agreement)
+    {
+        // create the bill
+        $bill = \App\Models\Bill::create($billData);
+
+        // find payments with unallocated_amount for this agreement (oldest first)
+        $paymentsWithCredit = Payment::where('agreement_id', $agreement->agreement_id)
+            ->where('unallocated_amount', '>', 0)
+            ->orderBy('payment_date', 'asc')
+            ->get();
+
+        foreach ($paymentsWithCredit as $payment) {
+            if ($bill->balance <= 0) break;
+
+            $available = (float) $payment->unallocated_amount;
+            if ($available <= 0) continue;
+
+            // apply to bill (Bill::applyPaymentAmount returns amount actually applied)
+            $applied = $bill->applyPaymentAmount($available);
+
+            if ($applied > 0) {
+                // create payment_item to record allocation
+                PaymentItem::create([
+                    'payment_id' => $payment->billing_id,
+                    'bill_id'    => $bill->id,
+                    'amount'     => $applied,
+                ]);
+
+                // deduct from payment.unallocated_amount
+                $payment->unallocated_amount = round((float)$payment->unallocated_amount - $applied, 2);
+                if ($payment->unallocated_amount < 0) $payment->unallocated_amount = 0;
+                $payment->save();
+            }
+        }
+
+        return $bill;
     }
 
     public function destroy(Bill $bill)

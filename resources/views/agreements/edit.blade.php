@@ -137,6 +137,11 @@
                                 </tr>
                             </tfoot>
                         </table>
+                        @if(isset($totalUnallocated) && $totalUnallocated > 0)
+                            <div style="margin-top:8px;font-weight:700;color:#0f5132;">
+                                Overpayment / Credit: ₱{{ number_format($totalUnallocated, 2) }} (will apply to future bills)
+                            </div>
+                        @endif
                     </div>
                 @else
                     <p style="margin-top:24px; color:#6B6B6B;">No bills have been generated for this agreement yet.</p>

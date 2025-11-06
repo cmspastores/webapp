@@ -39,7 +39,7 @@
                                     {{ (old('agreement_id') == $ag->agreement_id) ? 'selected' : '' }}
                                     {{ (isset($selectedBill) && $selectedBill->agreement_id == $ag->agreement_id) ? 'selected' : '' }}
                                 >
-                                    {{ $ag->agreement_id }} — {{ $ag->renter->full_name ?? '—' }} — {{ $ag->room->room_number ?? '' }}
+                                    {{ $ag->renter->full_name ?? '—' }} — Room {{ $ag->room->room_number ?? '' }}
                                 </option>
                             @endforeach
                         </select>
