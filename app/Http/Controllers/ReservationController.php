@@ -137,12 +137,18 @@ class ReservationController extends Controller
                 $room = Room::find($agreementData['room_id']);
                 $isTransient = ($room->roomType->is_transient ?? false) || $reservation->reservation_type === 'transient';
 
+                // Determine end_date: prefer explicit agreement payload; for transient use reservation check_out_date fallback,
+                // otherwise default to +1 year for dorm agreements.
+                $endDate = !empty($agreementData['end_date'])
+                    ? $agreementData['end_date']
+                    : ($isTransient ? ($reservation->check_out_date ?? Carbon::now()->toDateString()) : Carbon::now()->addYear()->toDateString());
+
                 $agreement = Agreement::create([
                     'renter_id'      => $renter->renter_id,
                     'room_id'        => $room->id,
                     'agreement_date' => $agreementData['agreement_date'] ?? now()->toDateString(),
                     'start_date'     => $agreementData['start_date'] ?? now()->toDateString(),
-                    'end_date'       => $agreementData['end_date'] ?? Carbon::now()->addYear()->toDateString(),
+                    'end_date'       => $endDate,
                     'rate'           => $room->room_price ?? 0,
                     'rate_unit'      => $isTransient ? 'daily' : 'monthly',
                     'monthly_rent'   => $isTransient ? null : $room->room_price,

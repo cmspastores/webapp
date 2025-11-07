@@ -18,7 +18,7 @@
                                         <option value="">-- Select Room for Agreement --</option>
                                         @isset($rooms)
                                             @foreach($rooms as $room)
-                                                <option value="{{ $room->id }}" {{ old('agreement_room_id') == $room->id ? 'selected' : '' }}>
+                                                <option value="{{ $room->id }}" data-is-transient="{{ $room->roomType->is_transient ?? false ? '1' : '0' }}" {{ old('agreement_room_id') == $room->id ? 'selected' : '' }}>
                                                     {{ $room->room_number ?? ('Room ' . $room->id) }}
                                                 </option>
                                             @endforeach
@@ -40,9 +40,19 @@
                                 </div>
 
                                 <div class="full-width" style="grid-column: span 2;">
-                                    <label for="end_date_preview">End Date (auto 1 year - optional)</label>
+                                    <label for="end_date_preview">End Date (optional)</label>
                                     <input type="text" id="end_date_preview" readonly value="{{ old('start_date') ? \Illuminate\Support\Carbon::parse(old('start_date'))->addYear()->toDateString() : now()->addYear()->toDateString() }}">
                                     <input type="hidden" id="end_date" name="end_date" value="{{ old('end_date') }}">
+                                    <input type="hidden" id="had_old_end_date" value="{{ old('end_date') ? '1' : '0' }}">
+
+                                    <!-- Auto 1-year toggle: only shown for dorm/monthly rooms -->
+                                    <div id="auto_one_year_container" style="margin-top:8px; display:none;">
+                                        <label style="font-weight:600;">
+                                            <input type="checkbox" id="auto_one_year_checkbox" name="auto_one_year" value="1" {{ old('end_date') ? 'checked' : '' }} />
+                                            &nbsp;Set end date automatically to +1 year from start date
+                                        </label>
+                                        <div class="muted">Only available for dorm/monthly room types. For transient rooms, set an explicit end date on confirmation.</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -140,8 +150,14 @@
         const startEl = document.getElementById('start_date');
         const endPreview = document.getElementById('end_date_preview');
         const endHidden = document.getElementById('end_date');
+        const roomSelect = document.getElementById('agreement_room_id');
+        const autoContainer = document.getElementById('auto_one_year_container');
+        const autoCheckbox = document.getElementById('auto_one_year_checkbox');
 
-        function computeEndDate() {
+    const hadOldEndDateEl = document.getElementById('had_old_end_date');
+    const hadOldEndDate = hadOldEndDateEl ? hadOldEndDateEl.value === '1' : false;
+
+    function computeEndDate() {
             const start = startEl.value;
             if (!start) return;
             const d = new Date(start);
@@ -151,12 +167,59 @@
             let dd = d.getDate().toString().padStart(2, '0');
             const val = `${yyyy}-${mm}-${dd}`;
             if (endPreview) endPreview.value = val;
-            if (endHidden) endHidden.value = val;
+
+            // Only write to hidden end_date when the auto checkbox is present and checked
+            if (endHidden) {
+                    if (autoCheckbox && autoCheckbox.checked) {
+                    endHidden.value = val;
+                } else {
+                    // If user hasn't opted into auto end date, don't override explicit old value
+                    // Clear only if there was no old value and checkbox is unchecked
+                    if (!hadOldEndDate) {
+                        endHidden.value = '';
+                    }
+                }
+            }
+        }
+
+        function updateAutoVisibility() {
+            if (!roomSelect) return;
+            const opt = roomSelect.options[roomSelect.selectedIndex];
+            const isTransient = opt ? opt.dataset.isTransient === '1' : false;
+                if (isTransient) {
+                // hide toggle for transient rooms and ensure we don't send an auto end date
+                if (autoContainer) autoContainer.style.display = 'none';
+                if (autoCheckbox) autoCheckbox.checked = false;
+                if (endHidden) {
+                    // do not overwrite any explicit end_date sent before; clear if it was only auto
+                    if (!hadOldEndDate) endHidden.value = '';
+                }
+                } else {
+                if (autoContainer) autoContainer.style.display = 'block';
+                // if there is an old end_date value (from previous submission), keep checkbox checked
+                if (autoCheckbox && hadOldEndDate) {
+                    autoCheckbox.checked = true;
+                }
+            }
+        }
+
+        if (roomSelect) {
+            roomSelect.addEventListener('change', function () {
+                updateAutoVisibility();
+                computeEndDate();
+            });
+            // initialize visibility
+            updateAutoVisibility();
         }
 
         if (startEl) {
             startEl.addEventListener('change', computeEndDate);
             computeEndDate();
+        }
+
+        // if user toggles the checkbox, recompute to write/clear the hidden field
+        if (autoCheckbox) {
+            autoCheckbox.addEventListener('change', computeEndDate);
         }
     });
 </script>
