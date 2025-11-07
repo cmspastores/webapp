@@ -45,6 +45,12 @@
     
     footer { background:linear-gradient(90deg,#D98348,#E6A574); border-top:1px solid #E6A574; text-align:center; padding:1rem; font-size:14px; font-weight:500; font-family:'Figtree',sans-serif; line-height:1.4; color:#fff; box-shadow:0 -2px 6px rgba(0,0,0,0.1); }
 
+    /* Sidebar offset/content wrapper & scroll control */
+    .content-wrapper{ flex:1; margin-left:16rem; transition:margin-left .28s ease; overflow:hidden; min-height:100vh; }
+    body.sidebar-collapsed .content-wrapper{ margin-left:4rem; }
+    /* Hide the page scrollbar; sidebar will handle its own scrolling */
+    html, body { overflow:hidden; }
+
   </style>
 </head>
 <body class="font-sans antialiased">
@@ -53,8 +59,8 @@
     {{-- Sidebar --}}
     @include('layouts.sidebar')
 
-    {{-- Main content --}}
-    <div class="flex-1 flex flex-col">
+  {{-- Main content --}}
+  <div class="content-wrapper flex-1 flex flex-col">
       {{-- Top bar / user menu --}}
       @include('layouts.navigation')
 

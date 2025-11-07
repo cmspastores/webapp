@@ -40,7 +40,11 @@
 <style>
 
 /* === 🌅 Base Sidebar Container === */
-.sidebar{background:linear-gradient(180deg,#FFF5EC,#F7E1B5);border-right:2px solid #E6A574;/* allow the sidebar to stretch with the page content */height:auto;width:16rem;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;align-self:stretch;color:#5C3A21;transition:width .3s ease;box-sizing:border-box;position:relative;overflow:auto;}
+.sidebar{background:linear-gradient(180deg,#FFF5EC,#F7E1B5);border-right:2px solid #E6A574;/* fixed sidebar that fills the viewport vertically */position:fixed;left:0;top:0;bottom:0;height:100vh;width:16rem;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;color:#5C3A21;transition:width .3s ease;box-sizing:border-box;overflow-y:auto;}
+
+/* Hide scrollbar but keep scrolling functional */
+.sidebar{ -ms-overflow-style: none; /* IE and Edge */ scrollbar-width: none; /* Firefox */ }
+.sidebar::-webkit-scrollbar{ display: none; width:0; height:0; }
 
 /* === 🖼️ Logo Section === */
 .sidebar-logo{display:flex;justify-content:center;align-items:center;padding:1.5rem 0;}
@@ -139,9 +143,10 @@
 <script>
 const sidebar=document.getElementById("sidebar");const toggle=document.getElementById("sidebarToggle");const sidebarIcon=document.getElementById("sidebarIcon");let userToggled=false;
 function updateIcon(){sidebarIcon.style.transform=sidebar.classList.contains("collapsed")?"rotate(180deg)":"rotate(0deg)";}
-function handleResize(){if(!userToggled){if(window.innerWidth<=1024){sidebar.classList.add("collapsed");updateIcon();}else{sidebar.classList.remove("collapsed");updateIcon();}}}
+function syncBodyClass(){ if(sidebar.classList.contains('collapsed')){ document.body.classList.add('sidebar-collapsed'); document.body.classList.remove('sidebar-expanded'); } else { document.body.classList.remove('sidebar-collapsed'); document.body.classList.add('sidebar-expanded'); } }
+function handleResize(){if(!userToggled){if(window.innerWidth<=1024){sidebar.classList.add("collapsed");updateIcon();syncBodyClass();}else{sidebar.classList.remove("collapsed");updateIcon();syncBodyClass();}}}
 window.addEventListener("resize",handleResize);handleResize();
-toggle.addEventListener("click",function(){sidebar.classList.toggle("collapsed");updateIcon();userToggled=true;});
+toggle.addEventListener("click",function(){sidebar.classList.toggle("collapsed");updateIcon();syncBodyClass();userToggled=true;});
 </script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
