@@ -361,8 +361,6 @@
     .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .agreements-table { min-width:700px; font-size:13px; width:auto; }
 
-    
-
     /* Hide less-important columns */
     .agreements-table thead th:nth-child(4), 
     .agreements-table thead th:nth-child(5), 
