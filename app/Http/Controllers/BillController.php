@@ -259,13 +259,14 @@ class BillController extends Controller
 
         $paidBills = $paidQuery->get();
 
-        $totalPaid = $paidBills->sum('balance');
+    // Compute amount actually paid per bill as (amount_due - balance). For paid bills balance is typically 0.
+    $totalPaid = $paidBills->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
 
-        $transientPaid = $paidBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')
-                                   ->sum('balance');
+    $transientPaid = $paidBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')
+                   ->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
 
-        $monthlyPaid = $paidBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')
-                                 ->sum('balance');
+    $monthlyPaid = $paidBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')
+                 ->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
 
         // Pass both unpaid and paid aggregates to the view
         return view('bills.reports', compact(
@@ -277,6 +278,7 @@ class BillController extends Controller
             'totalPaid',
             'transientPaid',
             'monthlyPaid',
+            'paidBills',
             'periodType',
             'month',
             'year'
