@@ -17,15 +17,18 @@ class ReservationController extends Controller
 {
     public function index()
     {
+        // Paginate pending reservations (separate paginator param to avoid conflicts with confirmed)
         $pendingReservations = Reservation::whereNull('agreement_id')
             ->whereNotNull('pending_payload')
             ->where('is_archived', false)
             ->latest()
-            ->get();
+            ->paginate(10, ['*'], 'pending_page')
+            ->withQueryString();
 
         $confirmedReservations = Reservation::whereNotNull('agreement_id')
             ->latest()
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return view('reservation.index', compact('pendingReservations', 'confirmedReservations'));
     }
