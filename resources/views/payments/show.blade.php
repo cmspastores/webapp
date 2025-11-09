@@ -19,6 +19,22 @@
                     <div class="label"><i class="fas fa-money-bill-wave"></i> Amount:</div>
                     <div class="value">₱{{ number_format($payment->amount,2) }}</div>
 
+                    {{-- Payment Type --}}
+                    <div class="label"><i class="fas fa-credit-card"></i> Type:</div>
+                    <div class="value">{{ ucfirst($payment->payment_type ?? 'cash') }}</div>
+
+                    {{-- Receipt / Reference (only show if present) --}}
+                    @if(!empty($payment->reference))
+                        <div class="label"><i class="fas fa-receipt"></i> Receipt / Ref:</div>
+                        <div class="value">{{ $payment->reference }}</div>
+                    @endif
+
+                    {{-- Notes (multiline support) --}}
+                    @if(!empty($payment->notes))
+                        <div class="label"><i class="fas fa-sticky-note"></i> Notes:</div>
+                        <div class="value">{!! nl2br(e($payment->notes)) !!}</div>
+                    @endif
+
                     <div class="label"><i class="fas fa-exclamation-circle"></i> Unallocated:</div>
                     <div class="value">₱{{ number_format($payment->unallocated_amount ?? 0,2) }}</div>
 

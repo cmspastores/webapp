@@ -87,11 +87,18 @@
             <a href="{{ route('payments.create', ['bill_id' => $bill->id]) }}" class="btn-pay">Make Payment</a>
         </div>
 
+        <!-- Refund Button for Admins if bill is paid -->
+        @if(auth()->user() && auth()->user()->is_admin && strtolower($bill->status) === 'paid')
+            <form action="{{ route('bills.refund', $bill) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Mark this bill as refunded?')">
+                @csrf
+                <button class="btn-cancel" type="submit">Refund</button>
+            </form>
+        @endif
+
         <!-- Back Button -->
         <div class="action-container">
             <a href="{{ route('bills.index') }}" class="btn-back">Back</a>
         </div>
-
     </div>
 </div>
 

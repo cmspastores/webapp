@@ -105,9 +105,13 @@ Route::middleware(['auth'])->group(function () {
     // create/destroy bill charges
     Route::post('bills/{bill}/charges', [\App\Http\Controllers\BillChargeController::class, 'store'])
         ->name('bills.charges.store');
-
     Route::delete('bills/{bill}/charges/{charge}', [\App\Http\Controllers\BillChargeController::class, 'destroy'])
-        ->name('bills.charges.destroy');
+            ->name('bills.charges.destroy');
+    
+    // Bill Refunds (admin only)
+    Route::post('/bills/{bill}/refund', [\App\Http\Controllers\BillController::class, 'refund'])
+        ->name('bills.refund')
+        ->middleware('admin');
 
     // Resource routes for bills (index, create, store, show, destroy etc.)
     Route::resource('bills', \App\Http\Controllers\BillController::class);
@@ -121,6 +125,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('payments', [PaymentController::class,'store'])->name('payments.store');
     Route::get('payments/{payment}', [PaymentController::class,'show'])->name('payments.show');
     Route::delete('payments/{payment}', [PaymentController::class,'destroy'])->name('payments.destroy');
+
+    // Ensure delete for bills is admin-only (overrides resource destroy)
+    Route::delete('bills/{bill}', [\App\Http\Controllers\BillController::class, 'destroy'])
+        ->name('bills.destroy')
+        ->middleware('admin');
+
+    // Ensure delete for payments is admin-only
+    Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])
+        ->name('payments.destroy')
+        ->middleware('admin');
 
     // ============================
     // Settings (All users)

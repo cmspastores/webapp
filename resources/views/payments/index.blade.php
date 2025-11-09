@@ -73,6 +73,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Payer</th>
+                                    <th>Type</th>
                                     <th>Amount</th>
                                     <th>Applied</th>
                                     <th>Unallocated</th>
@@ -85,6 +86,7 @@
                                     <tr>
                                         <td>{{ $p->billing_id }}</td>
                                         <td>{{ $p->payer_name }}</td>
+                                        <td>{{ ucfirst($p->payment_type ?? 'cash') }}</td>
                                         <td>₱{{ number_format($p->amount,2) }}</td>
                                         <td>
                                             @foreach($p->items as $it)
@@ -96,11 +98,15 @@
                                         <td class="actions-cell">
                                             <div class="actions-buttons">
                                                 <a href="{{ route('payments.show', $p) }}" class="btn-view">View</a>
-                                                <form method="POST" action="{{ route('payments.destroy', $p) }}" class="inline-form" onsubmit="return confirm('Delete this payment?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn-delete" type="submit">Delete</button>
-                                                </form>
+
+                                                @if(auth()->user() && auth()->user()->is_admin)
+                                                    <form method="POST" action="{{ route('payments.destroy', $p) }}" class="inline-form" onsubmit="return confirm('Delete this payment?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn-delete" type="submit">Delete</button>
+                                                    </form>
+                                                @endif
+
                                             </div>
                                         </td>
                                     </tr>
@@ -116,6 +122,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Payer</th>
+                                    <th>Type</th>
                                     <th>Amount</th>
                                     <th>Applied</th>
                                     <th>Unallocated</th>
@@ -128,6 +135,7 @@
                                     <tr>
                                         <td>{{ $p->billing_id }}</td>
                                         <td>{{ $p->payer_name }}</td>
+                                        <td>{{ ucfirst($p->payment_type ?? 'cash') }}</td>
                                         <td>₱{{ number_format($p->amount,2) }}</td>
                                         <td>
                                             @foreach($p->items as $it)
@@ -139,11 +147,14 @@
                                         <td class="actions-cell">
                                             <div class="actions-buttons">
                                                 <a href="{{ route('payments.show', $p) }}" class="btn-view">View</a>
-                                                <form method="POST" action="{{ route('payments.destroy', $p) }}" class="inline-form" onsubmit="return confirm('Delete this payment?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn-delete" type="submit">Delete</button>
-                                                </form>
+
+                                                @if(auth()->user() && auth()->user()->is_admin)
+                                                    <form method="POST" action="{{ route('payments.destroy', $p) }}" class="inline-form" onsubmit="return confirm('Delete this payment?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn-delete" type="submit">Delete</button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

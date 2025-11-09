@@ -118,8 +118,8 @@
                                         <td>₱{{ number_format($bill->amount_due, 2) }}</td>
                                         <td>₱{{ number_format($bill->balance, 2) }}</td>
                                         <td>
-                                            <span class="{{ $bill->status === 'unpaid' ? 'status-unpaid' : 'status-paid' }}">
-                                                {{ ucfirst($bill->status) }}
+                                            <span class="{{ strtolower($bill->status) === 'unpaid' ? 'status-unpaid' : (strtolower($bill->status) === 'refunded' ? 'status-refunded' : 'status-paid') }}">
+                                                {{ ucfirst(strtolower($bill->status)) }}
                                             </span>
                                         </td>
                                         <td>
@@ -220,6 +220,7 @@
     .btn-cancel { background:#b54b4b; color:#fff; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer; border:none; transition:0.2s; }
     .btn-cancel:hover { background:#d46a6a; }
     .error { color:#e07b7b; font-size:12px; margin-top:4px; }
+    .status-refunded { background:#f8d7da; color:#842029; padding:4px 8px; border-radius:6px; font-weight:600; }
 
     /* === 📱 Responsive Enhancements for Agreements Edit Form === */
 

@@ -22,6 +22,7 @@ class Payment extends Model
         'reference',
         'notes',
         'unallocated_amount',
+        'payment_type', 'receipt_number',
     ];
 
     protected $casts = [

@@ -92,6 +92,8 @@ class PaymentController extends Controller
             'exact_payment' => 'nullable|boolean',
             'notes' => 'nullable|string',
             'reference' => 'nullable|string|max:255',
+            'payment_type' => 'nullable|in:cash,bank',
+            'receipt_number' => 'nullable|string|max:255|required_if:payment_type,bank',
         ]);
 
         $bill = null;
@@ -122,6 +124,8 @@ class PaymentController extends Controller
                 'reference' => $data['reference'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'unallocated_amount' => 0,
+                'payment_type' => $data['payment_type'] ?? 'cash',
+                'receipt_number' => $data['receipt_number'] ?? null,
             ]);
 
             $remaining = $amountToPay;

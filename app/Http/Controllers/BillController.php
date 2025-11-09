@@ -285,6 +285,37 @@ class BillController extends Controller
         return $bill;
     }
 
+    /**
+     * Refund a paid bill (mark as refunded)
+     */
+    public function refund(\App\Models\Bill $bill)
+    {
+        // route already has admin middleware, but double-checking here is fine
+        if (!auth()->user() || !auth()->user()->is_admin) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Normalize statuses to lowercase across the app. We'll use lowercase 'refunded'.
+        if (strtolower($bill->status) === 'refunded') {
+            return redirect()->back()->with('error', 'This bill has already been refunded.');
+        }
+
+        // Only allow refunding fully paid bills (change if you want partially_paid allowed)
+        if (strtolower($bill->status) !== 'paid') {
+            return redirect()->back()->with('warning', 'Only fully paid bills can be marked refunded.');
+        }
+
+        // Update status and add a note (single atomic update)
+        $note = trim(($bill->notes ?? '') . "\n[Refunded by user_id: ".auth()->id()." on ".now()->toDateTimeString()."]");
+
+        $bill->update([
+            'status' => 'refunded', // use lowercase 'refunded' consistently
+            'notes'  => $note,
+        ]);
+
+        return redirect()->back()->with('success', 'Bill marked as refunded.');
+    }
+
     public function destroy(Bill $bill)
     {
         $bill->delete();
@@ -335,14 +366,14 @@ class BillController extends Controller
 
         $paidBills = $paidQuery->get();
 
-    // Compute amount actually paid per bill as (amount_due - balance). For paid bills balance is typically 0.
-    $totalPaid = $paidBills->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
+        // Compute amount actually paid per bill as (amount_due - balance). For paid bills balance is typically 0.
+        $totalPaid = $paidBills->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
 
-    $transientPaid = $paidBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')
-                   ->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
+        $transientPaid = $paidBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')
+                    ->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
 
-    $monthlyPaid = $paidBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')
-                 ->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
+        $monthlyPaid = $paidBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')
+                    ->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
 
         // Pass both unpaid and paid aggregates to the view
         return view('bills.reports', compact(

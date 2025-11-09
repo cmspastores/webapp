@@ -65,6 +65,20 @@
                     </div>
 
                     <div>
+                        <label for="payment_type">Payment Type</label>
+                        <select name="payment_type" id="payment_type" onchange="onPaymentTypeChange()">
+                            <option value="cash" {{ old('payment_type') == 'cash' ? 'selected' : '' }}>Cash (default)</option>
+                            <option value="bank" {{ old('payment_type') == 'bank' ? 'selected' : '' }}>Bank Transfer</option>
+                        </select>
+                    </div>
+
+                    <div id="receipt_row" style="display: none;">
+                        <label for="receipt_number">Receipt / Reference No. (bank)</label>
+                        <input type="text" name="receipt_number" id="receipt_number" value="{{ old('receipt_number') }}">
+                        <small style="color:#666">For bank payments you can paste the transaction or receipt number here.</small>
+                    </div>
+
+                    <div>
                         <label for="exact_payment">Exact payment</label>
                         <!-- hidden default (ensures a value is always sent) -->
                         <input type="hidden" name="exact_payment" value="0">
@@ -169,9 +183,21 @@
         onBillChange();
     }
 
+    function onPaymentTypeChange(){
+        const type = document.getElementById('payment_type').value;
+        const rr = document.getElementById('receipt_row');
+        if(type === 'bank'){
+            rr.style.display = 'block';
+        } else {
+            rr.style.display = 'none';
+            document.getElementById('receipt_number').value = '';
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         // If blade has a selected bill from controller, set agreement & bills now:
         onAgreementChange();
+        onPaymentTypeChange();
         onExactToggle();
     });
 </script>

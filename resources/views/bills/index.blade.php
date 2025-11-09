@@ -87,14 +87,27 @@
                         <tbody>
                             @foreach($monthlyBills as $bill)
                                 @php
-                                    // 🔹 Determine status based on balance and unallocated (overpayment)
-                                    if($bill->unallocated > 0){
+                                    // normalize stored status (some code uses lowercase 'refunded' etc.)
+                                    $rawStatus = strtolower($bill->status ?? 'unpaid');
+
+                                    // Detect if there's agreement-level unallocated credit (overpayment).
+                                    // Quick (but slightly heavier) approach: check payments table for this agreement.
+                                    // This does 1 small query per bill — OK for a small dataset; use controller preload for large.
+                                    $agreementOverpayment = \App\Models\Payment::where('agreement_id', $bill->agreement_id)
+                                        ->where('unallocated_amount', '>', 0)
+                                        ->exists();
+
+                                    if ($rawStatus === 'refunded') {
+                                        $statusText = 'Refunded';
+                                        $statusClass = 'refunded';
+                                    } elseif ($agreementOverpayment && $rawStatus === 'paid') {
+                                        // If payment has unallocated credit for this agreement and bill is paid => Overpayment
                                         $statusText = 'Overpayment';
                                         $statusClass = 'overpayment';
-                                    } elseif($bill->balance == 0){
+                                    } elseif ($rawStatus === 'paid') {
                                         $statusText = 'Paid';
                                         $statusClass = 'paid';
-                                    } elseif($bill->balance > 0 && $bill->balance < $bill->amount_due){
+                                    } elseif ($rawStatus === 'partially_paid' || $rawStatus === 'partially-paid') {
                                         $statusText = 'Partially Paid';
                                         $statusClass = 'partially_paid';
                                     } else {
@@ -116,11 +129,15 @@
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
                                             <a href="{{ route('bills.show', $bill) }}" class="btn-view">View</a>
-                                            <form action="{{ route('bills.destroy', $bill) }}" method="POST" class="inline-form" onsubmit="return confirm('Delete this bill?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn-delete" type="submit">Delete</button>
-                                            </form>
+
+                                            @if(auth()->user() && auth()->user()->is_admin)
+                                                <form action="{{ route('bills.destroy', $bill) }}" method="POST" class="inline-form" onsubmit="return confirm('Delete this bill?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn-delete" type="submit">Delete</button>
+                                                </form>
+                                            @endif
+
                                         </div>
                                     </td>
                                 </tr>
@@ -152,13 +169,27 @@
                         <tbody>
                             @foreach($transientBills as $bill)
                                 @php
-                                    if($bill->unallocated > 0){
+                                    // normalize stored status (some code uses lowercase 'refunded' etc.)
+                                    $rawStatus = strtolower($bill->status ?? 'unpaid');
+
+                                    // Detect if there's agreement-level unallocated credit (overpayment).
+                                    // Quick (but slightly heavier) approach: check payments table for this agreement.
+                                    // This does 1 small query per bill — OK for a small dataset; use controller preload for large.
+                                    $agreementOverpayment = \App\Models\Payment::where('agreement_id', $bill->agreement_id)
+                                        ->where('unallocated_amount', '>', 0)
+                                        ->exists();
+
+                                    if ($rawStatus === 'refunded') {
+                                        $statusText = 'Refunded';
+                                        $statusClass = 'refunded';
+                                    } elseif ($agreementOverpayment && $rawStatus === 'paid') {
+                                        // If payment has unallocated credit for this agreement and bill is paid => Overpayment
                                         $statusText = 'Overpayment';
                                         $statusClass = 'overpayment';
-                                    } elseif($bill->balance == 0){
+                                    } elseif ($rawStatus === 'paid') {
                                         $statusText = 'Paid';
                                         $statusClass = 'paid';
-                                    } elseif($bill->balance > 0 && $bill->balance < $bill->amount_due){
+                                    } elseif ($rawStatus === 'partially_paid' || $rawStatus === 'partially-paid') {
                                         $statusText = 'Partially Paid';
                                         $statusClass = 'partially_paid';
                                     } else {
@@ -293,6 +324,7 @@
 .status-badge.pending { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; } 
 .status-badge.partially_paid { background:#D1D5DB; color:#374151; border:1px solid #A3A3A3; } 
 .status-badge.overpayment { background:#D1FAE5; color:#065F46; border:1px solid #34D399; }
+.status-badge.refunded { background:#FFEFD5; color:#7A2B1A; border:1px solid #F7C9A3; }
 .actions-buttons { display:flex; gap:6px; justify-content:center; flex-wrap:nowrap; align-items:center; width:100%; }
 .inline-form { display:inline-block; margin-left:6px; } 
 .btn-view, .btn-delete { padding:6px 12px; border-radius:6px; font-weight:600; font-size:13px; cursor:pointer; border:none; transition:0.2s; text-decoration:none; text-align:center; } 
