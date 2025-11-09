@@ -1,6 +1,25 @@
 <x-app-layout>
     <div class="container">
         <div class="card form-card">
+            {{-- Flash & validation messages --}}
+            @if(session('success'))
+                <div class="alert alert-success" style="margin-bottom:12px;">{!! session('success') !!}</div>
+            @endif
+
+            @if(session('warning'))
+                <div class="alert alert-warning" style="margin-bottom:12px;">{!! session('warning') !!}</div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-danger" style="margin-bottom:12px;">
+                    <ul style="margin:0 0 0 16px;">
+                        @foreach($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             {{-- Generate for single agreement --}}
             <form action="{{ route('bills.store') }}" method="POST" style="margin-bottom:12px;">
                 @csrf
@@ -12,7 +31,7 @@
                         <select name="agreement_id" id="agreement_id">
                             <option value="">-- Select Agreement --</option>
                             @foreach ($agreements as $agreement)
-                                <option value="{{ $agreement->agreement_id }}">
+                                <option value="{{ $agreement->agreement_id }}" {{ old('agreement_id') == $agreement->agreement_id ? 'selected' : '' }}>
                                     Agreement #{{ $agreement->agreement_id }} —
                                     Renter: {{ $agreement->renter->full_name ?? 'Unknown' }} —
                                     Room: {{ $agreement->room->room_number ?? 'N/A' }}

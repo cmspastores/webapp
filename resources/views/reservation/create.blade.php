@@ -18,7 +18,7 @@
                                         <option value="">-- Select Room for Agreement --</option>
                                         @isset($rooms)
                                             @foreach($rooms as $room)
-                                                <option value="{{ $room->id }}" {{ old('agreement_room_id') == $room->id ? 'selected' : '' }}>
+                                                <option value="{{ $room->id }}" data-is-transient="{{ $room->roomType->is_transient ?? false ? '1' : '0' }}" {{ old('agreement_room_id') == $room->id ? 'selected' : '' }}>
                                                     {{ $room->room_number ?? ('Room ' . $room->id) }}
                                                 </option>
                                             @endforeach
@@ -40,9 +40,19 @@
                                 </div>
 
                                 <div class="full-width" style="grid-column: span 2;">
-                                    <label for="end_date_preview">End Date (auto 1 year - optional)</label>
+                                    <label for="end_date_preview">End Date (optional)</label>
                                     <input type="text" id="end_date_preview" readonly value="{{ old('start_date') ? \Illuminate\Support\Carbon::parse(old('start_date'))->addYear()->toDateString() : now()->addYear()->toDateString() }}">
                                     <input type="hidden" id="end_date" name="end_date" value="{{ old('end_date') }}">
+                                    <input type="hidden" id="had_old_end_date" value="{{ old('end_date') ? '1' : '0' }}">
+
+                                    <!-- Auto 1-year toggle: only shown for dorm/monthly rooms -->
+                                    <div id="auto_one_year_container" style="margin-top:8px; display:none;">
+                                        <label style="font-weight:600;">
+                                            <input type="checkbox" id="auto_one_year_checkbox" name="auto_one_year" value="1" {{ old('end_date') ? 'checked' : '' }} />
+                                            &nbsp;Set end date automatically to +1 year from start date
+                                        </label>
+                                        <div class="muted">Only available for dorm/monthly room types. For transient rooms, set an explicit end date on confirmation.</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -140,8 +150,14 @@
         const startEl = document.getElementById('start_date');
         const endPreview = document.getElementById('end_date_preview');
         const endHidden = document.getElementById('end_date');
+        const roomSelect = document.getElementById('agreement_room_id');
+        const autoContainer = document.getElementById('auto_one_year_container');
+        const autoCheckbox = document.getElementById('auto_one_year_checkbox');
 
-        function computeEndDate() {
+    const hadOldEndDateEl = document.getElementById('had_old_end_date');
+    const hadOldEndDate = hadOldEndDateEl ? hadOldEndDateEl.value === '1' : false;
+
+    function computeEndDate() {
             const start = startEl.value;
             if (!start) return;
             const d = new Date(start);
@@ -151,12 +167,152 @@
             let dd = d.getDate().toString().padStart(2, '0');
             const val = `${yyyy}-${mm}-${dd}`;
             if (endPreview) endPreview.value = val;
-            if (endHidden) endHidden.value = val;
+
+            // Also update reservation check-in/check-out fields when auto end date is enabled
+            const checkInElLocal = document.getElementById('check_in_date');
+            const checkOutElLocal = document.getElementById('check_out_date');
+            if (checkInElLocal && start) {
+                // If check-in is empty, default it to the agreement start date
+                if (!checkInElLocal.value) checkInElLocal.value = start;
+            }
+
+            // Only write to hidden end_date and check-out when the auto checkbox is present and checked.
+            // However, if the user has manually edited the check-out field we should not overwrite it.
+            if (endHidden) {
+                if (autoCheckbox && autoCheckbox.checked) {
+                    endHidden.value = val;
+                    if (checkOutElLocal && checkOutElLocal.dataset.manual !== 'true') {
+                        checkOutElLocal.value = val;
+                    }
+                } else {
+                    // If user hasn't opted into auto end date, don't override explicit old value
+                    // Clear only if there was no old value and checkbox is unchecked
+                    if (!hadOldEndDate) {
+                        endHidden.value = '';
+                    }
+                }
+            }
         }
 
+        function updateAutoVisibility() {
+            if (!roomSelect) return;
+            const opt = roomSelect.options[roomSelect.selectedIndex];
+            const isTransient = opt ? opt.dataset.isTransient === '1' : false;
+                if (isTransient) {
+                // hide toggle for transient rooms and ensure we don't send an auto end date
+                if (autoContainer) autoContainer.style.display = 'none';
+                if (autoCheckbox) autoCheckbox.checked = false;
+                if (endHidden) {
+                    // do not overwrite any explicit end_date sent before; clear if it was only auto
+                    if (!hadOldEndDate) endHidden.value = '';
+                }
+                } else {
+                if (autoContainer) autoContainer.style.display = 'block';
+                // if there is an old end_date value (from previous submission), keep checkbox checked
+                if (autoCheckbox && hadOldEndDate) {
+                    autoCheckbox.checked = true;
+                }
+            }
+        }
+
+        if (roomSelect) {
+            roomSelect.addEventListener('change', function () {
+                updateAutoVisibility();
+                computeEndDate();
+            });
+            // initialize visibility
+            updateAutoVisibility();
+        }
+
+        // wire start change
         if (startEl) {
-            startEl.addEventListener('change', computeEndDate);
+            startEl.addEventListener('change', function(){
+                // when start changes, reset manual flag so auto can update check-out again
+                const co = document.getElementById('check_out_date'); if(co) co.dataset.manual = 'false';
+                computeEndDate();
+            });
             computeEndDate();
+        }
+
+        // allow manual override: if the user edits check-in/check-out, mark check-out as manual
+        const checkInEl = document.getElementById('check_in_date');
+        const checkOutEl = document.getElementById('check_out_date');
+        if(checkInEl){
+            checkInEl.addEventListener('input', function(e){
+                // user edited check-in: mark manual if they typed a value
+                if(this.value && this.value.length) this.dataset.manual = 'true';
+            });
+
+            // allow typing a 4-digit year (e.g. "2026") to quickly set the date
+            // while typing partial year digits the input will stay blank (buffered) to avoid transient numbers
+            checkInEl.addEventListener('input', function(e){
+                const raw = this.value.trim();
+                // only digits typed (partial year)
+                if(/^\d{1,4}$/.test(raw)){
+                    // store buffer and keep the visible input blank while typing
+                    this.dataset.yearBuffer = raw;
+                    this.value = '';
+                    if(raw.length === 4){
+                        const v = raw;
+                        const ref = startEl && startEl.value ? new Date(startEl.value) : new Date();
+                        const mm = (ref.getMonth()+1).toString().padStart(2,'0');
+                        const dd = (ref.getDate()).toString().padStart(2,'0');
+                        this.value = `${v}-${mm}-${dd}`;
+                        this.dataset.manual = 'true';
+                        delete this.dataset.yearBuffer;
+                    }
+                    return;
+                }
+                // if user typed a full date (YYYY-MM-DD) accept it normally
+                if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){
+                    this.dataset.manual = 'true';
+                    delete this.dataset.yearBuffer;
+                    return;
+                }
+                // anything else, clear buffer
+                delete this.dataset.yearBuffer;
+            });
+        }
+        if(checkOutEl){
+            checkOutEl.addEventListener('input', function(){
+                this.dataset.manual = 'true';
+            });
+
+            // accept 4-digit year typing for check-out as a convenience: set to year with same month/day as start
+            checkOutEl.addEventListener('input', function(e){
+                const raw = this.value.trim();
+                if(/^\d{1,4}$/.test(raw)){
+                    this.dataset.yearBuffer = raw;
+                    this.value = '';
+                    if(raw.length === 4){
+                        const v = raw;
+                        const ref = startEl && startEl.value ? new Date(startEl.value) : new Date();
+                        const mm = (ref.getMonth()+1).toString().padStart(2,'0');
+                        const dd = (ref.getDate()).toString().padStart(2,'0');
+                        this.value = `${v}-${mm}-${dd}`;
+                        this.dataset.manual = 'true';
+                        delete this.dataset.yearBuffer;
+                    }
+                    return;
+                }
+                if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){
+                    this.dataset.manual = 'true';
+                    delete this.dataset.yearBuffer;
+                    return;
+                }
+                delete this.dataset.yearBuffer;
+            });
+        }
+
+        // if user toggles the auto-checkbox, recompute and when enabling clear manual override so auto applies
+        if (autoCheckbox) {
+            autoCheckbox.addEventListener('change', function(){
+                if(this.checked){
+                    // enabling auto should allow auto to set check-out even if previously manual
+                    if(checkOutEl) checkOutEl.dataset.manual = 'false';
+                }
+                computeEndDate();
+            });
         }
     });
 </script>

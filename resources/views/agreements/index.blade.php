@@ -67,7 +67,7 @@
         <!-- 🏠 Dorm / Monthly Agreements Table -->
         <div class="card table-card" id="table-dorm">
             <div class="table-wrapper">
-                <h3 style="text-align:left; margin-bottom:8px; color:#5C3A21;">Dorm / Monthly Agreements</h3>
+               
                 <table class="agreements-table">
                     <thead>
                         <tr>
@@ -134,7 +134,7 @@
         <!-- 🕓 Transient / Daily Agreements Table -->
         <div class="card table-card" id="table-transient" style="display:none;">
             <div class="table-wrapper">
-                <h3 style="text-align:left; margin-bottom:8px; color:#5C3A21;">Transient / Daily Agreements</h3>
+              
                 <table class="agreements-table">
                     <thead>
                         <tr>
@@ -360,8 +360,6 @@
     .container { flex:1; width:100%; padding:12px; }
     .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .agreements-table { min-width:700px; font-size:13px; width:auto; }
-
-    
 
     /* Hide less-important columns */
     .agreements-table thead th:nth-child(4), 

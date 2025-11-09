@@ -7,7 +7,7 @@
 
 <style>
 /* 🌅 Base & Container */
-html, body { height:100%; margin:0; padding:0; font-family:'Figtree',sans-serif; color:#2C2C2C; background:#FFF8F2; }
+html, body { margin:0; padding:0; font-family:'Figtree',sans-serif; color:#2C2C2C; background:#FFF8F2; }
 body::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:300px; height:300px; background:url('/path-to-logo.svg') no-repeat center center; background-size:contain; opacity:0.08; pointer-events:none; }
 header { display:none!important; }
 
@@ -21,8 +21,7 @@ header { display:none!important; }
 h3 { color:#5C3A21; font-weight:900; display:flex; align-items:center; gap:8px; justify-content:center; margin:0; font-size:18px; }
 .total-unpaid { font-size:14px; font-weight:700; color:#5C3A21; margin:0; display:flex; align-items:center; justify-content:center; gap:6px; background:#FFF3E5; padding:6px 12px; border-radius:6px; border:2px solid #E6A574; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
 
-/* 📋 Table Styling */
-.table-wrapper { width:100%; overflow-x:auto; overflow-y:auto; max-height:250px; margin-top:12px; }
+.table-wrapper { width:100%; overflow-x:auto; /* let vertical flow to page so the main scrollbar handles it */ margin-top:12px; }
 table { width:100%; min-width:600px; border-collapse:separate; border-spacing:0; border-radius:10px; overflow:hidden; color:#5C3A21; font-size:13px; }
 th, td { padding:8px 12px; border-bottom:1px solid #D97A4E; border-right:1px solid #D97A4E; text-align:left; }
 th:first-child, td:first-child { border-left:none; }
@@ -31,7 +30,10 @@ thead { background: linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-
 tbody tr:hover { background:#FFF4E1; transition: background .2s; }
 
 /* 📊 Chart Container */
-.chart-container { position: relative; width: 55%; max-width: 300px; height: 280px; margin: 24px auto; }
+.chart-container { 
+    position: relative; width: 55%; max-width: 300px; height: 280px; margin: 24px auto; }
+
+
 
 /* 🔹 Buttons */
 .btn-back, .btn-refresh { font-family:'Figtree',sans-serif; font-weight:600; border:none; cursor:pointer; transition:.2s; padding:5px 12px; border-radius:6px; display:flex; align-items:center; gap:5px; justify-content:center; box-shadow:0 3px 8px rgba(0,0,0,0.1); text-decoration:none; position:absolute; top:16px; }
@@ -40,158 +42,262 @@ tbody tr:hover { background:#FFF4E1; transition: background .2s; }
 .btn-refresh { right:100px; background:#D97A4E; color:#FFF5EC; }
 .btn-refresh:hover { background:#F4C38C; color:#5C3A21; }
 
-/* 🎨 Filter Form */
+/* 🎨 Filter Form & Dropdowns */
 .filter-form { display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap; margin:12px 0; padding:8px 10px; background:#FFF9F3; border:1px solid #E6A574; border-radius:10px; font-size:13px; }
 .filter-form label { font-weight:700; color:#5C3A21; font-size:13px; margin:0; }
-.filter-form select, .dropdown-selected { font-family:'Figtree',sans-serif; font-size:13px; padding:6px 10px; border-radius:6px; border:2px solid #E6A574; background:#FFF9F3; color:#5C3A21; font-weight:500; min-width:90px; transition:.2s; }
+.filter-form select { font-family:'Figtree',sans-serif; font-size:13px; padding:6px 10px; border-radius:6px; border:2px solid #E6A574; background:#FFF9F3; color:#5C3A21; font-weight:500; min-width:90px; transition:.2s; }
+.filter-form button { font-family:'Figtree',sans-serif; font-weight:700; border:none; cursor:pointer; transition:.2s; background:#D97A4E; color:#FFF5EC; padding:6px 14px; border-radius:6px; display:flex; align-items:center; gap:5px; justify-content:center; box-shadow:0 3px 8px rgba(0,0,0,0.1); }
+.filter-form button:hover { background:#F4C38C; color:#5C3A21; }
+
+/* Custom Dropdown */
+.custom-dropdown { position:relative; min-width:100px; }
+.dropdown-selected { background:#FFF9F3; border:2px solid #E6A574; border-radius:6px; padding:6px 10px; cursor:pointer; font-weight:600; color:#5C3A21; transition:.2s; }
+.dropdown-selected:hover { background:#FFE7CA; border-color:#D97A4E; }
+.dropdown-options { display:none; position:absolute; z-index:10; top:110%; left:0; width:100%; max-height:120px; overflow-y:auto; background:#FFF; border:2px solid #E6A574; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); color:#5C3A21; }
+.dropdown-option { padding:5px 8px; cursor:pointer; font-weight:500; color:#5C3A21; transition:.2s; }
+.dropdown-option:hover, .dropdown-option.active { background:#E6A574; color:#FFF; }
 
 /* Tabs */
 .tab-btn { font-family:'Figtree',sans-serif; font-weight:700; padding:6px 12px; border-radius:6px; border:2px solid #E6A574; background:#FFF9F3; cursor:pointer; transition:.2s; }
 .tab-btn.active { background:#D97A4E; color:#FFF5EC; border-color:#D97A4E; }
 .tab-btn:not(.active):hover { background:#F4C38C; color:#5C3A21; }
 
-/* ⚙️ Responsive */
-@media(max-width:1024px){ .chart-container { width:35%; max-width:150px; height:150px; } }
-@media(max-width:768px){ .chart-container { width:100%; max-width:250px; height:200px; } }
+/* === 📱 Responsive Enhancements for Reports & Bills View === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px){
+  .reports-container{max-width:1200px;padding:24px;}
+  .card{padding:24px;gap:20px;}
+  h3{font-size:20px;}
+  .filter-form{gap:14px;font-size:14px;}
+  .filter-form select,.filter-form button{font-size:14px;padding:8px 14px;}
+  .btn-back,.btn-refresh{font-size:14px;padding:7px 16px;}
+  .chart-container{width:45%;max-width:340px;height:320px;}
+  table th,table td{padding:10px 14px;font-size:14px;}
+}
+
+/* 🖥️ Medium screens (1025px–1200px) */
+@media (min-width:1025px) and (max-width:1200px){
+  .reports-container{max-width:1100px;padding:20px;}
+  .card{padding:20px;gap:18px;}
+  h3{font-size:18px;}
+  .filter-form{gap:12px;font-size:13px;}
+  .filter-form select,.filter-form button{font-size:13px;padding:7px 12px;}
+  .btn-back,.btn-refresh{font-size:13px;padding:6px 14px;}
+  .chart-container{width:50%;max-width:300px;height:280px;}
+  table th,table td{padding:9px 12px;font-size:13px;}
+}
+
+/* 📱 Small screens / tablets (769px–1024px) */
+@media (min-width:769px) and (max-width:1024px){
+  .reports-container{padding:18px;max-width:900px;}
+  .card{padding:18px;gap:14px;}
+  h3{font-size:17px;}
+  .filter-form{flex-wrap:wrap;gap:10px;padding:10px;}
+  .filter-form select,.filter-form button{width:auto;font-size:13px;padding:6px 10px;}
+  .btn-back,.btn-refresh{font-size:13px;padding:6px 12px;}
+  .table-wrapper{overflow-x:auto;}
+  table{font-size:13px;}
+  .chart-container{width:70%;max-width:260px;height:220px;margin:16px auto;}
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px){
+  .reports-container{padding:16px;}
+  .card{padding:16px;gap:12px;}
+  h3{font-size:16px;text-align:center;}
+  .filter-form{flex-direction:column;gap:8px;align-items:stretch;}
+  .filter-form select,.filter-form button{width:100%;font-size:13px;padding:8px 10px;}
+  .btn-back,.btn-refresh{font-size:12px;padding:6px 10px;position:static;width:100%;margin-top:8px;}
+  table{min-width:100%;font-size:12px;}
+  table th,table td{padding:8px 10px;}
+  .chart-container{width:90%;max-width:220px;height:200px;margin:16px auto;}
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px){
+  .reports-container{padding:12px;}
+  .card{padding:14px;gap:10px;}
+  h3{font-size:15px;text-align:center;}
+  .filter-form{flex-direction:column;gap:6px;padding:8px;}
+  .filter-form select,.filter-form button{width:100%;font-size:12px;padding:6px 8px;}
+  .btn-back,.btn-refresh{width:100%;font-size:12px;padding:5px 10px;position:static;margin-top:6px;}
+  .tab-btn{width:100%;font-size:12px;padding:6px 8px;}
+  .table-wrapper{overflow-x:auto;}
+  table{min-width:100%;font-size:12px;}
+  table th,table td{padding:6px 8px;}
+  .chart-container{width:100%;max-width:200px;height:180px;margin:12px auto;}
+}
+
 </style>
 
-@php
-    // ✅ Safe numeric conversion
-    $transientOutstanding = floatval($transientOutstanding ?? 0);
-    $monthlyOutstanding = floatval($monthlyOutstanding ?? 0);
-    $totalOutstanding = $transientOutstanding + $monthlyOutstanding;
 
-    $transientPaid = floatval($transientPaid ?? 0);
-    $monthlyPaid = floatval($monthlyPaid ?? 0);
-    $totalPaid = $transientPaid + $monthlyPaid;
+    @php
+        $transientOutstanding = $transientOutstanding ?? 0;
+        $monthlyOutstanding = $monthlyOutstanding ?? 0;
+        $totalOutstandingCombined = $totalOutstandingCombined ?? 0;
+        $periodType = $periodType ?? 'monthly';
+        $year = $year ?? now()->year;
+        $month = $month ?? now()->month;
+    @endphp
 
-    // ✅ Safe guards
-    $totalOutstandingSafe = $totalOutstanding > 0 ? $totalOutstanding : 1;
-    $totalPaidSafe = $totalPaid > 0 ? $totalPaid : 1;
+    <div class="reports-container">
+        <div class="card">
+            <a href="{{ route('bills.index') }}" class="btn-back"></i> Back</a>
+            <a href="{{ route('bills.reports') }}" class="btn-refresh"></i> Refresh</a>
 
-    // ✅ Correct percentage math
-    $transientPercent = $totalOutstanding > 0 ? round(($transientOutstanding / $totalOutstanding) * 100, 2) : 0;
-    $monthlyPercent = $totalOutstanding > 0 ? round(($monthlyOutstanding / $totalOutstanding) * 100, 2) : 0;
+            <h3><i class="fa-solid fa-chart-line"></i> Bills Report</h3>
 
-    $transientPercentPaid = $totalPaid > 0 ? round(($transientPaid / $totalPaid) * 100, 2) : 0;
-    $monthlyPercentPaid = $totalPaid > 0 ? round(($monthlyPaid / $totalPaid) * 100, 2) : 0;
+            <form method="GET" action="{{ route('bills.reports') }}" class="filter-form">
+                <label>View:</label>
+                <div class="custom-dropdown" id="viewDropdown">
+                    <div class="dropdown-selected">{{ ucfirst($periodType) }}</div>
+                    <div class="dropdown-options">
+                        <div class="dropdown-option {{ $periodType === 'monthly' ? 'active' : '' }}" data-value="monthly">Monthly</div>
+                        <div class="dropdown-option {{ $periodType === 'annual' ? 'active' : '' }}" data-value="annual">Annual</div>
+                    </div>
+                    <input type="hidden" name="period_type" value="{{ $periodType }}">
+                </div>
 
-    // Filters
-    $periodType = $periodType ?? 'monthly';
-    $year = $year ?? now()->year;
-    $month = $month ?? now()->month;
-@endphp
+                <label>Month:</label>
+                <div class="custom-dropdown" id="monthDropdown">
+                    <div class="dropdown-selected">{{ date('F', mktime(0, 0, 0, $month, 1)) }}</div>
+                    <div class="dropdown-options">
+                        @for($m = 1; $m <= 12; $m++)
+                            <div class="dropdown-option {{ $month == $m ? 'active' : '' }}" data-value="{{ $m }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</div>
+                        @endfor
+                    </div>
+                    <input type="hidden" name="month" value="{{ $month }}">
+                </div>
 
-<div class="reports-container">
-    <div class="card">
-        <a href="{{ route('bills.index') }}" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
-        <a href="{{ route('bills.reports') }}" class="btn-refresh"><i class="fa-solid fa-rotate"></i> Refresh</a>
+                <label>Year:</label>
+                <div class="custom-dropdown" id="yearDropdown">
+                    <div class="dropdown-selected">{{ $year }}</div>
+                    <div class="dropdown-options">
+                        @for($y = 2035; $y >= 2015; $y--)
+                            <div class="dropdown-option {{ $year == $y ? 'active' : '' }}" data-value="{{ $y }}">{{ $y }}</div>
+                        @endfor
+                    </div>
+                    <input type="hidden" name="year" value="{{ $year }}">
+                </div>
 
-        <h3><i class="fa-solid fa-chart-line"></i> Bills Report</h3>
+                <button type="submit"></i> Apply</button>
+                </form>
 
-        {{-- Filters --}}
-        <form method="GET" action="{{ route('bills.reports') }}" class="filter-form">
-            <label>View:</label>
-            <select name="period_type">
-                <option value="monthly" {{ $periodType === 'monthly' ? 'selected' : '' }}>Monthly</option>
-                <option value="annual" {{ $periodType === 'annual' ? 'selected' : '' }}>Annual</option>
-            </select>
+                {{-- Tabs: Unpaid / Paid --}}
+                <div style="display:flex; gap:12px; justify-content:center; margin-bottom:16px;">
+                    <button type="button" class="tab-btn active" data-tab="unpaid">Unpaid</button>
+                    <button type="button" class="tab-btn" data-tab="paid">Paid</button>
+                </div>
 
-            <label>Month:</label>
-            <select name="month">
-                @for($m=1;$m<=12;$m++)
-                    <option value="{{ $m }}" {{ $month==$m ? 'selected' : '' }}>{{ date('F', mktime(0,0,0,$m,1)) }}</option>
-                @endfor
-            </select>
+                @php
+                    // totals fallback
+                    $totalOutstanding = $totalOutstanding ?? $totalOutstandingCombined ?? ($transientOutstanding + $monthlyOutstanding);
+                    $totalPaid = $totalPaid ?? 0;
+                    $transientPaid = $transientPaid ?? 0;
+                    $monthlyPaid = $monthlyPaid ?? 0;
+                @endphp
 
-            <label>Year:</label>
-            <select name="year">
-                @for($y=date('Y')+5;$y>=2015;$y--)
-                    <option value="{{ $y }}" {{ $year==$y ? 'selected' : '' }}>{{ $y }}</option>
-                @endfor
-            </select>
+                <div class="tab-content" id="tab-unpaid">
+                    <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Unpaid: ₱{{ number_format($totalOutstanding,2) }}</p>
 
-            <button type="submit"><i class="fa-solid fa-filter"></i> Apply</button>
-        </form>
+                    <h3 style="margin-top:12px;"><i class="fa-solid fa-list-check"></i> Outstanding Balance Breakdown</h3>
 
-        {{-- Tabs --}}
-        <div style="display:flex; gap:12px; justify-content:center; margin-bottom:16px;">
-            <button type="button" class="tab-btn active" data-tab="unpaid">Unpaid</button>
-            <button type="button" class="tab-btn" data-tab="paid">Paid</button>
-        </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
+                            <tbody>
+                                @php
+                                    $transientPercent = $totalOutstanding > 0 ? round(($transientOutstanding / $totalOutstanding) * 100, 2) : 0;
+                                    $monthlyPercent = $totalOutstanding > 0 ? round(($monthlyOutstanding / $totalOutstanding) * 100, 2) : 0;
+                                @endphp
+                                <tr><td>Transient/Daily</td><td>₱{{ number_format($transientOutstanding,2) }}</td><td>{{ $transientPercent }}%</td></tr>
+                                <tr><td>Dorm/Monthly</td><td>₱{{ number_format($monthlyOutstanding,2) }}</td><td>{{ $monthlyPercent }}%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-        {{-- Unpaid Tab --}}
-        <div class="tab-content" id="tab-unpaid">
-            <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Unpaid: ₱{{ number_format($totalOutstanding,2) }}</p>
+                    <div class="chart-container" id="salesChartContainer" data-labels="Transient/Daily,Dorm/Monthly" data-values="{{ $transientOutstanding }},{{ $monthlyOutstanding }}">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
 
-            <h3><i class="fa-solid fa-list-check"></i> Outstanding Breakdown</h3>
+                <div class="tab-content" id="tab-paid" style="display:none;">
+                    <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Paid: ₱{{ number_format($totalPaid,2) }}</p>
 
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
-                    <tbody>
-                        <tr><td>Transient/Daily</td><td>₱{{ number_format($transientOutstanding,2) }}</td><td>{{ $transientPercent }}%</td></tr>
-                        <tr><td>Dorm/Monthly</td><td>₱{{ number_format($monthlyOutstanding,2) }}</td><td>{{ $monthlyPercent }}%</td></tr>
-                    </tbody>
-                </table>
-            </div>
+                    <h3 style="margin-top:12px;"><i class="fa-solid fa-list-check"></i> Paid Balance Breakdown</h3>
 
-            <div class="chart-container" id="salesChartContainer" data-labels="Transient/Daily,Dorm/Monthly" data-values="{{ $transientOutstanding }},{{ $monthlyOutstanding }}">
-                <canvas id="salesChart"></canvas>
-            </div>
-        </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
+                            <tbody>
+                                @php
+                                    $transientPercentPaid = $totalPaid > 0 ? round(($transientPaid / $totalPaid) * 100, 2) : 0;
+                                    $monthlyPercentPaid = $totalPaid > 0 ? round(($monthlyPaid / $totalPaid) * 100, 2) : 0;
+                                @endphp
+                                <tr><td>Transient/Daily</td><td>₱{{ number_format($transientPaid,2) }}</td><td>{{ $transientPercentPaid }}%</td></tr>
+                                <tr><td>Dorm/Monthly</td><td>₱{{ number_format($monthlyPaid,2) }}</td><td>{{ $monthlyPercentPaid }}%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-        {{-- Paid Tab --}}
-        <div class="tab-content" id="tab-paid" style="display:none;">
-            <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Paid: ₱{{ number_format($totalPaid,2) }}</p>
-
-            <h3><i class="fa-solid fa-list-check"></i> Paid Breakdown</h3>
-
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
-                    <tbody>
-                        <tr><td>Transient/Daily</td><td>₱{{ number_format($transientPaid,2) }}</td><td>{{ $transientPercentPaid }}%</td></tr>
-                        <tr><td>Dorm/Monthly</td><td>₱{{ number_format($monthlyPaid,2) }}</td><td>{{ $monthlyPercentPaid }}%</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="chart-container" id="paidChartContainer" data-labels="Transient/Daily,Dorm/Monthly" data-values="{{ $transientPaid }},{{ $monthlyPaid }}">
-                <canvas id="paidChart"></canvas>
-            </div>
+                    <div class="chart-container" id="paidChartContainer" data-labels="Transient/Daily,Dorm/Monthly" data-values="{{ $transientPaid }},{{ $monthlyPaid }}">
+                        <canvas id="paidChart"></canvas>
+                    </div>
+                </div>
         </div>
     </div>
-</div>
 
-<script>
-function initChart(canvasId, containerId){
-    const container=document.getElementById(containerId);
-    if(!container) return;
-    const labels=(container.dataset.labels||'').split(',');
-    const values=(container.dataset.values||'').split(',').map(Number);
-    if(labels.length && values.length){
-        new Chart(document.getElementById(canvasId),{
-            type:'pie',
-            data:{ labels, datasets:[{ data:values, backgroundColor:['#E6A574','#F4C38C'], borderColor:'#FFF8F0', borderWidth:2 }] },
-            options:{ responsive:true, plugins:{ legend:{ display:true, position:'bottom', labels:{ color:'#5C3A21', font:{ family:'Figtree', size:13 }, boxWidth:20, padding:20 } }, tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ₱${ctx.formattedValue}` } } } }
+    <script>
+        // Small helper to initialize a pie chart from a container holding data-values and data-labels
+        function initChart(canvasId, containerId){
+            const container=document.getElementById(containerId);
+            if(!container) return;
+            const labels=(container.dataset.labels||'').split(',');
+            const values=(container.dataset.values||'').split(',').map(Number);
+            if(labels.length && values.length){
+                new Chart(document.getElementById(canvasId),{
+                    type:'pie',
+                    data:{ labels, datasets:[{ data:values, backgroundColor:['#E6A574','#F4C38C'], borderColor:'#FFF8F0', borderWidth:2 }] },
+                    options:{ responsive:true, plugins:{ legend:{ display:true, position:'bottom', labels:{ color:'#5C3A21', font:{ family:'Figtree', size:13 }, boxWidth:20, padding:20 }, align:'center', maxWidth:200 }, tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ₱${ctx.formattedValue}` } } } }
+                });
+            }
+        }
+
+        // Initialize both charts
+        initChart('salesChart','salesChartContainer');
+        initChart('paidChart','paidChartContainer');
+
+        // Tabs
+        const tabButtons=document.querySelectorAll('.tab-btn');
+        const tabContents=document.querySelectorAll('.tab-content');
+        tabButtons.forEach(btn=>{
+            btn.addEventListener('click',()=>{
+                tabButtons.forEach(b=>b.classList.remove('active'));
+                btn.classList.add('active');
+                const tab=btn.dataset.tab;
+                tabContents.forEach(c=>c.style.display='none');
+                const el=document.getElementById('tab-'+tab);
+                if(el) el.style.display='block';
+            });
         });
-    }
-}
-initChart('salesChart','salesChartContainer');
-initChart('paidChart','paidChartContainer');
 
-const tabButtons=document.querySelectorAll('.tab-btn');
-const tabContents=document.querySelectorAll('.tab-content');
-tabButtons.forEach(btn=>{
-    btn.addEventListener('click',()=>{
-        tabButtons.forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        const tab=btn.dataset.tab;
-        tabContents.forEach(c=>c.style.display='none');
-        const el=document.getElementById('tab-'+tab);
-        if(el) el.style.display='block';
-    });
-});
-</script>
+        // Custom Dropdown Logic
+        document.querySelectorAll('.custom-dropdown').forEach(dropdown=>{
+            const selected=dropdown.querySelector('.dropdown-selected');
+            const options=dropdown.querySelector('.dropdown-options');
+            const input=dropdown.querySelector('input[type="hidden"]');
+            selected.addEventListener('click',()=>options.style.display=options.style.display==='block'?'none':'block');
+            options.querySelectorAll('.dropdown-option').forEach(option=>{
+                option.addEventListener('click',()=>{
+                    selected.textContent=option.textContent;
+                    input.value=option.dataset.value;
+                    options.querySelectorAll('.dropdown-option').forEach(o=>o.classList.remove('active'));
+                    option.classList.add('active');
+                    options.style.display='none';
+                });
+            });
+            document.addEventListener('click',e=>{if(!dropdown.contains(e.target))options.style.display='none';});
+        });
+    </script>
 </x-app-layout>

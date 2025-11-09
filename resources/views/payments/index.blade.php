@@ -35,51 +35,123 @@
             </div>
         </div>
 
-        <!-- 🔹 Payments Table -->
+        <!-- 🔹 Payments Ribbon + Tables -->
         <div class="card table-card">
+
+            {{-- Ribbon: toggle between Dorm/Monthly and Transient/Daily payments --}}
+            <div class="ribbon-toggle" style="display:flex; gap:8px; margin-bottom:12px;">
+                <button type="button" class="btn-ribbon active" data-target="monthly">Dorm / Monthly Payments</button>
+                <button type="button" class="btn-ribbon" data-target="daily">Transient / Daily Payments</button>
+            </div>
+
             @if($payments->isEmpty())
                 <p>No payment records found.</p>
             @else
+                @php
+                    // split current page payments into monthly (non-transient) and transient groups
+                    $monthlyPayments = $payments->filter(function($p){
+                        try {
+                            $isTransient = optional($p->bill)->room?->roomType?->is_transient ?? false;
+                            return !$isTransient;
+                        } catch (
+                        Throwable $e) { return true; }
+                    })->values();
+
+                    $transientPayments = $payments->filter(function($p){
+                        try {
+                            return optional($p->bill)->room?->roomType?->is_transient ?? false;
+                        } catch (\Throwable $e) { return false; }
+                    })->values();
+                @endphp
+
                 <div class="table-wrapper">
-                    <table class="bills-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Payer</th>
-                                <th>Amount</th>
-                                <th>Applied</th>
-                                <th>Unallocated</th>
-                                <th>Date</th>
-                                <th style="white-space:nowrap">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($payments as $p)
+
+                    {{-- Monthly / Dorm Payments Table (default visible) --}}
+                    <div class="bill-table" id="monthly-table">
+                        <table class="bills-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $p->billing_id }}</td>
-                                    <td>{{ $p->payer_name }}</td>
-                                    <td>₱{{ number_format($p->amount,2) }}</td>
-                                    <td>
-                                        @foreach($p->items as $it)
-                                            <div>Bill #{{ $it->bill_id }}: ₱{{ number_format($it->amount,2) }}</div>
-                                        @endforeach
-                                    </td>
-                                    <td>₱{{ number_format($p->unallocated_amount,2) }}</td>
-                                    <td>{{ $p->payment_date?->format('M d, Y h:i A') }}</td>
-                                    <td class="actions-cell">
-                                        <div class="actions-buttons">
-                                            <a href="{{ route('payments.show', $p) }}" class="btn-view">View</a>
-                                            <form method="POST" action="{{ route('payments.destroy', $p) }}" class="inline-form" onsubmit="return confirm('Delete this payment?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn-delete" type="submit">Delete</button>
-                                            </form>
-                                        </div>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Payer</th>
+                                    <th>Amount</th>
+                                    <th>Applied</th>
+                                    <th>Unallocated</th>
+                                    <th>Date</th>
+                                    <th style="white-space:nowrap">Actions</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($monthlyPayments as $p)
+                                    <tr>
+                                        <td>{{ $p->billing_id }}</td>
+                                        <td>{{ $p->payer_name }}</td>
+                                        <td>₱{{ number_format($p->amount,2) }}</td>
+                                        <td>
+                                            @foreach($p->items as $it)
+                                                <div>Bill #{{ $it->bill_id }}: ₱{{ number_format($it->amount,2) }}</div>
+                                            @endforeach
+                                        </td>
+                                        <td>₱{{ number_format($p->unallocated_amount,2) }}</td>
+                                        <td>{{ $p->payment_date?->format('M d, Y h:i A') }}</td>
+                                        <td class="actions-cell">
+                                            <div class="actions-buttons">
+                                                <a href="{{ route('payments.show', $p) }}" class="btn-view">View</a>
+                                                <form method="POST" action="{{ route('payments.destroy', $p) }}" class="inline-form" onsubmit="return confirm('Delete this payment?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn-delete" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Transient / Daily Payments Table (hidden by default) --}}
+                    <div class="bill-table" id="daily-table" style="display:none;">
+                        <table class="bills-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Payer</th>
+                                    <th>Amount</th>
+                                    <th>Applied</th>
+                                    <th>Unallocated</th>
+                                    <th>Date</th>
+                                    <th style="white-space:nowrap">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($transientPayments as $p)
+                                    <tr>
+                                        <td>{{ $p->billing_id }}</td>
+                                        <td>{{ $p->payer_name }}</td>
+                                        <td>₱{{ number_format($p->amount,2) }}</td>
+                                        <td>
+                                            @foreach($p->items as $it)
+                                                <div>Bill #{{ $it->bill_id }}: ₱{{ number_format($it->amount,2) }}</div>
+                                            @endforeach
+                                        </td>
+                                        <td>₱{{ number_format($p->unallocated_amount,2) }}</td>
+                                        <td>{{ $p->payment_date?->format('M d, Y h:i A') }}</td>
+                                        <td class="actions-cell">
+                                            <div class="actions-buttons">
+                                                <a href="{{ route('payments.show', $p) }}" class="btn-view">View</a>
+                                                <form method="POST" action="{{ route('payments.destroy', $p) }}" class="inline-form" onsubmit="return confirm('Delete this payment?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn-delete" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             @endif
 
@@ -98,28 +170,109 @@
             window.location.href = "{{ route('payments.index') }}";
         });
 
-        // Custom dropdowns
-        document.querySelectorAll('.custom-dropdown').forEach(dd => {
-            const selected = dd.querySelector('.selected');
-            const options = dd.querySelectorAll('.dropdown-option');
-            const hiddenInput = dd.querySelector('input[type="hidden"]');
+        // Helper: parse currency string like "₱1,234.56" to number
+        function parseCurrency(value){
+            if(!value) return 0;
+            return Number(value.replace(/[^0-9.-]+/g, '')) || 0;
+        }
 
-            selected.addEventListener('click', () => selected.classList.toggle('active'));
+        // Parse date string shown in table (attempt native parse)
+        function parseDateValue(value){
+            const t = Date.parse(value);
+            return isNaN(t) ? 0 : t;
+        }
 
-            options.forEach(opt => opt.addEventListener('click', () => {
-                selected.textContent = opt.textContent;
-                hiddenInput.value = opt.dataset.value;
-                selected.classList.remove('active');
-                options.forEach(o => o.classList.remove('active'));
-                opt.classList.add('active');
-            }));
-
-            document.addEventListener('click', e => {
-                if(!dd.contains(e.target)) selected.classList.remove('active');
+        // Generic sorter for table rows
+        function sortTableRows(table, colIndex, type='string', asc=false){
+            const tbody = table.querySelector('tbody');
+            if(!tbody) return;
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a,b)=>{
+                const aText = a.children[colIndex]?.textContent.trim() || '';
+                const bText = b.children[colIndex]?.textContent.trim() || '';
+                let res = 0;
+                if(type === 'numeric'){
+                    res = parseCurrency(aText) - parseCurrency(bText);
+                } else if(type === 'date'){
+                    res = parseDateValue(aText) - parseDateValue(bText);
+                } else {
+                    res = aText.localeCompare(bText);
+                }
+                return asc ? res : -res;
             });
+            rows.forEach(r=>tbody.appendChild(r));
+        }
 
-            // Set initial active
-            options.forEach(o => { if(o.dataset.value === hiddenInput.value) o.classList.add('active'); });
+        // make headers clickable to toggle sort
+        function makeTableSortable(table){
+            const headers = table.querySelectorAll('thead th');
+            headers.forEach((th, idx) => {
+                th.style.cursor = 'pointer';
+                th.dataset.sortDir = 'desc';
+                th.addEventListener('click', ()=>{
+                    const label = th.textContent.trim();
+                    let type = 'string';
+                    if(['Amount','Unallocated','ID'].includes(label)) type = 'numeric';
+                    if(label === 'Date') type = 'date';
+                    const asc = th.dataset.sortDir === 'asc';
+                    sortTableRows(table, idx, type, asc);
+                    th.dataset.sortDir = asc ? 'desc' : 'asc';
+                });
+            });
+        }
+
+        // Ribbon toggle + default sorting (Date desc)
+        const buttons = document.querySelectorAll('.btn-ribbon');
+        const tables = document.querySelectorAll('.bill-table');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                tables.forEach(t => t.style.display = 'none');
+
+                const target = btn.getAttribute('data-target');
+                const el = document.getElementById(`${target}-table`);
+                if(el){
+                    el.style.display = 'block';
+                    const tbl = el.querySelector('.bills-table');
+                    if(tbl){
+                        // default: sort by Date column (index 5) descending
+                        sortTableRows(tbl, 5, 'date', false);
+                        if(!tbl.dataset.sortable){ makeTableSortable(tbl); tbl.dataset.sortable = '1'; }
+                    }
+                }
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', ()=>{
+            const activeBtn = document.querySelector('.btn-ribbon.active');
+            if(activeBtn){ activeBtn.click(); }
+
+            // Custom dropdowns
+            document.querySelectorAll('.custom-dropdown').forEach(dd => {
+                const selected = dd.querySelector('.selected');
+                const options = dd.querySelectorAll('.dropdown-option');
+                const hiddenInput = dd.querySelector('input[type="hidden"]');
+
+                selected.addEventListener('click', () => selected.classList.toggle('active'));
+
+                options.forEach(opt => opt.addEventListener('click', () => {
+                    selected.textContent = opt.textContent;
+                    hiddenInput.value = opt.dataset.value;
+                    selected.classList.remove('active');
+                    options.forEach(o => o.classList.remove('active'));
+                    opt.classList.add('active');
+                }));
+
+                document.addEventListener('click', e => {
+                    if(!dd.contains(e.target)) selected.classList.remove('active');
+                });
+
+                options.forEach(o => { if(o.dataset.value === hiddenInput.value) o.classList.add('active'); });
+            });
         });
     </script>
 </x-app-layout>

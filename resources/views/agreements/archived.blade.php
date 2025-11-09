@@ -45,7 +45,7 @@
         <!-- 🔹 Dorm / Monthly Table -->
         <div class="card table-card" id="table-dorm">
             <div class="table-wrapper">
-                <h3 class="table-title">Dorm / Monthly Agreements</h3>
+             
                 <table class="agreements-table">
                     <thead>
                         <tr>
@@ -94,7 +94,7 @@
         <!-- 🔹 Transient / Daily Table -->
         <div class="card table-card" id="table-transient" style="display:none;">
             <div class="table-wrapper">
-                <h3 class="table-title">Transient / Daily Agreements</h3>
+               
                 <table class="agreements-table">
                     <thead>
                         <tr>
