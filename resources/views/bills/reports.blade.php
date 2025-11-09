@@ -62,13 +62,73 @@ tbody tr:hover { background:#FFF4E1; transition: background .2s; }
 .tab-btn.active { background:#D97A4E; color:#FFF5EC; border-color:#D97A4E; }
 .tab-btn:not(.active):hover { background:#F4C38C; color:#5C3A21; }
 
-/* ⚙️ Responsive */
-@media(max-width:1024px){
-    .chart-container { width:35%; max-width:150px; height:150px; margin:24px auto; }
+/* === 📱 Responsive Enhancements for Reports & Bills View === */
+
+/* 💻 Large screens (>1200px) */
+@media (min-width:1201px){
+  .reports-container{max-width:1200px;padding:24px;}
+  .card{padding:24px;gap:20px;}
+  h3{font-size:20px;}
+  .filter-form{gap:14px;font-size:14px;}
+  .filter-form select,.filter-form button{font-size:14px;padding:8px 14px;}
+  .btn-back,.btn-refresh{font-size:14px;padding:7px 16px;}
+  .chart-container{width:45%;max-width:340px;height:320px;}
+  table th,table td{padding:10px 14px;font-size:14px;}
 }
-@media(max-width:768px){
-    .chart-container { width:100%; max-width:250px; height:200px; margin:16px auto; }
+
+/* 🖥️ Medium screens (1025px–1200px) */
+@media (min-width:1025px) and (max-width:1200px){
+  .reports-container{max-width:1100px;padding:20px;}
+  .card{padding:20px;gap:18px;}
+  h3{font-size:18px;}
+  .filter-form{gap:12px;font-size:13px;}
+  .filter-form select,.filter-form button{font-size:13px;padding:7px 12px;}
+  .btn-back,.btn-refresh{font-size:13px;padding:6px 14px;}
+  .chart-container{width:50%;max-width:300px;height:280px;}
+  table th,table td{padding:9px 12px;font-size:13px;}
 }
+
+/* 📱 Small screens / tablets (769px–1024px) */
+@media (min-width:769px) and (max-width:1024px){
+  .reports-container{padding:18px;max-width:900px;}
+  .card{padding:18px;gap:14px;}
+  h3{font-size:17px;}
+  .filter-form{flex-wrap:wrap;gap:10px;padding:10px;}
+  .filter-form select,.filter-form button{width:auto;font-size:13px;padding:6px 10px;}
+  .btn-back,.btn-refresh{font-size:13px;padding:6px 12px;}
+  .table-wrapper{overflow-x:auto;}
+  table{font-size:13px;}
+  .chart-container{width:70%;max-width:260px;height:220px;margin:16px auto;}
+}
+
+/* 📱 Small screens / tablets (481px–768px) */
+@media (min-width:481px) and (max-width:768px){
+  .reports-container{padding:16px;}
+  .card{padding:16px;gap:12px;}
+  h3{font-size:16px;text-align:center;}
+  .filter-form{flex-direction:column;gap:8px;align-items:stretch;}
+  .filter-form select,.filter-form button{width:100%;font-size:13px;padding:8px 10px;}
+  .btn-back,.btn-refresh{font-size:12px;padding:6px 10px;position:static;width:100%;margin-top:8px;}
+  table{min-width:100%;font-size:12px;}
+  table th,table td{padding:8px 10px;}
+  .chart-container{width:90%;max-width:220px;height:200px;margin:16px auto;}
+}
+
+/* 📞 Extra small screens / mobile (≤480px) */
+@media (max-width:480px){
+  .reports-container{padding:12px;}
+  .card{padding:14px;gap:10px;}
+  h3{font-size:15px;text-align:center;}
+  .filter-form{flex-direction:column;gap:6px;padding:8px;}
+  .filter-form select,.filter-form button{width:100%;font-size:12px;padding:6px 8px;}
+  .btn-back,.btn-refresh{width:100%;font-size:12px;padding:5px 10px;position:static;margin-top:6px;}
+  .tab-btn{width:100%;font-size:12px;padding:6px 8px;}
+  .table-wrapper{overflow-x:auto;}
+  table{min-width:100%;font-size:12px;}
+  table th,table td{padding:6px 8px;}
+  .chart-container{width:100%;max-width:200px;height:180px;margin:12px auto;}
+}
+
 </style>
 
 

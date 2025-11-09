@@ -67,7 +67,7 @@
         <!-- 🏠 Dorm / Monthly Agreements Table -->
         <div class="card table-card" id="table-dorm">
             <div class="table-wrapper">
-                <h3 style="text-align:left; margin-bottom:8px; color:#5C3A21;">Dorm / Monthly Agreements</h3>
+               
                 <table class="agreements-table">
                     <thead>
                         <tr>
@@ -134,7 +134,7 @@
         <!-- 🕓 Transient / Daily Agreements Table -->
         <div class="card table-card" id="table-transient" style="display:none;">
             <div class="table-wrapper">
-                <h3 style="text-align:left; margin-bottom:8px; color:#5C3A21;">Transient / Daily Agreements</h3>
+              
                 <table class="agreements-table">
                     <thead>
                         <tr>
