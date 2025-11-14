@@ -27,6 +27,32 @@ The system provides a structured approach to handling dormitory operations, redu
 - Frontend: Tailwind CSS, Custom/Vanilla CSS & JS, FontAwesome (CDN)
 - Build Tool / Environment: Node.js, npm, Vite, Laravel Vite Plugin
 
+
+
+## Programming Language: 
+- PHP - Handles backend logic, database interactions, and user requests.
+
+## Backend Framework: 
+- Laravel - Provides routing, authentication, Eloquent ORM for database management, and security. Managed with Composer.
+
+
+## Frontend:
+
+- Tailwind CSS - Utility-first framework for responsive design.
+
+- Custom / Vanilla CSS & JS - Adds unique styling and interactions, including FontAwesome (via CDN) for icons.
+
+## Build Tool / Environment:  
+- Node.js & npm - For compiling frontend assets.
+
+- Vite – Bundles JS and CSS efficiently.
+
+- Laravel Vite Plugin - Integrates Vite with Blade templates.
+
+## Database: 
+MySQL - Stores structured data such as user accounts, dormitory info, and bookings, connected through Eloquent ORM.
+
+
 ## MODULES
 
 * General
