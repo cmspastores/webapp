@@ -100,13 +100,13 @@ footer p{font-size:1rem;margin-top:.3rem;font-weight:600}
     <!-- Hero Section -->
     <section class="hero">
         <img src="{{ asset('images/c5background.jpg') }}" alt="Front view of C5 Dormitel, Roxas Avenue, Davao City">
-        <h1>Welcome to C5 Dormitel</h1>
-        <p>Affordable, comfortable, and secure dormitory accommodations for students, professionals, and tourists in Davao City.</p>
+        <h1>Welcome to The C5 Dormitel Management System</h1>
+        <p>A platform that streamlines and organizes room, renter, reservation, agreement, and billing management for the dormitel.</p>
     </section>
 
     <!-- About Section (directly visible) -->
     <section class="about-section">
-        <h2>About Us</h2>
+        <h2>About The Dormitel</h2>
         <p>
             C5 Dormitel has been operational since August 2006, located along Roxas Avenue, Davao City.  
             We provide a unique blend of dormitory-style accommodations within a professional hotel setting.  

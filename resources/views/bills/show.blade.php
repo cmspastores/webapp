@@ -144,6 +144,11 @@
 .btn-pay{background:#D97A4E;color:#FFF5EC;padding:8px 20px;border-radius:8px;font-weight:700;text-decoration:none;display:inline-block;margin:8px auto 0 auto;transition:0.2s;}
 .btn-pay:hover{background:#F4C38C;color:#5C3A21;}
 
+/* Refund / Cancel button */
+.btn-cancel { background: #D97A4E; color: #FFF5EC; padding: 6px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; transition: 0.2s; }
+.btn-cancel:hover { background: #F4C38C; color: #5C3A21; }
+
+
 /* Action container */
 .action-container{display:flex;justify-content:flex-end;margin-top:16px;}
 .btn-back{font-family:'Figtree',sans-serif;font-weight:600;border:none;cursor:pointer;transition:0.2s;background:#D97A4E;color:#FFF5EC;padding:6px 14px;border-radius:6px;text-decoration:none;display:flex;align-items:center;gap:6px;}

@@ -1,19 +1,32 @@
 
 
 ## PROJECT TITLE
-* C5 Dormitel Management System
+## C5 Dormitel Management System
 
 ## BACKGROUND OF ORG/BUSINESS
 
-C5 Dormitel is a Dormitory  operational around August 2006 and is located in Davao City along Roxas Avenue. The establishment offers a unique blend of dormitory-style accommodations within a
-hotel setting.
-It primarily caters to students, professionals, and tourists seeking affordable yet comfortable
-lodging. Its history ties to its founding as a budget-friendly alternative to traditional hotels, aiming
+C5 Dormitel is a Dormitory  operational around August 2006 and is located in Davao City along Roxas Avenue. The establishment offers a unique blend of dormitory-style accommodations within hotel setting. 
+
+It primarily caters to students, professionals, and tourists seeking affordable yet comfortable lodging. Its history ties to its founding as a budget-friendly alternative to traditional hotels, aiming
 to provide accessible, secure, and functional spaces in the city center.
+
+## Project Description
+
+The C5 Dormitel Management System is a web-based platform developed to streamline and modernize most daily dormitory operations at C5 Dormitel in Davao City. It centralizes key processes such as room types and room management, renter profiles, reservations, agreements, and billing, allowing staff to manage most administrative tasks through a single, organized interface.
+
+The system provides a structured approach to handling dormitory operations, reducing manual effort for administrative work while still requiring in-person actions for certain processes like room inspections and payment collections.
 
 
 
 -----
+
+## TECH STACK
+
+- Backend: PHP, Laravel, Composer
+- Database: MySQL
+- Frontend: Tailwind CSS, Custom/Vanilla CSS & JS, FontAwesome (CDN)
+- Build Tool / Environment: Node.js, npm, Vite, Laravel Vite Plugin
+
 ## MODULES
 
 * General
@@ -24,75 +37,110 @@ to provide accessible, secure, and functional spaces in the city center.
 * Agreement Registration Management
 * Billing Management
 
-
 ---
 
 ## SETUP
 
 • PHP – Ensure you have PHP 7.3 or later installed.
 • Composer – Download and install Composer from https://getcomposer.org.
-• Laravel Installer (optional) – Install globally with Composer via:
-  composer global require laravel/installer
+• Laravel Installer (optional) – Install globally with Composer 
+  Note: composer global require laravel/installer
 • Database – Install MySQL (or PostgreSQL, SQLite, etc.) for your app’s database.
 • Node.js and npm – Needed for front-end builds (e.g. Tailwind CSS, Vite).
 • Git – Useful for version control and cloning repositories.
 • Code Editor – VS Code or your preferred editor.
 
-----
+-----------------------------
 
-• Install dependencies:
-  composer install
-
-• Create or update your .env file (if not done already):
-  copy .env.example .env
-  php artisan key:generate
-
-• Migrate the database (assuming your credentials in .env are set up):
-  php artisan migrate
-
-• Install frontend dependencies and build assets (if using Vite/Tailwind):
-  npm install
-  npm run dev
-
-• Start the Laravel development server:
-  php artisan serve
 
 
 ------------------------------
 
- Clearing Laravel Cache and Optimizing Commands:
+##  How to clone and Run:
 
-  php artisan config:clear
-  php artisan route:clear
-  php artisan view:clear
-  php artisan cache:clear
-  php artisan event:clear
-  php artisan optimize:clear
+- ## Create a project folder for your laravel app
+
+- ## Turn on terminal from the project folder and input:
+ 
+  git clone -b main https://github.com/cmspastores/webapp.git
+
+- ## Install PHP dependencies: 
+  composer install
+- ## Install Node dependencies (For frontend assets): 
+  npm install
+- ## (Optional) Fix vulnerable packages
+  npm audit fix
+- ## Create your environment file: 
+  cp .env.example .env
+- ## Generate the application key: 
+  php artisan key:generate
+- ## Run your database migrations: 
+  php artisan migrate
+- ## Build your frontend assets (For Vite/Tailwind): 
+  npm run build
+- ## Run frontend dev server (for developing your assets)
+  Run frontend dev server
+- ## Serve your Laravel app: 
+  php artisan serve 
+- ## Then visit http://127.0.0.1:8000 in your browser.
+
+
+
+
+
+
+
+
+
+
+------------------------------
+## Laravel Cache Clearing and Optimization Commands
+
+- php artisan config:clear - Reloads fresh config
+- php artisan route:clear - Refreshes route list
+- php artisan view:clear - Recompiles Blade views
+- php artisan cache:clear - Empties app cache
+- php artisan event:clear - Resets cached events
+- php artisan optimize:clear - Clears all optimization caches
+
+- php artisan storage:link  (for linking) - Creates public storage link
+
+
+## Laravel Migration Management Commands
+
+- php artisan migrate - Runs pending migrations.
+- php artisan migrate:status - Shows migration status.
+- php artisan migrate:rollback - Reverts last migration batch.
+- php artisan migrate:refresh - Drops and rebuilds all tables.
+- php artisan db:wipe - Completely wipes database tables. (Used when the migrate refresh failed due to tables that cannot drop because of foreign keys or existing data)
+
+
+
 
 
 ------------------------------
 
-Setting up MySQL:
+## Setting up MySQL:
 
-Open your .env file and note your database settings (DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD).
+- Open your .env file and note your database settings (DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD).
 
 
 NOTE: Generating Hashed Passwords in Laravel are stored securely using hashing (bcrypt by default). To generate a hashed password, you can use Laravel's Tinker. Open your terminal in the project folder and run:
 
-    php artisan tinker
+php artisan tinker
     >>> bcrypt('your_plaintext_password')
 
-In your terminal, connect to MySQL using your credentials. For example, if your username is "root":
+- In your terminal, connect to MySQL using your credentials. For example, if your username is "root":
   mysql -u root -p
-Then enter your password when prompted.
+- Then enter your password when prompted.
 
-Once connected, run:
+- Once connected, run:
   SHOW DATABASES;
-Confirm that your database (as specified in DB_DATABASE) is listed.
+- Confirm that your database (as specified in DB_DATABASE) is listed.
 
-To examine its tables, switch to your database:
+- To examine its tables, switch to your database:
   USE your_database_name;
-Then list tables:
+- Then list tables:
   SHOW TABLES;
 
 ---
@@ -111,6 +159,12 @@ Then list tables:
 ## Dashboard
 <img src="public/screenshots/dashboard.png" width=500>
 
+## User Management
+<img src="public/screenshots/usermanagement.png" width=500>
+
+## Room Type
+<img src="public/screenshots/roomtypes.png" width=500>
+
 ## Rooms
 <img src="public/screenshots/rooms.png" width=500>
 
@@ -125,20 +179,6 @@ Then list tables:
 
 ## Billings
 <img src="public/screenshots/bills.png" width=500>
-
-## Charges
-
-
-## User Management
-<img src="public/screenshots/usermanagement.png" width=500>
-
-## Room Type
-<img src="public/screenshots/roomtypes.png" width=500>
-
-
-
-
-
 
 ## Laravel Setup
 <img src="public/screenshots/laravel setup.png" width=500>
@@ -163,17 +203,8 @@ Then list tables:
 
 
 
-
-
-
 ## AUTHOR
-DESIREE S. DAGONDON
-
-
-
-
-
-
+C5 Dormitel Group
 
 
 
@@ -238,8 +269,6 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-
 
 
 
