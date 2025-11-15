@@ -87,12 +87,7 @@
                         <tbody>
                             @foreach($monthlyBills as $bill)
                                 @php
-                                    // normalize stored status (some code uses lowercase 'refunded' etc.)
                                     $rawStatus = strtolower($bill->status ?? 'unpaid');
-
-                                    // Detect if there's agreement-level unallocated credit (overpayment).
-                                    // Quick (but slightly heavier) approach: check payments table for this agreement.
-                                    // This does 1 small query per bill — OK for a small dataset; use controller preload for large.
                                     $agreementOverpayment = \App\Models\Payment::where('agreement_id', $bill->agreement_id)
                                         ->where('unallocated_amount', '>', 0)
                                         ->exists();
@@ -101,7 +96,6 @@
                                         $statusText = 'Refunded';
                                         $statusClass = 'refunded';
                                     } elseif ($agreementOverpayment && $rawStatus === 'paid') {
-                                        // If payment has unallocated credit for this agreement and bill is paid => Overpayment
                                         $statusText = 'Overpayment';
                                         $statusClass = 'overpayment';
                                     } elseif ($rawStatus === 'paid') {
@@ -121,15 +115,10 @@
                                     <td>{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</td>
                                     <td>₱{{ number_format($bill->amount_due,2) }}</td>
                                     <td>₱{{ number_format($bill->balance,2) }}</td>
-                                    <td>
-                                        <span class="status-badge {{ $statusClass }}">
-                                            {{ $statusText }}
-                                        </span>
-                                    </td>
+                                    <td><span class="status-badge {{ $statusClass }}">{{ $statusText }}</span></td>
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
                                             <a href="{{ route('bills.show', $bill) }}" class="btn-view">View</a>
-
                                             @if(auth()->user() && auth()->user()->is_admin)
                                                 <form action="{{ route('bills.destroy', $bill) }}" method="POST" class="inline-form" onsubmit="return confirm('Delete this bill?');">
                                                     @csrf
@@ -137,7 +126,6 @@
                                                     <button class="btn-delete" type="submit">Delete</button>
                                                 </form>
                                             @endif
-
                                         </div>
                                     </td>
                                 </tr>
@@ -169,12 +157,7 @@
                         <tbody>
                             @foreach($transientBills as $bill)
                                 @php
-                                    // normalize stored status (some code uses lowercase 'refunded' etc.)
                                     $rawStatus = strtolower($bill->status ?? 'unpaid');
-
-                                    // Detect if there's agreement-level unallocated credit (overpayment).
-                                    // Quick (but slightly heavier) approach: check payments table for this agreement.
-                                    // This does 1 small query per bill — OK for a small dataset; use controller preload for large.
                                     $agreementOverpayment = \App\Models\Payment::where('agreement_id', $bill->agreement_id)
                                         ->where('unallocated_amount', '>', 0)
                                         ->exists();
@@ -183,7 +166,6 @@
                                         $statusText = 'Refunded';
                                         $statusClass = 'refunded';
                                     } elseif ($agreementOverpayment && $rawStatus === 'paid') {
-                                        // If payment has unallocated credit for this agreement and bill is paid => Overpayment
                                         $statusText = 'Overpayment';
                                         $statusClass = 'overpayment';
                                     } elseif ($rawStatus === 'paid') {
@@ -196,18 +178,18 @@
                                         $statusText = 'Unpaid';
                                         $statusClass = 'unpaid';
                                     }
+
+                                    // ✅ Fix transient period display
+                                    $start = $bill->period_start instanceof \Carbon\Carbon ? $bill->period_start->format('M d, Y') : \Carbon\Carbon::parse($bill->period_start)->format('M d, Y');
+                                    $end = $bill->period_end instanceof \Carbon\Carbon ? $bill->period_end->format('M d, Y') : \Carbon\Carbon::parse($bill->period_end)->format('M d, Y');
                                 @endphp
                                 <tr>
                                     <td>{{ $bill->renter->full_name ?? '—' }}</td>
                                     <td>{{ $bill->room->room_number ?? '—' }}</td>
-                                    <td>{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</td>
+                                    <td>{{ $start }} — {{ $end }}</td>
                                     <td>₱{{ number_format($bill->amount_due,2) }}</td>
                                     <td>₱{{ number_format($bill->balance,2) }}</td>
-                                    <td>
-                                        <span class="status-badge {{ $statusClass }}">
-                                            {{ $statusText }}
-                                        </span>
-                                    </td>
+                                    <td><span class="status-badge {{ $statusClass }}">{{ $statusText }}</span></td>
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
                                             <a href="{{ route('bills.show', $bill) }}" class="btn-view">View</a>
@@ -235,58 +217,42 @@
 
     <!-- 🔹 JS -->
     <script>
-        // Refresh
         document.getElementById('btn-refresh').addEventListener('click', () => {
             window.location.href = "{{ route('bills.index') }}";
         });
 
-        // Ribbon toggle
         const buttons = document.querySelectorAll('.btn-ribbon');
         const tables = document.querySelectorAll('.bill-table');
-
         buttons.forEach(btn => {
             btn.addEventListener('click', () => {
                 buttons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-
                 tables.forEach(t => t.style.display = 'none');
-
                 const target = btn.getAttribute('data-target');
                 document.getElementById(`${target}-table`).style.display = 'block';
             });
         });
 
-        // Custom dropdown
         document.querySelectorAll('.custom-dropdown').forEach(dd => {
             const selected = dd.querySelector('.selected');
             const options = dd.querySelectorAll('.dropdown-option');
             const hiddenInput = dd.querySelector('input[type="hidden"]');
-
-            selected.addEventListener('click', () => {
-                selected.classList.toggle('active');
-            });
-
+            selected.addEventListener('click', () => selected.classList.toggle('active'));
             options.forEach(opt => {
                 opt.addEventListener('click', () => {
                     selected.textContent = opt.textContent;
                     hiddenInput.value = opt.dataset.value;
                     selected.classList.remove('active');
-
                     options.forEach(o => o.classList.remove('active'));
                     opt.classList.add('active');
                 });
             });
-
-            document.addEventListener('click', e => {
-                if (!dd.contains(e.target)) selected.classList.remove('active');
-            });
-
-            options.forEach(o => {
-                if(o.dataset.value === hiddenInput.value) o.classList.add('active');
-            });
+            document.addEventListener('click', e => { if (!dd.contains(e.target)) selected.classList.remove('active'); });
+            options.forEach(o => { if(o.dataset.value === hiddenInput.value) o.classList.add('active'); });
         });
     </script>
 </x-app-layout>
+
 
 
 
