@@ -22,9 +22,9 @@
                 <input type="email" name="email" placeholder="Email" value="{{ old('email') }}">
 
                 <input type="text" name="phone" placeholder="Contact Number" value="{{ old('phone') }}" required>
-                <input type="text" name="emergency_contact" placeholder="Emergency Contact" value="{{ old('emergency_contact') }}">
+                <input type="text" name="emergency_contact" placeholder="Emergency Contact Number" value="{{ old('emergency_contact') }}">
                 <input type="text" name="address" placeholder="Address" class="full-width" value="{{ old('address') }}">
-                <input type="text" name="emergency_contact" placeholder="Emergency Contact Name" value="{{ old('emergency_contact') }}">
+                <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" value="{{ old('emergency_contact_name') }}">
                 <input type="email" name="emergency_contact_email" placeholder="Emergency Contact Email" value="{{ old('emergency_contact_email') }}">
             </div>
 
