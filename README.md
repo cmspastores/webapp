@@ -151,13 +151,15 @@ MySQL - Stores structured data such as user accounts, dormitory info, and bookin
 - Open your .env file and note your database settings (DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD).
 
 
-NOTE: Generating Hashed Passwords in Laravel are stored securely using hashing (bcrypt by default). To generate a hashed password, you can use Laravel's Tinker. Open your terminal in the project folder and run:
+NOTE: Generating Hashed Passwords in Laravel are stored securely using hashing (bcrypt by default). 
+To generate a hashed password, you can use Laravel's Tinker. Open your terminal in the project folder and run:
 
 php artisan tinker
     >>> bcrypt('your_plaintext_password')
 
 - In your terminal, connect to MySQL using your credentials. For example, if your username is "root":
   mysql -u root -p
+
 - Then enter your password when prompted.
 
 - Once connected, run:
