@@ -58,7 +58,12 @@ class BillController extends Controller
     // form to choose billing period (month) and generate bills
     public function create()
     {
-        $agreements = Agreement::where('is_active', true)->orderBy('start_date')->get();
+        $agreements = Agreement::where('is_active', true)
+            ->whereHas('room.roomType', function($q){
+                $q->where('is_transient', false);
+            })
+            ->orderBy('start_date')
+            ->get();
         return view('bills.create', compact('agreements'));
     }
 
@@ -90,6 +95,11 @@ class BillController extends Controller
         $agreement = Agreement::findOrFail($data['agreement_id']);
         if (! $agreement->is_active || $agreement->start_date > $periodEnd->toDateString() || $agreement->end_date < $periodStart->toDateString()) {
             return back()->withInput()->withErrors(['agreement_id' => 'Selected agreement is not active for that period.']);
+        }
+
+        if ( optional($agreement->room->roomType)->is_transient ) {
+            return back()->withInput()
+                ->withErrors(['agreement_id' => 'Cannot generate monthly bill for transient agreements. Choose a dorm agreement.']);
         }
 
         $this->createBillForAgreement($agreement, $periodStart, $periodEnd, $hasBaseAmountColumn, $created, $skipped);

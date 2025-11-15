@@ -154,10 +154,12 @@
 
                 @if(auth()->user() && auth()->user()->is_admin)
                     @if($agreement->is_active)
-                        <form action="{{ route('agreements.renew', $agreement) }}" method="POST" onsubmit="return confirm('Renew this agreement for another year?')">
-                            @csrf
-                            <button type="submit" class="btn-confirm">Renew Agreement</button>
-                        </form>
+                        @if(! optional($agreement->room->roomType)->is_transient)
+                            <form action="{{ route('agreements.renew', $agreement) }}" method="POST" onsubmit="return confirm('Renew agreement?');">
+                                @csrf
+                                <button class="btn-confirm" type="submit">Renew Agreement</button>
+                            </form>
+                        @endif
 
                         <form action="{{ route('agreements.terminate', $agreement) }}" method="POST" onsubmit="return confirm('Are you sure you want to terminate this agreement?')">
                             @csrf
