@@ -17,7 +17,6 @@ class ReservationController extends Controller
 {
     public function index()
     {
-        // Paginate pending reservations (separate paginator param to avoid conflicts with confirmed)
         $pendingReservations = Reservation::whereNull('agreement_id')
             ->whereNotNull('pending_payload')
             ->where('is_archived', false)
@@ -73,9 +72,8 @@ class ReservationController extends Controller
             'phone'                  => 'nullable|string|max:50',
             'address'                => 'nullable|string|max:1000',
             'emergency_contact'      => 'nullable|string|max:1000',
-            'emergency_contact_name'          => 'nullable|string|max:255',
-
-            'emergency_contact_email'         => 'nullable|email',
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_email'=> 'nullable|email',
             'check_in_date'          => 'required|date',
             'check_out_date'         => 'required|date|after_or_equal:check_in_date',
         ]);
@@ -128,20 +126,16 @@ class ReservationController extends Controller
 
         try {
             DB::transaction(function () use ($reservation, $payload) {
-                // 🧍 Create or get Renter
                 $renterData = $payload['renter'];
                 $renter = Renters::firstOrCreate(
                     ['email' => $renterData['email'] ?? null],
                     $renterData
                 );
 
-                // 📄 Create Agreement
                 $agreementData = $payload['agreement'];
                 $room = Room::find($agreementData['room_id']);
                 $isTransient = ($room->roomType->is_transient ?? false) || $reservation->reservation_type === 'transient';
 
-                // Determine end_date: prefer explicit agreement payload; for transient use reservation check_out_date fallback,
-                // otherwise default to +1 year for dorm agreements.
                 $endDate = !empty($agreementData['end_date'])
                     ? $agreementData['end_date']
                     : ($isTransient ? ($reservation->check_out_date ?? Carbon::now()->toDateString()) : Carbon::now()->addYear()->toDateString());
@@ -158,7 +152,6 @@ class ReservationController extends Controller
                     'is_active'      => true,
                 ]);
 
-                // 💰 Create Bills
                 if ($isTransient) {
                     $this->createTransientBill($agreement);
                 } else {
@@ -166,7 +159,6 @@ class ReservationController extends Controller
                     $this->recalcRoomAgreementRents($room);
                 }
 
-                // 🔗 Update Reservation
                 $reservation->update([
                     'agreement_id'    => $agreement->agreement_id,
                     'room_id'         => $agreement->room_id,
@@ -188,8 +180,12 @@ class ReservationController extends Controller
     private function createTransientBill(Agreement $agreement)
     {
         $periodStart = Carbon::parse($agreement->start_date)->startOfDay();
-        $periodEnd = Carbon::parse($agreement->end_date)->startOfDay();
-        $days = $periodStart->diffInDays($periodEnd) + 1;
+        $periodEnd   = Carbon::parse($agreement->end_date)->startOfDay();
+        
+        // FIX: correctly calculate number of days
+        $days = $periodStart->diffInDays($periodEnd);
+        if ($days < 1) $days = 1;
+
         $amount = round(($agreement->rate ?? 0) * $days, 2);
         $dueDate = $periodEnd->copy()->setTime(12, 0, 0);
 
