@@ -1,23 +1,20 @@
-
-
-
 <x-app-layout>
     <div class="container">
 
-        <!-- 🏷️ Header -->
+        <!-- 🔹 Header Row -->
         <div class="reservations-header-row">
             <div class="reservations-header">Reservations</div>
         </div>
 
-        <!-- 🔹 Toolbar -->
+        <!-- 🔹 Create Button -->
         <div class="toolbar-row">
             <a href="{{ route('reservation.create') }}" class="btn-new">+ Create Reservation</a>
-            <a href="{{ route('reservation.archived') }}" class="btn-new">View Archives</a>
+            <a href="{{ route('reservation.archived') }}" class="btn-archive">View Archives</a>
         </div>
 
-        <!-- 🔹 Pending Reservations -->
-        <div class="card table-card">
-            <h3 class="table-card-title">Pending Reservations</h3>
+        {{-- Pending Reservations --}}
+        <div class="card table-card" style="margin-bottom:18px;">
+            <h3 style="margin:0 0 12px 0; color:#5C3A21;">Pending Reservations</h3>
             @if(empty($pendingReservations) || $pendingReservations->isEmpty())
                 <p>No pending reservations.</p>
             @else
@@ -36,7 +33,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($pendingReservations as $reservation)
+                            @forelse($pendingReservations as $reservation)
                                 <tr>
                                     <td>{{ $reservation->created_at->format('M d, Y g:i A') }}</td>
                                     <td>{{ $reservation->room_id }}</td>
@@ -52,28 +49,35 @@
                                     <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
-                                            <form method="POST" action="{{ route('reservation.confirm', $reservation) }}">
-                                                @csrf
-                                                <button type="submit" class="btn-confirm" title="Confirm reservation">Confirm</button>
-                                            </form>
-                                            <form method="POST" action="{{ route('reservation.archive', $reservation) }}" onsubmit="return confirm('Archive this pending reservation?');">
-                                                @csrf
-                                                <button type="submit" class="btn-delete" title="Archive pending reservation">Archive</button>
-                                            </form>
-                                            <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" onsubmit="return confirm('Delete this pending reservation?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn-delete" title="Delete pending reservation">Delete</button>
-                                            </form>
+                                        {{-- Confirm button --}}
+                                        <form method="POST" action="{{ route('reservation.confirm', $reservation) }}" style="display:inline">
+                                            @csrf
+                                            <button type="submit" class="btn-confirm" title="Confirm reservation">Confirm</button>
+                                        </form>
+
+                                        {{-- Archive pending reservation (available to all authenticated users) --}}
+                                        <form method="POST" action="{{ route('reservation.archive', $reservation) }}" style="display:inline" onsubmit="return confirm('Archive this pending reservation? You can view archived items from the Archive page.');">
+                                            @csrf
+                                            <button type="submit" class="btn-delete" title="Archive pending reservation">Archive</button>
+                                        </form>
+
+                                        {{-- Delete pending reservation --}}
+                                        <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" style="display:inline" onsubmit="return confirm('Delete this pending reservation?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete" title="Delete pending reservation">Delete</button>
+                                        </form>
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr><td colspan="8" class="text-center">No pending reservations.</td></tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Pagination -->
+                <!-- Pagination for pending reservations -->
                 <div class="pagination">
                     @if ($pendingReservations->lastPage() > 1)
                         <a href="{{ $pendingReservations->url(1) }}" class="{{ $pendingReservations->currentPage()==1?'disabled':'' }}">« First</a>
@@ -88,14 +92,28 @@
             @endif
         </div>
 
-        <!-- 🔹 Confirmed Reservations -->
+        {{-- Confirmed Reservations --}}
         <div class="card table-card">
-            <h3 class="table-card-title">Confirmed Reservations</h3>
+            <h3 style="margin:0 0 12px 0; color:#5C3A21;">Confirmed Reservations</h3>
+            {{-- Search & Filter (confirmed only) --}}
+            <div class="confirmed-controls" style="display:flex; gap:8px; align-items:center; margin:10px 0 12px 0;">
+                <input type="text" id="confirmedSearchInput" placeholder="Search confirmed reservations..." style="padding:8px 10px; border-radius:8px; border:1px solid #E6A574; min-width:260px;" />
+                <select id="confirmedFilterSelect" style="padding:8px 10px; border-radius:8px; border:1px solid #E6A574; background:#FFF9F3;">
+                    <option value="all">All fields</option>
+                    <option value="room">Room ID</option>
+                    <option value="guest">Guest</option>
+                    <option value="renter">Renter</option>
+                    <option value="agreement">Agreement #</option>
+                    <option value="status">Status</option>
+                </select>
+                <button type="button" id="confirmedSearchBtn" class="btn-new" style="padding:8px 14px; font-size:14px;">Search</button>
+                <button type="button" id="confirmedRefreshBtn" class="btn-refresh" style="padding:8px 12px; font-size:14px;">Refresh Table</button>
+            </div>
             @if(empty($confirmedReservations) || $confirmedReservations->isEmpty())
                 <p>No confirmed reservations.</p>
             @else
                 <div class="table-wrapper">
-                    <table class="reservations-table">
+                    <table id="confirmedReservationsTable" class="reservations-table">
                         <thead>
                             <tr>
                                 <th>Room ID</th>
@@ -112,7 +130,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($confirmedReservations as $reservation)
+                            @forelse($confirmedReservations as $reservation)
                                 <tr>
                                     <td>{{ $reservation->room_id }}</td>
                                     <td>{{ $reservation->first_name }} {{ $reservation->last_name }}</td>
@@ -123,30 +141,35 @@
                                             <div>{{ optional($reservation->renter)->phone }}</div>
                                         @endif
                                     </td>
-                                    <td>{{ optional($reservation->agreement)->agreement_number ?? '-' }}</td>
-                                    <td>{{ optional($reservation->agreement)->start_date ? \Carbon\Carbon::parse($reservation->agreement->start_date)->format('M d, Y') : '-' }}</td>
-                                    <td>{{ optional($reservation->agreement)->end_date ? \Carbon\Carbon::parse($reservation->agreement->end_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ optional($reservation->agreement)->agreement_number ?? (optional($reservation->agreement)->agreement_id ? 'Agreement #' . optional($reservation->agreement)->agreement_id : '-') }}</td>
+                                    <td>{{ $reservation->agreement && $reservation->agreement->start_date ? \Carbon\Carbon::parse($reservation->agreement->start_date)->format('M d, Y') : '-' }}</td>
+                                    <td>{{ $reservation->agreement && $reservation->agreement->end_date ? \Carbon\Carbon::parse($reservation->agreement->end_date)->format('M d, Y') : '-' }}</td>
                                     <td>{{ $reservation->check_in_date ? \Carbon\Carbon::parse($reservation->check_in_date)->format('M d, Y') : '-' }}</td>
                                     <td>{{ $reservation->check_out_date ? \Carbon\Carbon::parse($reservation->check_out_date)->format('M d, Y') : '-' }}</td>
+
                                     <td><span class="status-badge {{ $reservation->status }}">{{ ucfirst($reservation->status) }}</span></td>
+
                                     <td class="actions-cell">
                                         <div class="actions-buttons">
-                                            @if(auth()->user() && (auth()->user()->is_admin ?? false))
-                                                <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" onsubmit="return confirm('Delete this confirmed reservation?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn-delete">Delete</button>
-                                                </form>
-                                            @endif
+                                        {{-- Only admins can delete confirmed reservations --}}
+                                        @if(auth()->user() && (auth()->user()->is_admin ?? false))
+                                            <form method="POST" action="{{ route('reservation.destroy', $reservation) }}" style="display:inline" onsubmit="return confirm('Delete this confirmed reservation? This will permanently remove the reservation and its link to the agreement.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-delete" title="Delete confirmed reservation">Delete</button>
+                                            </form>
+                                        @endif
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr><td colspan="11" class="text-center">No confirmed reservations.</td></tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Pagination -->
+                <!-- Pagination (match other index pages) -->
                 <div class="pagination">
                     @if ($confirmedReservations->lastPage() > 1)
                         <a href="{{ $confirmedReservations->url(1) }}" class="{{ $confirmedReservations->currentPage()==1?'disabled':'' }}">« First</a>
@@ -163,6 +186,8 @@
 
     </div>
 </x-app-layout>
+
+
 
 <style>
 /* 🌅 Container */
