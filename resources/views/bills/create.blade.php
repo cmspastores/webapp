@@ -29,7 +29,7 @@
                     <div>
                         <label for="agreement_id">Select Agreement</label>
                         <select name="agreement_id" id="agreement_id">
-                            <option value="">-- Select Agreement --</option>
+                            <option value="">-- Select Dorm Agreement --</option>
                             @foreach ($agreements as $agreement)
                                 <option value="{{ $agreement->agreement_id }}" {{ old('agreement_id') == $agreement->agreement_id ? 'selected' : '' }}>
                                     Agreement #{{ $agreement->agreement_id }} —

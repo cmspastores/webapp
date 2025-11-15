@@ -55,7 +55,7 @@
 
             <!-- Right: Action Buttons -->
             <div class="toolbar-actions">
-                <a href="{{ route('bills.create') }}" class="btn-new btn-fullwidth">Generate Monthly Bills</a>
+                <a href="{{ route('bills.create') }}" class="btn-new btn-fullwidth">Generate Monthly Dorm Bills</a>
                 <a href="{{ route('bills.reports') }}" class="btn-archive btn-fullwidth">View Reports</a>
             </div>
         </div>
