@@ -26,26 +26,23 @@
                 <div class="label"><i class="fas fa-phone"></i> Phone:</div>
                 <div class="value">{{ $renter->phone ?? '-' }}</div>
 
-                <div class="label"><i class="fas fa-user-friends"></i> Emergency Contact:</div>
-                <div class="value">{{ $renter->emergency_contact ?? '-' }}</div>
-
                 <div class="label"><i class="fas fa-home"></i> Address:</div>
                 <div class="value">{{ $renter->address ?? '-' }}</div>
             </div>
         </div>
 
-        <!-- Guardian Info -->
+        <!-- Emergency Contact Info -->
         <div class="section-card">
-            <h2 class="section-title"><i class="fas fa-user-shield"></i> Guardian Information</h2>
+            <h2 class="section-title"><i class="fas fa-user-shield"></i> Emergency Contact Information</h2>
             <div class="detail-grid">
-                <div class="label"><i class="fas fa-user"></i> Guardian Name:</div>
-                <div class="value">{{ $renter->guardian_name ?? '-' }}</div>
+                <div class="label"><i class="fas fa-user"></i> Emergency Contact Name:</div>
+                <div class="value">{{ $renter->emergency_contact_name ?? '-' }}</div>
 
-                <div class="label"><i class="fas fa-phone"></i> Guardian Phone:</div>
-                <div class="value">{{ $renter->guardian_phone ?? '-' }}</div>
+                <div class="label"><i class="fas fa-user-friends"></i> Emergency Contact:</div>
+                <div class="value">{{ $renter->emergency_contact ?? '-' }}</div>
 
-                <div class="label"><i class="fas fa-envelope"></i> Guardian Email:</div>
-                <div class="value">{{ $renter->guardian_email ?? '-' }}</div>
+                <div class="label"><i class="fas fa-envelope"></i> Emergency Contact Email:</div>
+                <div class="value">{{ $renter->emergency_contact_email ?? '-' }}</div>
             </div>
         </div>
 

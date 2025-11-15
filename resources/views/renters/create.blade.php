@@ -24,9 +24,8 @@
                 <input type="text" name="phone" placeholder="Contact Number" value="{{ old('phone') }}" required>
                 <input type="text" name="emergency_contact" placeholder="Emergency Contact" value="{{ old('emergency_contact') }}">
                 <input type="text" name="address" placeholder="Address" class="full-width" value="{{ old('address') }}">
-                <input type="text" name="guardian_name" placeholder="Guardian Name" value="{{ old('guardian_name') }}">
-                <input type="text" name="guardian_phone" placeholder="Guardian Phone" value="{{ old('guardian_phone') }}">
-                <input type="email" name="guardian_email" placeholder="Guardian Email" value="{{ old('guardian_email') }}">
+                <input type="text" name="emergency_contact" placeholder="Emergency Contact Name" value="{{ old('emergency_contact') }}">
+                <input type="email" name="emergency_contact_email" placeholder="Emergency Contact Email" value="{{ old('emergency_contact_email') }}">
             </div>
 
             {{-- Form Actions --}}

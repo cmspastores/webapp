@@ -28,11 +28,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->string('emergency_contact')->nullable();
-
-            // Guardian details
-            $table->string('guardian_name')->nullable();    // Added guardian_name
-            $table->string('guardian_phone')->nullable();   // Added guardian_phone
-            $table->string('guardian_email')->nullable();   // Added guardian_email
+            $table->string('emergency_contact_name')->nullable();    
+            $table->string('emergency_contact_email')->nullable();   
 
             // Room number (nullable for now to avoid errors)
             $table->string('room_number')->nullable();

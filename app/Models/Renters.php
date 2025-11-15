@@ -52,9 +52,8 @@ class Renters extends Model
         'phone',              // Contact number
         'address',            // Current address
         'emergency_contact',  // Emergency contact information
-        'guardian_name',     // Guardian’s name (if applicable)
-        'guardian_phone',    // Guardian’s phone number (if applicable)
-        'guardian_email'
+        'emergency_contact_name',  // Emergency contact information
+        'emergency_contact_email' // Emergency contact information
     ];
 
     /**

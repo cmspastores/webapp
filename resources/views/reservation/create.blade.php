@@ -105,23 +105,16 @@
                         @error('emergency_contact') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Guardian Info -->
                     <div>
-                        <label for="guardian_name">Guardian Name</label>
-                        <input id="guardian_name" name="guardian_name" value="{{ old('guardian_name') }}" />
-                        @error('guardian_name') <div class="error">{{ $message }}</div> @enderror
+                        <label for="emergency_contact_name">Emergency Contact Name</label>
+                        <input id="emergency_contact_name" name="emergency_contact_name" value="{{ old('emergency_contact_name') }}" />
+                        @error('emergency_contact_name') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
                     <div>
-                        <label for="guardian_phone">Guardian Phone</label>
-                        <input id="guardian_phone" name="guardian_phone" value="{{ old('guardian_phone') }}" />
-                        @error('guardian_phone') <div class="error">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div>
-                        <label for="guardian_email">Guardian Email</label>
-                        <input id="guardian_email" name="guardian_email" type="email" value="{{ old('guardian_email') }}" />
-                        @error('guardian_email') <div class="error">{{ $message }}</div> @enderror
+                        <label for="emergency_contact_email">Emergency Contact Email</label>
+                        <input id="emergency_contact_email" name="emergency_contact_email" type="email" value="{{ old('emergency_contact_email') }}" />
+                        @error('emergency_contact_email') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
                     <!-- Reservation Dates -->
