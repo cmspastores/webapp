@@ -67,14 +67,16 @@ MySQL - Stores structured data such as user accounts, dormitory info, and bookin
 
 ## SETUP
 
-• PHP – Ensure you have PHP 7.3 or later installed.
-• Composer – Download and install Composer from https://getcomposer.org.
-• Laravel Installer (optional) – Install globally with Composer 
-  Note: composer global require laravel/installer
-• Database – Install MySQL (or PostgreSQL, SQLite, etc.) for your app’s database.
-• Node.js and npm – Needed for front-end builds (e.g. Tailwind CSS, Vite).
-• Git – Useful for version control and cloning repositories.
-• Code Editor – VS Code or your preferred editor.
+* PHP - Ensure you have PHP 7.3 or later installed
+* Composer - Download and install Composer from https://getcomposer.org
+* Laravel Installer (optional) - Install globally with Composer (Note: composer global require laravel/installer)
+* Database - Install MySQL (or PostgreSQL, SQLite, etc.) for your app’s database
+* Node.js and npm - Needed for front-end builds (e.g. Tailwind CSS, Vite)
+* Git - Useful for version control and cloning repositories
+* Code Editor - VSCode or your preferred editor
+
+
+
 
 -----------------------------
 
@@ -153,15 +155,16 @@ MySQL - Stores structured data such as user accounts, dormitory info, and bookin
 NOTE: Generating Hashed Passwords in Laravel are stored securely using hashing (bcrypt by default). 
 To generate a hashed password, you can use Laravel's Tinker. Open your terminal in the project folder and run:
 
-php artisan tinker
-    >>> bcrypt('your_plaintext_password')
+php artisan tinker 
 
-- In your terminal, connect to MySQL using your credentials. For example, if your username is "root": mysql -u root -p
+->>> bcrypt('your_plaintext_password')
+
+- In your terminal, connect to MySQL using your credentials. 
+- For example, if your username is "root": mysql -u root -p
 
 - Then enter your password when prompted.
 
-- Once connected, run:
-  SHOW DATABASES;
+- Once connected, run: SHOW DATABASES;
 - Confirm that your database (as specified in DB_DATABASE) is listed.
 
 - To examine its tables, switch to your database: USE your_database_name;
