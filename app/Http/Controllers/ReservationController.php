@@ -17,6 +17,7 @@ class ReservationController extends Controller
 {
     public function index()
     {
+        // Paginate pending reservations (separate paginator param to avoid conflicts with confirmed)
         $pendingReservations = Reservation::whereNull('agreement_id')
             ->whereNotNull('pending_payload')
             ->where('is_archived', false)
@@ -72,21 +73,15 @@ class ReservationController extends Controller
             'phone'                  => 'nullable|string|max:50',
             'address'                => 'nullable|string|max:1000',
             'emergency_contact'      => 'nullable|string|max:1000',
-            'emergency_contact_name'  => 'nullable|string|max:255',
-            'emergency_contact_email' => 'nullable|email|max:255',
+            'guardian_name'          => 'nullable|string|max:255',
+            'guardian_phone'         => 'nullable|string|max:50',
+            'guardian_email'         => 'nullable|email',
             'check_in_date'          => 'required|date',
             'check_out_date'         => 'required|date|after_or_equal:check_in_date',
         ]);
 
         $room = Room::find($validated['agreement_room_id']);
-
-        // Automatically set transient for single-day stays
-        $checkIn = Carbon::parse($validated['check_in_date']);
-        $checkOut = Carbon::parse($validated['check_out_date']);
         $reservationType = ($room && ($room->roomType->is_transient ?? false)) ? 'transient' : 'dorm';
-        if ($checkIn->eq($checkOut)) {
-            $reservationType = 'transient';
-        }
 
         $pending = [
             'agreement' => [
@@ -97,7 +92,7 @@ class ReservationController extends Controller
             ],
             'renter' => $request->only([
                 'first_name','last_name','dob','email','phone',
-                'address','emergency_contact','emergency_contact_name','emergency_contact_email'
+                'address','emergency_contact','guardian_name','guardian_phone','guardian_email'
             ]),
         ];
 
@@ -133,23 +128,20 @@ class ReservationController extends Controller
 
         try {
             DB::transaction(function () use ($reservation, $payload) {
+                // 🧍 Create or get Renter
                 $renterData = $payload['renter'];
                 $renter = Renters::firstOrCreate(
                     ['email' => $renterData['email'] ?? null],
                     $renterData
                 );
 
+                // 📄 Create Agreement
                 $agreementData = $payload['agreement'];
                 $room = Room::find($agreementData['room_id']);
-
-                // Force transient for single-day stays
-                $start = Carbon::parse($reservation->check_in_date);
-                $end = Carbon::parse($reservation->check_out_date);
                 $isTransient = ($room->roomType->is_transient ?? false) || $reservation->reservation_type === 'transient';
-                if ($start->eq($end)) {
-                    $isTransient = true;
-                }
 
+                // Determine end_date: prefer explicit agreement payload; for transient use reservation check_out_date fallback,
+                // otherwise default to +1 year for dorm agreements.
                 $endDate = !empty($agreementData['end_date'])
                     ? $agreementData['end_date']
                     : ($isTransient ? ($reservation->check_out_date ?? Carbon::now()->toDateString()) : Carbon::now()->addYear()->toDateString());
@@ -166,6 +158,7 @@ class ReservationController extends Controller
                     'is_active'      => true,
                 ]);
 
+                // 💰 Create Bills
                 if ($isTransient) {
                     $this->createTransientBill($agreement);
                 } else {
@@ -173,6 +166,7 @@ class ReservationController extends Controller
                     $this->recalcRoomAgreementRents($room);
                 }
 
+                // 🔗 Update Reservation
                 $reservation->update([
                     'agreement_id'    => $agreement->agreement_id,
                     'room_id'         => $agreement->room_id,
@@ -180,6 +174,7 @@ class ReservationController extends Controller
                     'pending_payload' => null,
                 ]);
             });
+
         } catch (QueryException $e) {
             if ($e->getCode() === '23000') {
                 return back()->with('error', 'Database integrity error while confirming reservation.');

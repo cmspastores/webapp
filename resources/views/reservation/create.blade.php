@@ -11,6 +11,8 @@
                         <label>Agreement (new)</label>
                         <div id="agreement-new" style="margin-top:10px; border-top:1px dashed #E6A574; padding-top:10px;">
                             <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">
+
+                                <!-- Room select -->
                                 <div>
                                     <label for="agreement_room_id">Agreement - Room to reserve</label>
                                     <select id="agreement_room_id" name="agreement_room_id">
@@ -26,24 +28,28 @@
                                     @error('agreement_room_id') <div class="error">{{ $message }}</div> @enderror
                                 </div>
 
+                                <!-- Agreement Date -->
                                 <div>
                                     <label for="agreement_date">Agreement Date</label>
-                                    <input id="agreement_date" name="agreement_date" type="date" value="{{ old('agreement_date', now()->toDateString()) }}" />
+                                    <input id="agreement_date" name="agreement_date" type="date" value="{{ old('agreement_date') }}" />
                                     @error('agreement_date') <div class="error">{{ $message }}</div> @enderror
                                 </div>
 
+                                <!-- Start Date -->
                                 <div>
                                     <label for="start_date">Start Date</label>
-                                    <input id="start_date" name="start_date" type="date" value="{{ old('start_date', now()->toDateString()) }}" />
+                                    <input id="start_date" name="start_date" type="date" value="{{ old('start_date') }}" />
                                     @error('start_date') <div class="error">{{ $message }}</div> @enderror
                                 </div>
 
+                                <!-- End Date -->
                                 <div>
                                     <label for="end_date">End Date</label>
-                                    <input id="end_date" name="end_date" type="date" value="{{ old('end_date', now()->addYear()->toDateString()) }}" />
+                                    <input id="end_date" name="end_date" type="date" value="{{ old('end_date') }}" />
                                     @error('end_date') <div class="error">{{ $message }}</div> @enderror
                                 </div>
 
+                                <!-- Auto one-year checkbox -->
                                 <div class="full-width">
                                     <div id="auto_one_year_container" style="margin-top:8px; display:none;">
                                         <label>
@@ -53,6 +59,20 @@
                                         <div class="muted">Only available for dorm/monthly room types. For transient rooms, set an explicit end date.</div>
                                     </div>
                                 </div>
+
+                                <!-- Check-in / Check-out Dates -->
+                                <div>
+                                    <label for="check_in_date">Check-in Date</label>
+                                    <input id="check_in_date" name="check_in_date" type="date" value="{{ old('check_in_date') }}" />
+                                    @error('check_in_date') <div class="error">{{ $message }}</div> @enderror
+                                </div>
+
+                                <div>
+                                    <label for="check_out_date">Check-out Date</label>
+                                    <input id="check_out_date" name="check_out_date" type="date" value="{{ old('check_out_date') }}" />
+                                    @error('check_out_date') <div class="error">{{ $message }}</div> @enderror
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -85,7 +105,7 @@
                         @error('email') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Renter Phone + Address side by side -->
+                    <!-- Renter Phone + Address -->
                     <div>
                         <label for="phone">Renter Phone</label>
                         <input id="phone" name="phone" value="{{ old('phone') }}" />
@@ -117,19 +137,6 @@
                         @error('emergency_contact_email') <div class="error">{{ $message }}</div> @enderror
                     </div>
 
-                    <!-- Reservation Dates -->
-                    <div>
-                        <label for="check_in_date">Check-in Date</label>
-                        <input id="check_in_date" name="check_in_date" type="date" value="{{ old('check_in_date') }}" />
-                        @error('check_in_date') <div class="error">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div>
-                        <label for="check_out_date">Check-out Date</label>
-                        <input id="check_out_date" name="check_out_date" type="date" value="{{ old('check_out_date') }}" />
-                        @error('check_out_date') <div class="error">{{ $message }}</div> @enderror
-                    </div>
-
                 </div>
 
                 <!-- Form Buttons -->
@@ -141,6 +148,94 @@
         </div>
     </div>
 </x-app-layout>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const startEl = document.getElementById('start_date');
+    const endEl = document.getElementById('end_date');
+    const checkInEl = document.getElementById('check_in_date');
+    const checkOutEl = document.getElementById('check_out_date');
+    const roomSelect = document.getElementById('agreement_room_id');
+    const autoContainer = document.getElementById('auto_one_year_container');
+    const autoCheckbox = document.getElementById('auto_one_year_checkbox');
+
+    function computeEndDate() {
+        if(!autoCheckbox.checked) return;
+
+        // End Date = Start Date + 1 year
+        if(startEl.value){
+            const d = new Date(startEl.value);
+            d.setFullYear(d.getFullYear()+1);
+            const yyyy = d.getFullYear();
+            const mm = (d.getMonth()+1).toString().padStart(2,'0');
+            const dd = d.getDate().toString().padStart(2,'0');
+            endEl.value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // Check-out Date = Check-in Date + 1 year
+        if(checkInEl.value){
+            const d2 = new Date(checkInEl.value);
+            d2.setFullYear(d2.getFullYear()+1);
+            const yyyy2 = d2.getFullYear();
+            const mm2 = (d2.getMonth()+1).toString().padStart(2,'0');
+            const dd2 = d2.getDate().toString().padStart(2,'0');
+            checkOutEl.value = `${yyyy2}-${mm2}-${dd2}`;
+        }
+    }
+
+    function updateAutoVisibility() {
+        const opt = roomSelect.options[roomSelect.selectedIndex];
+        const isTransient = opt ? opt.dataset.isTransient === '1' : false;
+
+        if(!roomSelect.value || isTransient){
+            autoContainer.style.display = 'none';
+            autoCheckbox.checked = false;
+        } else {
+            autoContainer.style.display = 'flex';
+        }
+    }
+
+    function clearDatesIfNoRoom() {
+        if(!roomSelect.value){
+            startEl.value = '';
+            endEl.value = '';
+            checkInEl.value = '';
+            checkOutEl.value = '';
+        }
+    }
+
+    // Initialize
+    autoContainer.style.display = 'none';
+    clearDatesIfNoRoom();
+
+    if(roomSelect){
+        roomSelect.addEventListener('change', function(){
+            updateAutoVisibility();
+            clearDatesIfNoRoom();
+            computeEndDate();
+        });
+        updateAutoVisibility();
+    }
+
+    if(startEl){
+        startEl.addEventListener('input', computeEndDate);
+    }
+
+    if(checkInEl){
+        checkInEl.addEventListener('input', computeEndDate);
+    }
+
+    if(autoCheckbox){
+        autoCheckbox.addEventListener('change', computeEndDate);
+    }
+});
+</script>
+
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
