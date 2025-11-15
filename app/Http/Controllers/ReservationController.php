@@ -73,9 +73,9 @@ class ReservationController extends Controller
             'phone'                  => 'nullable|string|max:50',
             'address'                => 'nullable|string|max:1000',
             'emergency_contact'      => 'nullable|string|max:1000',
-            'guardian_name'          => 'nullable|string|max:255',
-            'guardian_phone'         => 'nullable|string|max:50',
-            'guardian_email'         => 'nullable|email',
+            'emergency_contact_name'          => 'nullable|string|max:255',
+
+            'emergency_contact_email'         => 'nullable|email',
             'check_in_date'          => 'required|date',
             'check_out_date'         => 'required|date|after_or_equal:check_in_date',
         ]);
@@ -92,7 +92,7 @@ class ReservationController extends Controller
             ],
             'renter' => $request->only([
                 'first_name','last_name','dob','email','phone',
-                'address','emergency_contact','guardian_name','guardian_phone','guardian_email'
+                'address','emergency_contact','emergency_contact_name','emergency_contact_email'
             ]),
         ];
 
