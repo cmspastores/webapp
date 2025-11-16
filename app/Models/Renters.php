@@ -53,7 +53,9 @@ class Renters extends Model
         'address',            // Current address
         'emergency_contact',  // Emergency contact information
         'emergency_contact_name',  // Emergency contact information
-        'emergency_contact_email' // Emergency contact information
+        'emergency_contact_email', // Emergency contact information
+        'check_in_date',
+        'check_out_date'
     ];
 
     /**
