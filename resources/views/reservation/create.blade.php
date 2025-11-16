@@ -20,7 +20,7 @@
                                         @isset($rooms)
                                             @foreach($rooms as $room)
                                                 <option value="{{ $room->id }}" data-is-transient="{{ $room->roomType->is_transient ?? false ? '1' : '0' }}" {{ old('agreement_room_id') == $room->id ? 'selected' : '' }}>
-                                                    {{ $room->room_number ?? ('Room ' . $room->id) }}
+                                                    {{ $room->room_number ?? ('Room ' . $room->id) }} {{ optional($room->roomType)->name ? ' - ' . optional($room->roomType)->name : '' }}
                                                 </option>
                                             @endforeach
                                         @endisset
