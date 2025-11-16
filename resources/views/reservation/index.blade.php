@@ -177,56 +177,81 @@
 </x-app-layout>
 
 <style>
+
 /* 🌅 Container */
 .container { max-width:1100px; margin:0 auto; padding:20px; font-family:'Figtree',sans-serif; display:flex; flex-direction:column; gap:12px; background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; border:2px solid #E6A574; box-shadow:0 10px 25px rgba(0,0,0,0.15); }
+
 /* 🏷️ Header */
 .reservations-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
 .reservations-header { font-size:24px; font-weight:900; color:#5C3A21; text-align:left; flex:1; padding-bottom:8px; border-bottom:2px solid #D97A4E; margin-bottom:8px; }
+
 /* 🔹 Toolbar Buttons */
 .toolbar-row { display:flex; justify-content:flex-start; margin-bottom:16px; gap:8px; }
 .btn-new { background:linear-gradient(90deg,#E6A574,#F4C38C); color:#5C3A21; font-weight:700; border-radius:10px; padding:10px 18px; font-size:15px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-decoration:none; transition:0.2s; border:none; cursor:pointer; }
 .btn-new:hover { background:#D97A4E; color:#fff; }
+
 /* 📋 Table Card */
 .card.table-card { background:linear-gradient(135deg,#FFFDFB,#FFF8F0); border-radius:16px; padding:16px; box-shadow:0 8px 20px rgba(0,0,0,0.12); }
-.table-card-title { margin:0 0 12px 0; color:#5C3A21; font-size:18px; font-weight:700; }
+
+/* ⭐ UPDATED ONLY THIS — Title styling for Pending + Confirmed */
+.card.table-card h3 { 
+    font-size:20px; 
+    font-weight:900; 
+    color:#5C3A21; 
+    margin-bottom:14px; 
+    letter-spacing:0.5px; 
+    text-transform:uppercase;
+}
+
 /* 📑 Table Wrapper */
 .table-wrapper { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#E6A574 #FFF8F0; }
 .table-wrapper::-webkit-scrollbar { height:8px; width:8px; }
 .table-wrapper::-webkit-scrollbar-thumb { background-color: #E6A574; border-radius:8px; border:2px solid #FFF8F0; }
 .table-wrapper::-webkit-scrollbar-track { background:#FFF8F0; }
+
 .reservations-table { width:100%; min-width:1100px; border-collapse:separate; border-spacing:0; text-align:center; border-radius:12px; overflow:hidden; }
 .reservations-table thead { background:linear-gradient(to right,#F4C38C,#E6A574); color:#5C3A21; }
 .reservations-table th, .reservations-table td { padding:12px 16px; font-size:14px; border-bottom:1px solid #D97A4E; border-right:1px solid #D97A4E; }
 .reservations-table tbody tr:hover { background:#FFF4E1; transition:background 0.2s; }
+
 /* 🟩 Status Badges */
 .status-badge { padding:4px 10px; border-radius:20px; font-weight:600; font-size:13px; display:inline-block; }
 .status-badge.verified { background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0; }
 .status-badge.unverified { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; }
 .status-badge.cancelled { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
 .status-badge.checkedout { background:#E5E7EB; color:#374151; border:1px solid #D1D5DB; }
+
 /* 🔘 Buttons */
 .btn-confirm { background:#4CAF50; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:0.2s; }
 .btn-confirm:hover { background:#45A049; }
 .btn-delete { background:#E53E3E; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:14px; font-weight:600; cursor:pointer; transition:0.2s; }
 .btn-delete:hover { background:#C53030; }
+
 /* 🔄 Actions */
 .actions-buttons { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
 .actions-cell { white-space:nowrap; }
+
 /* 📄 Pagination */
 .pagination{margin-top:16px;display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap;}
 .pagination a,.pagination span{padding:6px 10px;border-radius:6px;border:1px solid #D97A4E;text-decoration:none;color:#5C3A21;font-weight:600;}
 .pagination a:hover{background:#F4C38C;color:#5C3A21;}
 .pagination .active{background:#E6A574;color:#fff;border:none;}
-/* === 📱 Fixed Responsive for Reservations (Scrollbars always visible when needed) === */
-/* 🖥️ Large screens (>1200px) */
+
+/* === 📱 Fixed Responsive for Reservations === */
 @media(min-width:1201px) { body { display:flex; } .sidebar { width:250px; flex-shrink:0; } .container { flex:1; max-width:1100px; padding:20px; } .table-wrapper { overflow-x:auto; -webkit-overflow-scrolling: touch; } .reservations-table { min-width:1200px; width:auto; } }
-/* 💻 Medium screens (769px - 1200px) */
+
 @media(min-width:769px) and (max-width:1200px) { body { display:flex; } .sidebar { width:220px; flex-shrink:0; } .container { flex:1; width:100%; padding:16px; } .table-wrapper { overflow-x:auto; -webkit-overflow-scrolling: touch; } .reservations-table { min-width:900px; width:auto; } .toolbar-row, .actions-buttons { flex-wrap: wrap; gap:6px; } }
-/* 📱 Small screens / tablets (481px - 768px) */
+
 @media(min-width:481px) and (max-width:768px) { body { display:flex; flex-direction:row; } .sidebar { width:180px; flex-shrink:0; } .container { flex:1; width:100%; padding:12px; } .table-wrapper { overflow-x:auto; -webkit-overflow-scrolling: touch; } .reservations-table { min-width:700px; font-size:13px; width:auto; } .reservations-table thead th:nth-child(4), .reservations-table thead th:nth-child(5), .reservations-table thead th:nth-child(6), .reservations-table tbody td:nth-child(4), .reservations-table tbody td:nth-child(5), .reservations-table tbody td:nth-child(6) { display: none; } }
-/* 📞 Extra small / mobile (≤480px) */
+
 @media(max-width:480px) { body { display:flex; flex-direction:row; } .sidebar { width:150px; flex-shrink:0; } .container { flex:1; width:100%; padding:8px; } .reservations-header { font-size:16px; } .btn-new, .btn-confirm, .btn-delete { font-size:12px; padding:6px 6px; } .table-wrapper { overflow-x:auto; -webkit-overflow-scrolling: touch; width:100%; } .reservations-table { min-width:600px; width:auto; font-size:12px; } .reservations-table thead th:nth-child(3), .reservations-table thead th:nth-child(7), .reservations-table tbody td:nth-child(3), .reservations-table tbody td:nth-child(7) { display: none; } }
+
 </style>
+
+
+
+
+
 
 <script>
 (function(){

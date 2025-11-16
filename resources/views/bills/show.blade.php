@@ -4,40 +4,58 @@
     <!-- Main Card -->
     <div id="bill-details" class="card">
 
-        <!-- Bill Info Section -->
-        <div class="section-card">
-            <h2 class="section-title"><i class="fas fa-file-invoice"></i> Bill Information</h2>
-            <div class="detail-grid">
-                <div class="label"><i class="fas fa-file-contract"></i> Agreement:</div>
-                <div class="value">{{ $bill->agreement->agreement_id ?? '-' }}</div>
+        <!-- 🔹 Bill Overview + Monthly Fees -->
+        <div class="flex-grid">
+            <!-- Bill Info -->
+            <div class="section-card flex-item">
+                <h2 class="section-title"><i class="fas fa-file-invoice"></i> Bill Overview</h2>
+                <div class="detail-grid">
+                    <div class="label"><i class="fas fa-file-contract"></i> Agreement:</div>
+                    <div class="value">{{ $bill->agreement->agreement_id ?? '-' }}</div>
 
-                <div class="label"><i class="fas fa-user"></i> Renter:</div>
-                <div class="value">{{ $bill->renter->full_name ?? '-' }}</div>
+                    <div class="label"><i class="fas fa-user"></i> Renter:</div>
+                    <div class="value">{{ $bill->renter->full_name ?? '-' }}</div>
 
-                <div class="label"><i class="fas fa-door-closed"></i> Room:</div>
-                <div class="value">{{ $bill->room->room_number ?? '-' }}</div>
+                    <div class="label"><i class="fas fa-door-closed"></i> Room:</div>
+                    <div class="value">{{ $bill->room->room_number ?? '-' }}</div>
 
-                <div class="label"><i class="fas fa-calendar-alt"></i> Billing Period:</div>
-                <div class="value">{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</div>
+                    <div class="label"><i class="fas fa-calendar-alt"></i> Billing Period:</div>
+                    <div class="value">{{ $bill->period_start->format('M d, Y') }} — {{ $bill->period_end->format('M d, Y') }}</div>
 
-                <div class="label"><i class="fas fa-calendar-day"></i> Due Date:</div>
-                <div class="value">{{ $bill->due_date ? \Carbon\Carbon::parse($bill->due_date)->format('M d, Y') : '-' }}</div>
+                    <div class="label"><i class="fas fa-calendar-day"></i> Due Date:</div>
+                    <div class="value">{{ $bill->due_date ? \Carbon\Carbon::parse($bill->due_date)->format('M d, Y') : '-' }}</div>
 
-                <div class="label"><i class="fas fa-money-bill-wave"></i> Amount Due:</div>
-                <div class="value">₱{{ number_format($bill->amount_due, 2) }}</div>
+                    <div class="label"><i class="fas fa-circle-check"></i> Status:</div>
+                    <div class="value">{{ ucfirst($bill->status) }}</div>
+                </div>
+            </div>
 
-                <div class="label"><i class="fas fa-wallet"></i> Balance:</div>
-                <div class="value">₱{{ number_format($bill->balance, 2) }}</div>
+            <!-- Monthly Fees -->
+            <div class="section-card flex-item">
+                <h2 class="section-title"><i class="fas fa-list-check"></i> Monthly Fees</h2>
+                <div class="detail-grid">
+                    <div class="label"><i class="fas fa-house"></i> Base Rent:</div>
+                    <div class="value">₱{{ number_format($bill->base_amount ?? 0,2) }}</div>
 
-                <div class="label"><i class="fas fa-info-circle"></i> Status:</div>
-                <div class="value">{{ ucfirst($bill->status) }}</div>
+                    @if($bill->charges->isNotEmpty())
+                        @foreach($bill->charges as $c)
+                            <div class="label"><i class="fas fa-circle-notch"></i> {{ $c->name }}:</div>
+                            <div class="value">₱{{ number_format($c->amount,2) }}</div>
+                        @endforeach
+                    @else
+                        <div class="label">Additional Charges:</div>
+                        <div class="value">₱0.00</div>
+                    @endif
+
+                    <div class="label" style="font-weight:900;">Total for this Month:</div>
+                    <div class="value" style="font-weight:900;">₱{{ number_format($bill->amount_due,2) }}</div>
+                </div>
             </div>
         </div>
 
-        <!-- Charges list -->
+        <!-- 🔹 Charges Table -->
         <div class="card charges-card">
             <h3 class="charges-title"><i class="fas fa-list-check"></i> Charges</h3>
-
             <table class="charges-table">
                 <thead>
                     <tr>
@@ -45,7 +63,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($bill->charges as $c)
+                    @forelse($bill->charges as $c)
                         <tr>
                             <td>{{ $c->name }}</td>
                             <td>{{ $c->description ?? '—' }}</td>
@@ -58,10 +76,9 @@
                                 </form>
                             </td>
                         </tr>
-                    @endforeach
-                    @if($bill->charges->isEmpty())
+                    @empty
                         <tr><td colspan="4">No charges yet.</td></tr>
-                    @endif
+                    @endforelse
                 </tbody>
             </table>
 
@@ -77,47 +94,99 @@
             </form>
         </div>
 
-        <!-- Totals display with icons and centered -->
-        <div class="totals-display">
-            <div><i class="fas fa-house"></i> Base rent: ₱{{ number_format($bill->base_amount ?? 0,2) }}</div>
-            <div><i class="fas fa-hand-holding-dollar"></i> Charges: ₱{{ number_format($bill->total_charges ?? 0,2) }}</div>
-            <div><i class="fas fa-money-bill-wave"></i> Total due: ₱{{ number_format($bill->amount_due, 2) }}</div>
+        <!-- 🔹 Payments & Balance Section -->
+        <div class="section-card payments-section">
+            <h2 class="section-title"><i class="fas fa-wallet"></i> Payments & Balance</h2>
 
-            <!-- Payments -->
-            <a href="{{ route('payments.create', ['bill_id' => $bill->id]) }}" class="btn-pay">Make Payment</a>
+            <div class="detail-grid" style="grid-template-columns:1fr; row-gap:6px;">
+                <!-- Total for this Month -->     
+            <div class="label" style="grid-column:1; display:block; text-align:left;">
+            Total fee for this month: ₱{{ number_format($bill->amount_due,2) }}
+           </div>
+           <div style="display:none;"></div>
+
+
+
+                <!-- List of Payments -->
+                <div class="label">Payments:</div>
+                <div class="value" style="display:flex;flex-direction:column;gap:2px;">
+                    @forelse($bill->payments as $index => $payment)
+                        <span>({{ $index + 1 }}) {{ \Carbon\Carbon::parse($payment->payment_date)->format('M d, Y') }}: ₱{{ number_format($payment->amount,2) }}</span>
+                    @empty
+                        <span>No payments yet</span>
+                    @endforelse
+                </div>
+
+                <!-- Total Amount Paid -->
+                <div class="label">_________________</div>
+                <div class="value">Total Amount Paid: ₱{{ number_format($totalPaid ?? 0,2) }}</div>
+
+                <!-- Remaining Balance -->
+                <div class="label">_________________</div>
+                <div class="value">Remaining Balance: ₱{{ number_format($bill->balance,2) }}</div>
+            </div>
+
+            <div class="button-group">
+                <a href="{{ route('payments.create', ['bill_id' => $bill->id]) }}" class="btn-pay">Make Payment</a>
+                @if(auth()->user() && auth()->user()->is_admin && strtolower($bill->status) === 'paid')
+                    <form action="{{ route('bills.refund', $bill) }}" method="POST" onsubmit="return confirm('Mark this bill as refunded?')">
+                        @csrf
+                        <button class="btn-cancel" type="submit">Refund</button>
+                    </form>
+                @endif
+            </div>
         </div>
-
-        <!-- Refund Button for Admins if bill is paid -->
-        @if(auth()->user() && auth()->user()->is_admin && strtolower($bill->status) === 'paid')
-            <form action="{{ route('bills.refund', $bill) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Mark this bill as refunded?')">
-                @csrf
-                <button class="btn-cancel" type="submit">Refund</button>
-            </form>
-        @endif
 
         <!-- Back Button -->
         <div class="action-container">
             <a href="{{ route('bills.index') }}" class="btn-back">Back</a>
         </div>
+
     </div>
 </div>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
+/* Flex wrapper for Bill Overview + Monthly Fees */
+.flex-grid{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+.flex-item{flex:1 1 48%;}
+
 /* Container */
 .container{max-width:900px;margin:0 auto;padding:16px;}
 
-/* Main card */
-.card{background:linear-gradient(135deg,#FFFDFB,#FFF8F0);border-radius:16px;border:2px solid #E6A574;padding:20px;box-shadow:0 6px 16px rgba(0,0,0,0.12);}
+/* Card base */
+.card, .section-card, .charges-card {
+    background: linear-gradient(135deg,#FFFDFB,#FFF8F0);
+    border-radius:16px;
+    border:2px solid #E6A574;
+    padding:20px;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+}
 
-/* Section card */
-.section-card{background:rgba(255,255,255,0.95);border-radius:12px;border:1px solid #E6A574;padding:16px;margin-bottom:16px;}
+/* Section cards specifics */
+.section-card{margin-bottom:16px;}
+
+/* Payments spacing */
+.section-card.payments-section{margin-top:20px;}
+
+/* Section Titles */
 .section-title{font-family:'Figtree',sans-serif;font-weight:800;font-size:17px;color:#D97A4E;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+/* Detail Grid */
 .detail-grid{display:grid;grid-template-columns:max-content 1fr;row-gap:6px;column-gap:12px;align-items:center;}
 .label{font-weight:900;color:#5C3A21;display:flex;align-items:center;gap:6px;text-align:right;}
 .value{font-weight:500;color:#3A2C1F;word-break:break-word;}
 
-/* Charges card */
-.charges-card{border-radius:16px;border:2px solid #E6A574;padding:16px;background:linear-gradient(135deg,#FFFDFB,#FFF8F0);margin-top:12px;box-shadow:0 6px 16px rgba(0,0,0,0.1);}
+/* Payments button group: left aligned, same height buttons */
+.button-group{display:flex;gap:10px;align-items:center;justify-content:flex-start;margin-top:12px;}
+.button-group .btn-pay, .button-group .btn-cancel{height:38px;line-height:1.2; padding:0 20px; display:flex;align-items:center;justify-content:center; font-weight:700; font-family:'Figtree',sans-serif; border-radius:6px; border:none; cursor:pointer; transition:0.2s;}
+.button-group .btn-pay{background:#D97A4E;color:#FFF5EC; text-decoration:none;}
+.button-group .btn-pay:hover{background:#F4C38C; color:#5C3A21;}
+.button-group .btn-cancel{background:#D97A4E;color:#FFF5EC;}
+.button-group .btn-cancel:hover{background:#F4C38C; color:#5C3A21;}
+
+/* Charges table */
 .charges-title{font-family:'Figtree',sans-serif;font-weight:800;font-size:16px;color:#D97A4E;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
 .charges-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:12px;overflow:hidden;margin-bottom:12px;}
 .charges-table th,.charges-table td{padding:10px 12px;border-bottom:1px solid #E6A574;border-right:1px solid #E6A574;text-align:left;}
@@ -136,32 +205,28 @@
 .btn-red{background:#b54b4b;color:#fff;padding:5px 12px;border-radius:6px;font-weight:600;border:none;cursor:pointer;transition:0.2s;}
 .btn-red:hover{background:#d46a6a;}
 
-/* Totals display */
-.totals-display{margin-top:12px;font-weight:700;color:#3A2C1F;text-align:center;display:flex;flex-direction:column;gap:6px;}
-.totals-display i{margin-right:6px;}
-
-/* Make Payment button */
-.btn-pay{background:#D97A4E;color:#FFF5EC;padding:8px 20px;border-radius:8px;font-weight:700;text-decoration:none;display:inline-block;margin:8px auto 0 auto;transition:0.2s;}
-.btn-pay:hover{background:#F4C38C;color:#5C3A21;}
-
-/* Refund / Cancel button */
-.btn-cancel { background: #D97A4E; color: #FFF5EC; padding: 6px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; transition: 0.2s; }
-.btn-cancel:hover { background: #F4C38C; color: #5C3A21; }
-
-
 /* Action container */
 .action-container{display:flex;justify-content:flex-end;margin-top:16px;}
 .btn-back{font-family:'Figtree',sans-serif;font-weight:600;border:none;cursor:pointer;transition:0.2s;background:#D97A4E;color:#FFF5EC;padding:6px 14px;border-radius:6px;text-decoration:none;display:flex;align-items:center;gap:6px;}
 .btn-back:hover{background:#F4C38C;color:#5C3A21;}
 
 /* Responsive */
-@media(max-width:1024px){.detail-grid{grid-template-columns:1fr;}.label{text-align:left;}}
-@media(max-width:768px){.section-title{font-size:15px;}.label,.value{font-size:14px;}.add-charge-form input{flex:1 1 100%;}}
+@media(max-width:1024px){.detail-grid{grid-template-columns:1fr;}.label{text-align:left;} }
+@media(max-width:768px){.section-title{font-size:15px;}.label,.value{font-size:14px;}.add-charge-form input{flex:1 1 100%;} }
+@media(max-width:480px){.container{padding:12px;}.section-title{font-size:14px;}.label,.value{font-size:13px;}.add-charge-form input{flex:1 1 100%; min-width:0; font-size:12px;}.btn-back,.btn-confirm,.btn-red,.btn-pay,.btn-cancel{width:100%;font-size:12px;padding:6px 10px;} }
 
 /* Sidebar collapse fix */
 body.sidebar-collapsed .container { max-width:calc(100% - 80px); transition:max-width 0.3s ease; }
 body.sidebar-expanded .container { max-width:calc(100% - 240px); transition:max-width 0.3s ease; }
 body.sidebar-collapsed .table-wrapper, body.sidebar-expanded .table-wrapper { overflow-x:auto; scrollbar-width:thin; }
+
+
+
+
+
+
+
+
 
 
 /* === 📱 Responsive Enhancements for Bills Show Blade === */
