@@ -4,9 +4,9 @@
     <!-- Main Card -->
     <div id="bill-details" class="card">
 
-        <!-- 🔹 Bill Overview + Monthly Fees Container -->
+        <!-- 🔹 Bill Overview + Monthly Fees -->
         <div class="flex-grid">
-            <!-- Bill Info Section -->
+            <!-- Bill Info -->
             <div class="section-card flex-item">
                 <h2 class="section-title"><i class="fas fa-file-invoice"></i> Bill Overview</h2>
                 <div class="detail-grid">
@@ -24,10 +24,13 @@
 
                     <div class="label"><i class="fas fa-calendar-day"></i> Due Date:</div>
                     <div class="value">{{ $bill->due_date ? \Carbon\Carbon::parse($bill->due_date)->format('M d, Y') : '-' }}</div>
+
+                    <div class="label"><i class="fas fa-circle-check"></i> Status:</div>
+                    <div class="value">{{ ucfirst($bill->status) }}</div>
                 </div>
             </div>
 
-            <!-- Monthly Fees Section -->
+            <!-- Monthly Fees -->
             <div class="section-card flex-item">
                 <h2 class="section-title"><i class="fas fa-list-check"></i> Monthly Fees</h2>
                 <div class="detail-grid">
@@ -50,10 +53,9 @@
             </div>
         </div>
 
-        <!-- 🔹 Charges Table & Add Form -->
+        <!-- 🔹 Charges Table -->
         <div class="card charges-card">
             <h3 class="charges-title"><i class="fas fa-list-check"></i> Charges</h3>
-
             <table class="charges-table">
                 <thead>
                     <tr>
@@ -61,7 +63,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($bill->charges as $c)
+                    @forelse($bill->charges as $c)
                         <tr>
                             <td>{{ $c->name }}</td>
                             <td>{{ $c->description ?? '—' }}</td>
@@ -74,10 +76,9 @@
                                 </form>
                             </td>
                         </tr>
-                    @endforeach
-                    @if($bill->charges->isEmpty())
+                    @empty
                         <tr><td colspan="4">No charges yet.</td></tr>
-                    @endif
+                    @endforelse
                 </tbody>
             </table>
 
@@ -96,16 +97,37 @@
         <!-- 🔹 Payments & Balance Section -->
         <div class="section-card payments-section">
             <h2 class="section-title"><i class="fas fa-wallet"></i> Payments & Balance</h2>
-            
-            <div class="detail-grid">
-                <div class="label"><i class="fas fa-money-bill-wave"></i> Remaining Balance:</div>
-                <div class="value">₱{{ number_format($bill->balance,2) }}</div>
+
+            <div class="detail-grid" style="grid-template-columns:1fr; row-gap:6px;">
+                <!-- Total for this Month -->     
+            <div class="label" style="grid-column:1; display:block; text-align:left;">
+            Total fee for this month: ₱{{ number_format($bill->amount_due,2) }}
+           </div>
+           <div style="display:none;"></div>
+
+
+
+                <!-- List of Payments -->
+                <div class="label">Payments:</div>
+                <div class="value" style="display:flex;flex-direction:column;gap:2px;">
+                    @forelse($bill->payments as $index => $payment)
+                        <span>({{ $index + 1 }}) {{ \Carbon\Carbon::parse($payment->payment_date)->format('M d, Y') }}: ₱{{ number_format($payment->amount,2) }}</span>
+                    @empty
+                        <span>No payments yet</span>
+                    @endforelse
+                </div>
+
+                <!-- Total Amount Paid -->
+                <div class="label">_________________</div>
+                <div class="value">Total Amount Paid: ₱{{ number_format($totalPaid ?? 0,2) }}</div>
+
+                <!-- Remaining Balance -->
+                <div class="label">_________________</div>
+                <div class="value">Remaining Balance: ₱{{ number_format($bill->balance,2) }}</div>
             </div>
 
-            <!-- Button Group (moved outside grid, far left) -->
             <div class="button-group">
                 <a href="{{ route('payments.create', ['bill_id' => $bill->id]) }}" class="btn-pay">Make Payment</a>
-
                 @if(auth()->user() && auth()->user()->is_admin && strtolower($bill->status) === 'paid')
                     <form action="{{ route('bills.refund', $bill) }}" method="POST" onsubmit="return confirm('Mark this bill as refunded?')">
                         @csrf
@@ -119,6 +141,7 @@
         <div class="action-container">
             <a href="{{ route('bills.index') }}" class="btn-back">Back</a>
         </div>
+
     </div>
 </div>
 
@@ -196,6 +219,14 @@
 body.sidebar-collapsed .container { max-width:calc(100% - 80px); transition:max-width 0.3s ease; }
 body.sidebar-expanded .container { max-width:calc(100% - 240px); transition:max-width 0.3s ease; }
 body.sidebar-collapsed .table-wrapper, body.sidebar-expanded .table-wrapper { overflow-x:auto; scrollbar-width:thin; }
+
+
+
+
+
+
+
+
 
 
 /* === 📱 Responsive Enhancements for Bills Show Blade === */

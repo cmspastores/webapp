@@ -51,6 +51,16 @@ class Bill extends Model
     {
         return $this->hasMany(\App\Models\BillCharge::class, 'bill_id', 'id');
     }
+
+    /**
+     * Payments applied to this bill (through PaymentItem pivot)
+     */
+    public function payments()
+    {
+        return $this->belongsToMany(\App\Models\Payment::class, \App\Models\PaymentItem::class, 'bill_id', 'payment_id')
+                    ->withPivot('amount')
+                    ->withTimestamps();
+    }
     
     /**
      * Sum of charges (decimal)
