@@ -289,64 +289,45 @@ class BillController extends Controller
     }
 
     public function reports(Request $request)
-    {
-        $periodType = $request->input('period_type', 'monthly');
-        $month = $request->input('month');
-        $year = $request->input('year', now()->year);
+{
+    $periodType = $request->input('period_type', 'monthly');
+    $month = $request->input('month');
+    $year = $request->input('year', now()->year);
 
-        $query = Bill::with('renter', 'room', 'agreement')->where('status', 'unpaid');
-
-        if ($periodType === 'monthly' && $month && $year) {
-            $query->whereYear('period_start', $year)
-                  ->whereMonth('period_start', $month);
-        } elseif ($periodType === 'annual' && $year) {
-            $query->whereYear('period_start', $year);
-        }
-
-        $bills = $query->get();
-
-        $totalOutstanding = $bills->sum('balance');
-
-        $transientOutstanding = $bills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')
-                                      ->sum('balance');
-
-        $monthlyOutstanding = $bills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')
-                                    ->sum('balance');
-
-        $totalOutstandingCombined = $transientOutstanding + $monthlyOutstanding;
-
-        $paidQuery = Bill::with('renter', 'room', 'agreement')->where('status', 'paid');
-
-        if ($periodType === 'monthly' && $month && $year) {
-            $paidQuery->whereYear('period_start', $year)
-                     ->whereMonth('period_start', $month);
-        } elseif ($periodType === 'annual' && $year) {
-            $paidQuery->whereYear('period_start', $year);
-        }
-
-        $paidBills = $paidQuery->get();
-
-        $totalPaid = $paidBills->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
-
-        $transientPaid = $paidBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')
-                    ->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
-
-        $monthlyPaid = $paidBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')
-                    ->sum(fn($b) => (float) $b->amount_due - (float) $b->balance);
-
-        return view('bills.reports', compact(
-            'bills',
-            'totalOutstanding',
-            'transientOutstanding',
-            'monthlyOutstanding',
-            'totalOutstandingCombined',
-            'totalPaid',
-            'transientPaid',
-            'monthlyPaid',
-            'paidBills',
-            'periodType',
-            'month',
-            'year'
-        ));
+    // **All bills** for Unpaid tab – include both paid and unpaid
+    $allQuery = Bill::with('renter', 'room', 'agreement');
+    if ($periodType === 'monthly' && $month && $year) {
+        $allQuery->whereYear('period_start', $year)->whereMonth('period_start', $month);
+    } elseif ($periodType === 'annual' && $year) {
+        $allQuery->whereYear('period_start', $year);
     }
+    $allBills = $allQuery->get();
+
+    // **Paid bills** only for Paid tab
+    $paidQuery = Bill::with('renter', 'room', 'agreement')->where('status', 'paid');
+    if ($periodType === 'monthly' && $month && $year) {
+        $paidQuery->whereYear('period_start', $year)->whereMonth('period_start', $month);
+    } elseif ($periodType === 'annual' && $year) {
+        $paidQuery->whereYear('period_start', $year);
+    }
+    $paidBills = $paidQuery->get();
+
+    // Totals for Unpaid tab (all bills)
+    // Use `amount_due` to reflect total obligations even if paid
+    $totalOutstanding = $allBills->sum('amount_due');
+    $transientOutstanding = $allBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')->sum('amount_due');
+    $monthlyOutstanding = $allBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')->sum('amount_due');
+
+    // Totals for Paid tab
+    $totalPaid = $paidBills->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
+    $transientPaid = $paidBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
+    $monthlyPaid = $paidBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
+
+    return view('bills.reports', compact(
+        'allBills', 'totalOutstanding', 'transientOutstanding', 'monthlyOutstanding',
+        'paidBills', 'totalPaid', 'transientPaid', 'monthlyPaid',
+        'periodType', 'month', 'year'
+    ));
+}
+
 }

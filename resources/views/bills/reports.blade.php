@@ -133,171 +133,173 @@ tbody tr:hover { background:#FFF4E1; transition: background .2s; }
 
 
     @php
-        $transientOutstanding = $transientOutstanding ?? 0;
-        $monthlyOutstanding = $monthlyOutstanding ?? 0;
-        $totalOutstandingCombined = $totalOutstandingCombined ?? 0;
-        $periodType = $periodType ?? 'monthly';
-        $year = $year ?? now()->year;
-        $month = $month ?? now()->month;
-    @endphp
+    $transientOutstanding = $transientOutstanding ?? 0;
+    $monthlyOutstanding = $monthlyOutstanding ?? 0;
+    $totalOutstandingCombined = $totalOutstandingCombined ?? ($transientOutstanding + $monthlyOutstanding);
+    $periodType = $periodType ?? 'monthly';
+    $year = $year ?? now()->year;
+    $month = $month ?? now()->month;
 
-    <div class="reports-container">
-        <div class="card">
-            <a href="{{ route('bills.index') }}" class="btn-back"></i> Back</a>
-            <a href="{{ route('bills.reports') }}" class="btn-refresh"></i> Refresh</a>
+    $totalOutstanding = $totalOutstanding ?? $totalOutstandingCombined;
+    $totalPaid = $totalPaid ?? 0;
+    $transientPaid = $transientPaid ?? 0;
+    $monthlyPaid = $monthlyPaid ?? 0;
+@endphp
 
-            <h3><i class="fa-solid fa-chart-line"></i> Bills Report</h3>
+<div class="reports-container">
+    <div class="card">
+        <a href="{{ route('bills.index') }}" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <a href="{{ route('bills.reports') }}" class="btn-refresh"><i class="fa-solid fa-arrows-rotate"></i> Refresh</a>
 
-            <form method="GET" action="{{ route('bills.reports') }}" class="filter-form">
-                <label>View:</label>
-                <div class="custom-dropdown" id="viewDropdown">
-                    <div class="dropdown-selected">{{ ucfirst($periodType) }}</div>
-                    <div class="dropdown-options">
-                        <div class="dropdown-option {{ $periodType === 'monthly' ? 'active' : '' }}" data-value="monthly">Monthly</div>
-                        <div class="dropdown-option {{ $periodType === 'annual' ? 'active' : '' }}" data-value="annual">Annual</div>
-                    </div>
-                    <input type="hidden" name="period_type" value="{{ $periodType }}">
+        <h3><i class="fa-solid fa-chart-line"></i> Bills Report</h3>
+
+        <form method="GET" action="{{ route('bills.reports') }}" class="filter-form">
+            <label>View:</label>
+            <div class="custom-dropdown" id="viewDropdown">
+                <div class="dropdown-selected">{{ ucfirst($periodType) }}</div>
+                <div class="dropdown-options">
+                    <div class="dropdown-option {{ $periodType === 'monthly' ? 'active' : '' }}" data-value="monthly">Monthly</div>
+                    <div class="dropdown-option {{ $periodType === 'annual' ? 'active' : '' }}" data-value="annual">Annual</div>
                 </div>
+                <input type="hidden" name="period_type" value="{{ $periodType }}">
+            </div>
 
-                <label>Month:</label>
-                <div class="custom-dropdown" id="monthDropdown">
-                    <div class="dropdown-selected">{{ date('F', mktime(0, 0, 0, $month, 1)) }}</div>
-                    <div class="dropdown-options">
-                        @for($m = 1; $m <= 12; $m++)
-                            <div class="dropdown-option {{ $month == $m ? 'active' : '' }}" data-value="{{ $m }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</div>
-                        @endfor
-                    </div>
-                    <input type="hidden" name="month" value="{{ $month }}">
+            <label>Month:</label>
+            <div class="custom-dropdown" id="monthDropdown">
+                <div class="dropdown-selected">{{ date('F', mktime(0,0,0,$month,1)) }}</div>
+                <div class="dropdown-options">
+                    @for($m=1;$m<=12;$m++)
+                        <div class="dropdown-option {{ $month==$m?'active':'' }}" data-value="{{ $m }}">{{ date('F', mktime(0,0,0,$m,1)) }}</div>
+                    @endfor
                 </div>
+                <input type="hidden" name="month" value="{{ $month }}">
+            </div>
 
-                <label>Year:</label>
-                <div class="custom-dropdown" id="yearDropdown">
-                    <div class="dropdown-selected">{{ $year }}</div>
-                    <div class="dropdown-options">
-                        @for($y = 2035; $y >= 2015; $y--)
-                            <div class="dropdown-option {{ $year == $y ? 'active' : '' }}" data-value="{{ $y }}">{{ $y }}</div>
-                        @endfor
-                    </div>
-                    <input type="hidden" name="year" value="{{ $year }}">
+            <label>Year:</label>
+            <div class="custom-dropdown" id="yearDropdown">
+                <div class="dropdown-selected">{{ $year }}</div>
+                <div class="dropdown-options">
+                    @for($y=2035;$y>=2015;$y--)
+                        <div class="dropdown-option {{ $year==$y?'active':'' }}" data-value="{{ $y }}">{{ $y }}</div>
+                    @endfor
                 </div>
+                <input type="hidden" name="year" value="{{ $year }}">
+            </div>
 
-                <button type="submit"></i> Apply</button>
-                </form>
+            <button type="submit"><i class="fa-solid fa-filter"></i> Apply</button>
+        </form>
 
-                {{-- Tabs: Unpaid / Paid --}}
-                <div style="display:flex; gap:12px; justify-content:center; margin-bottom:16px;">
-                    <button type="button" class="tab-btn active" data-tab="unpaid">Unpaid</button>
-                    <button type="button" class="tab-btn" data-tab="paid">Paid</button>
-                </div>
+        {{-- Tabs --}}
+<div style="display:flex; gap:12px; justify-content:center; margin-bottom:16px;">
+    <button type="button" class="tab-btn active" data-tab="unpaid">Receivables</button>
+    <button type="button" class="tab-btn" data-tab="paid">Earnings</button>
+</div>
 
+{{-- Receivables tab (was Unpaid) --}}
+<div class="tab-content" id="tab-unpaid">
+    <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Receivables: ₱{{ number_format($totalOutstanding,2) }}</p>
+
+    <h3 style="margin-top:12px;"><i class="fa-solid fa-list-check"></i> Receivables Summary </h3>
+    <div class="table-wrapper">
+        <table>
+            <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
+            <tbody>
                 @php
-                    // totals fallback
-                    $totalOutstanding = $totalOutstanding ?? $totalOutstandingCombined ?? ($transientOutstanding + $monthlyOutstanding);
-                    $totalPaid = $totalPaid ?? 0;
-                    $transientPaid = $transientPaid ?? 0;
-                    $monthlyPaid = $monthlyPaid ?? 0;
+                    $transientPercent = $totalOutstanding > 0 ? round(($transientOutstanding / $totalOutstanding) * 100,2) : 0;
+                    $monthlyPercent = $totalOutstanding > 0 ? round(($monthlyOutstanding / $totalOutstanding) * 100,2) : 0;
                 @endphp
-
-                <div class="tab-content" id="tab-unpaid">
-                    <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Unpaid: ₱{{ number_format($totalOutstanding,2) }}</p>
-
-                    <h3 style="margin-top:12px;"><i class="fa-solid fa-list-check"></i> Outstanding Balance Breakdown</h3>
-
-                    <div class="table-wrapper">
-                        <table>
-                            <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
-                            <tbody>
-                                @php
-                                    $transientPercent = $totalOutstanding > 0 ? round(($transientOutstanding / $totalOutstanding) * 100, 2) : 0;
-                                    $monthlyPercent = $totalOutstanding > 0 ? round(($monthlyOutstanding / $totalOutstanding) * 100, 2) : 0;
-                                @endphp
-                                <tr><td>Transient/Daily</td><td>₱{{ number_format($transientOutstanding,2) }}</td><td>{{ $transientPercent }}%</td></tr>
-                                <tr><td>Dorm/Monthly</td><td>₱{{ number_format($monthlyOutstanding,2) }}</td><td>{{ $monthlyPercent }}%</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="chart-container" id="salesChartContainer" data-labels="Transient/Daily,Dorm/Monthly" data-values="{{ $transientOutstanding }},{{ $monthlyOutstanding }}">
-                        <canvas id="salesChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-paid" style="display:none;">
-                    <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Paid: ₱{{ number_format($totalPaid,2) }}</p>
-
-                    <h3 style="margin-top:12px;"><i class="fa-solid fa-list-check"></i> Paid Balance Breakdown</h3>
-
-                    <div class="table-wrapper">
-                        <table>
-                            <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
-                            <tbody>
-                                @php
-                                    $transientPercentPaid = $totalPaid > 0 ? round(($transientPaid / $totalPaid) * 100, 2) : 0;
-                                    $monthlyPercentPaid = $totalPaid > 0 ? round(($monthlyPaid / $totalPaid) * 100, 2) : 0;
-                                @endphp
-                                <tr><td>Transient/Daily</td><td>₱{{ number_format($transientPaid,2) }}</td><td>{{ $transientPercentPaid }}%</td></tr>
-                                <tr><td>Dorm/Monthly</td><td>₱{{ number_format($monthlyPaid,2) }}</td><td>{{ $monthlyPercentPaid }}%</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="chart-container" id="paidChartContainer" data-labels="Transient/Daily,Dorm/Monthly" data-values="{{ $transientPaid }},{{ $monthlyPaid }}">
-                        <canvas id="paidChart"></canvas>
-                    </div>
-                </div>
-        </div>
+                <tr><td>Transient/Daily</td><td>₱{{ number_format($transientOutstanding,2) }}</td><td>{{ $transientPercent }}%</td></tr>
+                <tr><td>Dorm/Monthly</td><td>₱{{ number_format($monthlyOutstanding,2) }}</td><td>{{ $monthlyPercent }}%</td></tr>
+            </tbody>
+        </table>
     </div>
 
-    <script>
-        // Small helper to initialize a pie chart from a container holding data-values and data-labels
-        function initChart(canvasId, containerId){
-            const container=document.getElementById(containerId);
-            if(!container) return;
-            const labels=(container.dataset.labels||'').split(',');
-            const values=(container.dataset.values||'').split(',').map(Number);
-            if(labels.length && values.length){
-                new Chart(document.getElementById(canvasId),{
-                    type:'pie',
-                    data:{ labels, datasets:[{ data:values, backgroundColor:['#E6A574','#F4C38C'], borderColor:'#FFF8F0', borderWidth:2 }] },
-                    options:{ responsive:true, plugins:{ legend:{ display:true, position:'bottom', labels:{ color:'#5C3A21', font:{ family:'Figtree', size:13 }, boxWidth:20, padding:20 }, align:'center', maxWidth:200 }, tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ₱${ctx.formattedValue}` } } } }
-                });
-            }
+    <div class="chart-container" id="salesChartContainer" data-labels="Transient/Daily,Dorm/Monthly" data-values="{{ $transientOutstanding }},{{ $monthlyOutstanding }}">
+        <canvas id="salesChart"></canvas>
+    </div>
+</div>
+
+{{-- Earnings tab (was Paid) --}}
+<div class="tab-content" id="tab-paid" style="display:none;">
+    <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Earnings: ₱{{ number_format($totalPaid,2) }}</p>
+
+    <h3 style="margin-top:12px;"><i class="fa-solid fa-list-check"></i> Earnings Breakdown</h3>
+    <div class="table-wrapper">
+        <table>
+            <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
+            <tbody>
+                @php
+                    $transientPercentPaid = $totalPaid > 0 ? round(($transientPaid / $totalPaid) * 100,2) : 0;
+                    $monthlyPercentPaid = $totalPaid > 0 ? round(($monthlyPaid / $totalPaid) * 100,2) : 0;
+                @endphp
+                <tr><td>Transient/Daily</td><td>₱{{ number_format($transientPaid,2) }}</td><td>{{ $transientPercentPaid }}%</td></tr>
+                <tr><td>Dorm/Monthly</td><td>₱{{ number_format($monthlyPaid,2) }}</td><td>{{ $monthlyPercentPaid }}%</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="chart-container" id="paidChartContainer" data-labels="Transient/Daily,Dorm/Monthly" data-values="{{ $transientPaid }},{{ $monthlyPaid }}">
+        <canvas id="paidChart"></canvas>
+    </div>
+</div>
+
+    </div>
+</div>
+
+<script>
+    // Chart init
+    function initChart(canvasId, containerId){
+        const container=document.getElementById(containerId);
+        if(!container) return;
+        const labels=(container.dataset.labels||'').split(',');
+        const values=(container.dataset.values||'').split(',').map(Number);
+        if(labels.length && values.length){
+            new Chart(document.getElementById(canvasId),{
+                type:'pie',
+                data:{ labels, datasets:[{ data:values, backgroundColor:['#E6A574','#F4C38C'], borderColor:'#FFF8F0', borderWidth:2 }] },
+                options:{ responsive:true, plugins:{ legend:{ display:true, position:'bottom', labels:{ color:'#5C3A21', font:{ family:'Figtree', size:13 }, boxWidth:20, padding:20 }, align:'center', maxWidth:200 }, tooltip:{ callbacks:{ label:ctx=>`${ctx.label}: ₱${ctx.formattedValue}` } } } }
+            });
         }
+    }
 
-        // Initialize both charts
-        initChart('salesChart','salesChartContainer');
-        initChart('paidChart','paidChartContainer');
+    initChart('salesChart','salesChartContainer');
+    initChart('paidChart','paidChartContainer');
 
-        // Tabs
-        const tabButtons=document.querySelectorAll('.tab-btn');
-        const tabContents=document.querySelectorAll('.tab-content');
-        tabButtons.forEach(btn=>{
-            btn.addEventListener('click',()=>{
-                tabButtons.forEach(b=>b.classList.remove('active'));
-                btn.classList.add('active');
-                const tab=btn.dataset.tab;
-                tabContents.forEach(c=>c.style.display='none');
-                const el=document.getElementById('tab-'+tab);
-                if(el) el.style.display='block';
+    // Tabs
+    const tabButtons=document.querySelectorAll('.tab-btn');
+    const tabContents=document.querySelectorAll('.tab-content');
+    tabButtons.forEach(btn=>{
+        btn.addEventListener('click',()=>{
+            tabButtons.forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            const tab=btn.dataset.tab;
+            tabContents.forEach(c=>c.style.display='none');
+            document.getElementById('tab-'+tab).style.display='block';
+        });
+    });
+
+    // Custom dropdowns
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown=>{
+        const selected=dropdown.querySelector('.dropdown-selected');
+        const options=dropdown.querySelector('.dropdown-options');
+        const input=dropdown.querySelector('input[type="hidden"]');
+        selected.addEventListener('click',()=>options.style.display=(options.style.display==='block'?'none':'block'));
+        options.querySelectorAll('.dropdown-option').forEach(option=>{
+            option.addEventListener('click',()=>{
+                selected.textContent=option.textContent;
+                input.value=option.dataset.value;
+                options.querySelectorAll('.dropdown-option').forEach(o=>o.classList.remove('active'));
+                option.classList.add('active');
+                options.style.display='none';
             });
         });
+        document.addEventListener('click',e=>{if(!dropdown.contains(e.target)) options.style.display='none';});
+    });
+</script>
 
-        // Custom Dropdown Logic
-        document.querySelectorAll('.custom-dropdown').forEach(dropdown=>{
-            const selected=dropdown.querySelector('.dropdown-selected');
-            const options=dropdown.querySelector('.dropdown-options');
-            const input=dropdown.querySelector('input[type="hidden"]');
-            selected.addEventListener('click',()=>options.style.display=options.style.display==='block'?'none':'block');
-            options.querySelectorAll('.dropdown-option').forEach(option=>{
-                option.addEventListener('click',()=>{
-                    selected.textContent=option.textContent;
-                    input.value=option.dataset.value;
-                    options.querySelectorAll('.dropdown-option').forEach(o=>o.classList.remove('active'));
-                    option.classList.add('active');
-                    options.style.display='none';
-                });
-            });
-            document.addEventListener('click',e=>{if(!dropdown.contains(e.target))options.style.display='none';});
-        });
-    </script>
+
+
+
+
+
 </x-app-layout>
