@@ -22,6 +22,8 @@ return new class extends Migration
 
             // Personal details
             $table->date('dob')->nullable(); 
+            $table->date('check_in_date')->nullable();
+            $table->date('check_out_date')->nullable();
 
             // Contact details
             $table->string('email')->unique()->nullable();

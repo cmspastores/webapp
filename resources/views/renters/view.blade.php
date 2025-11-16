@@ -28,6 +28,12 @@
 
                 <div class="label"><i class="fas fa-home"></i> Address:</div>
                 <div class="value">{{ $renter->address ?? '-' }}</div>
+
+                <div class="label"><i class="fas fa-calendar-alt"></i> Check-in Date:</div>
+                <div class="value">{{ $renter->check_in_date ?? '-' }}</div>
+
+                <div class="label"><i class="fas fa-calendar-alt"></i> Check-out Date:</div>
+                <div class="value">{{ $renter->check_out_date ?? '-' }}</div>
             </div>
         </div>
 

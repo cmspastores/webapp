@@ -10,10 +10,12 @@
                 <input type="date" name="dob" value="{{ $renter->dob }}">
                 <input type="email" name="email" value="{{ $renter->email }}" placeholder="Email">
                 <input type="text" name="phone" value="{{ $renter->phone }}" placeholder="Contact Number">
-                <input type="text" name="emergency_contact" value="{{ $renter->emergency_contact }}" placeholder="Emergency Contact Number">
+                <input type="text" name="emergency_contact" value="{{ $renter->emergency_contact }}" placeholder="Emergency Contact ">
                 <input type="text" name="address" value="{{ $renter->address }}" placeholder="Address" class="full-width">
-                <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" value="{{ old('emergency_contact_name') }}">
-                <input type="email" name="emergency_contact_email" placeholder="Emergency Contact Email" value="{{ old('emergency_contact_email') }}">
+                <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" value="{{ $renter->emergency_contact_name }}">
+                <input type="email" name="emergency_contact_email" placeholder="Emergency Contact Email" value="{{ $renter->emergency_contact_email }}">
+                <input type="date" name="check_in_date" value="{{ $renter->check_in_date }}">
+                <input type="date" name="check_out_date" value="{{ $renter->check_out_date }}">
             </div>
 
             <div class="form-buttons">
