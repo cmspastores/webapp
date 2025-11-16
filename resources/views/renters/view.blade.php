@@ -38,7 +38,7 @@
                 <div class="label"><i class="fas fa-user"></i> Emergency Contact Name:</div>
                 <div class="value">{{ $renter->emergency_contact_name ?? '-' }}</div>
 
-                <div class="label"><i class="fas fa-user-friends"></i> Emergency Contact:</div>
+                <div class="label"><i class="fas fa-user-friends"></i> Emergency Contact Number:</div>
                 <div class="value">{{ $renter->emergency_contact ?? '-' }}</div>
 
                 <div class="label"><i class="fas fa-envelope"></i> Emergency Contact Email:</div>
