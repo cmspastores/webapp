@@ -155,8 +155,18 @@ class ReservationController extends Controller
                 if ($isTransient) {
                     $this->createTransientBill($agreement);
                 } else {
-                    $this->createDormBill($agreement);
+                    // 🔹 Dorm: recalc rents and regenerate bills for all active agreements
                     $this->recalcRoomAgreementRents($room);
+                    $activeAgreements = Agreement::where('room_id', $room->id)
+                        ->where('is_active', true)
+                        ->get();
+
+                    foreach ($activeAgreements as $agr) {
+                        // Remove any existing dorm bills
+                        Bill::where('agreement_id', $agr->agreement_id)->delete();
+                        $agr->refresh(); // get updated monthly_rent
+                        $this->createDormBill($agr);
+                    }
                 }
 
                 $reservation->update([
@@ -181,8 +191,7 @@ class ReservationController extends Controller
     {
         $periodStart = Carbon::parse($agreement->start_date)->startOfDay();
         $periodEnd   = Carbon::parse($agreement->end_date)->startOfDay();
-        
-        // FIX: correctly calculate number of days
+
         $days = $periodStart->diffInDays($periodEnd);
         if ($days < 1) $days = 1;
 
