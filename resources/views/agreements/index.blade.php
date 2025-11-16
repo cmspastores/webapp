@@ -32,9 +32,7 @@
 
             <div class="toolbar-actions">
                 <button type="button" id="btn-refresh" class="btn-refresh">Refresh List</button>
-                @if(auth()->user() && auth()->user()->is_admin)
-                    <a href="{{ route('agreements.create') }}" class="btn-new">+ New Agreement</a>
-                @endif
+                <a href="{{ route('agreements.create') }}" class="btn-new">+ New Agreement</a>
                 <a href="{{ route('agreements.archived') }}" class="btn-archive">View Archive</a>
             </div>
         </div>

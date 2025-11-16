@@ -70,7 +70,9 @@
                                 <a href="{{ route('rooms.edit',$room) }}" class="btn-edit">Edit</a>
                                 <form action="{{ route('rooms.destroy',$room) }}" method="POST" class="inline-form" onsubmit="return confirm('Delete this room?');">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn-delete">Delete</button>
+                                    @if(auth()->user() && auth()->user()->is_admin)
+                                        <button type="submit" class="btn-delete">Delete</button>
+                                    @endif
                                 </form>
                             </td>
                         </tr>
