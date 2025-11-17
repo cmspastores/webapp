@@ -18,7 +18,7 @@ header { display:none!important; }
 .card:hover { transform:translateY(-3px); box-shadow:0 12px 25px rgba(0,0,0,0.18); }
 
 /* 💰 Headings & Totals */
-h3 { color:#5C3A21; font-weight:900; display:flex; align-items:center; gap:8px; justify-content:center; margin:0; font-size:18px; }
+h3 { color:#5C3A21; font-weight:900; display:flex; align-items:center; gap:8px; justify-content:center; margin:0;  font-size:22px !important; }
 .total-unpaid { font-size:14px; font-weight:700; color:#5C3A21; margin:0; display:flex; align-items:center; justify-content:center; gap:6px; background:#FFF3E5; padding:6px 12px; border-radius:6px; border:2px solid #E6A574; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
 
 .table-wrapper { width:100%; overflow-x:auto; /* let vertical flow to page so the main scrollbar handles it */ margin-top:12px; }
@@ -148,7 +148,7 @@ tbody tr:hover { background:#FFF4E1; transition: background .2s; }
 
 <div class="reports-container">
     <div class="card">
-        <a href="{{ route('bills.index') }}" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <a href="{{ route('bills.index') }}" class="btn-back"></i> Back</a>
         <a href="{{ route('bills.reports') }}" class="btn-refresh"><i class="fa-solid fa-arrows-rotate"></i> Refresh</a>
 
         <h3><i class="fa-solid fa-chart-line"></i> Bills Report</h3>

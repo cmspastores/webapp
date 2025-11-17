@@ -288,46 +288,71 @@ class BillController extends Controller
         return redirect()->route('bills.index')->with('success', 'Bill deleted.');
     }
 
-    public function reports(Request $request)
+
+
+
+
+
+
+
+
+   public function reports(Request $request)
 {
     $periodType = $request->input('period_type', 'monthly');
     $month = $request->input('month');
     $year = $request->input('year', now()->year);
 
-    // **All bills** for Unpaid tab – include both paid and unpaid
-    $allQuery = Bill::with('renter', 'room', 'agreement');
+    // Base query for bills in the selected period
+    $billsQuery = Bill::with('renter', 'room', 'agreement');
+
     if ($periodType === 'monthly' && $month && $year) {
-        $allQuery->whereYear('period_start', $year)->whereMonth('period_start', $month);
+        $billsQuery->whereYear('period_start', $year)
+                   ->whereMonth('period_start', $month);
     } elseif ($periodType === 'annual' && $year) {
-        $allQuery->whereYear('period_start', $year);
+        $billsQuery->whereYear('period_start', $year);
     }
-    $allBills = $allQuery->get();
 
-    // **Paid bills** only for Paid tab
-    $paidQuery = Bill::with('renter', 'room', 'agreement')->where('status', 'paid');
-    if ($periodType === 'monthly' && $month && $year) {
-        $paidQuery->whereYear('period_start', $year)->whereMonth('period_start', $month);
-    } elseif ($periodType === 'annual' && $year) {
-        $paidQuery->whereYear('period_start', $year);
-    }
-    $paidBills = $paidQuery->get();
+    // ❗ Exclude refunded bills entirely
+    $allBills = $billsQuery->where('status', '!=', 'refunded')->get();
 
-    // Totals for Unpaid tab (all bills)
-    // Use `amount_due` to reflect total obligations even if paid
-    $totalOutstanding = $allBills->sum('amount_due');
-    $transientOutstanding = $allBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')->sum('amount_due');
-    $monthlyOutstanding = $allBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')->sum('amount_due');
+    // Receivables (unpaid portion)
+    $transientOutstanding = $allBills
+        ->filter(fn($b) => optional($b->room->roomType)->is_transient 
+                        || ($b->agreement->rate_unit ?? '') === 'daily')
+        ->sum('balance');
 
-    // Totals for Paid tab
-    $totalPaid = $paidBills->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
-    $transientPaid = $paidBills->filter(fn($b) => optional($b->room->roomType)->is_transient || ($b->agreement->rate_unit ?? '') === 'daily')->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
-    $monthlyPaid = $paidBills->filter(fn($b) => !optional($b->room->roomType)->is_transient && ($b->agreement->rate_unit ?? '') !== 'daily')->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
+    $monthlyOutstanding = $allBills
+        ->filter(fn($b) => !optional($b->room->roomType)->is_transient 
+                        && ($b->agreement->rate_unit ?? '') !== 'daily')
+        ->sum('balance');
+
+    $totalOutstanding = $transientOutstanding + $monthlyOutstanding;
+
+    // Earnings (paid portion)
+    $transientPaid = $allBills
+        ->filter(fn($b) => optional($b->room->roomType)->is_transient 
+                        || ($b->agreement->rate_unit ?? '') === 'daily')
+        ->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
+
+    $monthlyPaid = $allBills
+        ->filter(fn($b) => !optional($b->room->roomType)->is_transient 
+                        && ($b->agreement->rate_unit ?? '') !== 'daily')
+        ->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
+
+    $totalPaid = $transientPaid + $monthlyPaid;
 
     return view('bills.reports', compact(
         'allBills', 'totalOutstanding', 'transientOutstanding', 'monthlyOutstanding',
-        'paidBills', 'totalPaid', 'transientPaid', 'monthlyPaid',
+        'totalPaid', 'transientPaid', 'monthlyPaid',
         'periodType', 'month', 'year'
     ));
 }
+
+
+
+
+
+
+
 
 }
