@@ -16,18 +16,50 @@
         <form action="{{ route('renters.store') }}" method="POST">
             @csrf
             <div class="form-grid">
-                <input type="text" name="first_name" placeholder="First Name" value="{{ old('first_name') }}" required>
-                <input type="text" name="last_name" placeholder="Last Name" value="{{ old('last_name') }}" required>
-                <input type="date" name="dob" value="{{ old('dob') }}">
-                <input type="email" name="email" placeholder="Email" value="{{ old('email') }}">
-
-                <input type="text" name="phone" placeholder="Contact Number" value="{{ old('phone') }}" required>
-                <input type="text" name="emergency_contact" placeholder="Emergency Contact Number" value="{{ old('emergency_contact') }}">
-                <input type="text" name="address" placeholder="Address" class="full-width" value="{{ old('address') }}">
-                <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" value="{{ old('emergency_contact_name') }}">
-                <input type="email" name="emergency_contact_email" placeholder="Emergency Contact Email" value="{{ old('emergency_contact_email') }}">
-                <input type="date" name="check_in_date" placeholder="Check-in Date" value="{{ old('check_in_date') }}">
-                <input type="date" name="check_out_date" placeholder="Check-out Date" value="{{ old('check_out_date') }}">
+                <label>
+                    <span class="label-text">First Name</span>
+                    <input type="text" name="first_name" placeholder="First Name" value="{{ old('first_name') }}" required>
+                </label>
+                <label>
+                    <span class="label-text">Last Name</span>
+                    <input type="text" name="last_name" placeholder="Last Name" value="{{ old('last_name') }}" required>
+                </label>
+                <label>
+                    <span class="label-text">Date of Birth</span>
+                    <input type="date" name="dob" placeholder="Date of Birth" value="{{ old('dob') }}">
+                </label>
+                <label>
+                    <span class="label-text">Email</span>
+                    <input type="email" name="email" placeholder="Email" value="{{ old('email') }}">
+                </label>
+                <label>
+                    <span class="label-text">Contact Number</span>
+                    <input type="text" name="phone" placeholder="Contact Number" value="{{ old('phone') }}" required>
+                </label>
+                <label>
+                    <span class="label-text">Emergency Contact Number</span>
+                    <input type="text" name="emergency_contact" placeholder="Emergency Contact Number" value="{{ old('emergency_contact') }}">
+                </label>
+                <label class="full-width">
+                    <span class="label-text">Address</span>
+                    <input type="text" name="address" placeholder="Address" value="{{ old('address') }}">
+                </label>
+                <label>
+                    <span class="label-text">Emergency Contact Name</span>
+                    <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" value="{{ old('emergency_contact_name') }}">
+                </label>
+                <label>
+                    <span class="label-text">Emergency Contact Email</span>
+                    <input type="email" name="emergency_contact_email" placeholder="Emergency Contact Email" value="{{ old('emergency_contact_email') }}">
+                </label>
+                <label>
+                    <span class="label-text">Check-in Date</span>
+                    <input type="date" name="check_in_date" placeholder="Check-in Date" value="{{ old('check_in_date') }}">
+                </label>
+                <label>
+                    <span class="label-text">Check-out Date</span>
+                    <input type="date" name="check_out_date" placeholder="Check-out Date" value="{{ old('check_out_date') }}">
+                </label>
             </div>
 
             {{-- Form Actions --}}
@@ -58,6 +90,10 @@
 .form-card .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
 .form-card input { padding:6px 10px; border-radius:6px; border:1px solid #E6A574; }
 .full-width { grid-column:span 1; }
+
+label { display:flex; flex-direction:column; gap:4px; }
+.label-text { font-weight:600; color:#5C3A21; font-size:13px; }
+label input { padding:8px 10px; border-radius:6px; border:1px solid #E6A574; font-family:'Figtree',sans-serif; }
 
 
 /* === 📱 Responsive Enhancements for Renter Create Form === */

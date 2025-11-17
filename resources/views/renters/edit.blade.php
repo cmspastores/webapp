@@ -5,17 +5,50 @@
             @csrf
             @method('PUT')
             <div class="form-grid">
-                <input type="text" name="first_name" value="{{ $renter->first_name }}" placeholder="First Name" required>
-                <input type="text" name="last_name" value="{{ $renter->last_name }}" placeholder="Last Name" required>
-                <input type="date" name="dob" value="{{ $renter->dob }}">
-                <input type="email" name="email" value="{{ $renter->email }}" placeholder="Email">
-                <input type="text" name="phone" value="{{ $renter->phone }}" placeholder="Contact Number">
-                <input type="text" name="emergency_contact" value="{{ $renter->emergency_contact }}" placeholder="Emergency Contact ">
-                <input type="text" name="address" value="{{ $renter->address }}" placeholder="Address" class="full-width">
-                <input type="text" name="emergency_contact_name" placeholder="Emergency Contact Name" value="{{ $renter->emergency_contact_name }}">
-                <input type="email" name="emergency_contact_email" placeholder="Emergency Contact Email" value="{{ $renter->emergency_contact_email }}">
-                <input type="date" name="check_in_date" value="{{ $renter->check_in_date }}">
-                <input type="date" name="check_out_date" value="{{ $renter->check_out_date }}">
+                <label>
+                    <span class="label-text">First Name</span>
+                    <input type="text" name="first_name" value="{{ $renter->first_name }}" required>
+                </label>
+                <label>
+                    <span class="label-text">Last Name</span>
+                    <input type="text" name="last_name" value="{{ $renter->last_name }}" required>
+                </label>
+                <label>
+                    <span class="label-text">Date of Birth</span>
+                    <input type="date" name="dob" value="{{ $renter->dob }}">
+                </label>
+                <label>
+                    <span class="label-text">Email</span>
+                    <input type="email" name="email" value="{{ $renter->email }}">
+                </label>
+                <label>
+                    <span class="label-text">Contact Number</span>
+                    <input type="text" name="phone" value="{{ $renter->phone }}">
+                </label>
+                <label>
+                    <span class="label-text">Emergency Contact</span>
+                    <input type="text" name="emergency_contact" value="{{ $renter->emergency_contact }}">
+                </label>
+                <label class="full-width">
+                    <span class="label-text">Address</span>
+                    <input type="text" name="address" value="{{ $renter->address }}">
+                </label>
+                <label>
+                    <span class="label-text">Emergency Contact Name</span>
+                    <input type="text" name="emergency_contact_name" value="{{ $renter->emergency_contact_name }}">
+                </label>
+                <label>
+                    <span class="label-text">Emergency Contact Email</span>
+                    <input type="email" name="emergency_contact_email" value="{{ $renter->emergency_contact_email }}">
+                </label>
+                <label>
+                    <span class="label-text">Check-in Date</span>
+                    <input type="date" name="check_in_date" value="{{ $renter->check_in_date }}">
+                </label>
+                <label>
+                    <span class="label-text">Check-out Date</span>
+                    <input type="date" name="check_out_date" value="{{ $renter->check_out_date }}">
+                </label>
             </div>
 
             <div class="form-buttons">
@@ -39,6 +72,9 @@
 .btn-confirm:hover { background:#F4C38C; }
 .form-buttons { display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
 
+label { display:flex; flex-direction:column; gap:4px; }
+.label-text { font-weight:600; color:#5C3A21; font-size:13px; }
+label input { padding:8px 10px; border-radius:6px; border:1px solid #E6A574; font-family:'Figtree',sans-serif; }
 
 /* === 📱 Responsive Enhancements for Renter Edit Form === */
 
@@ -79,8 +115,6 @@
   .btn-confirm, .btn-back { width:100%; font-size:12px; padding:6px 10px; }
   .form-buttons { flex-direction:column; gap:6px; align-items:center; }
 }
-
-
 
 </style>
 </x-app-layout>
