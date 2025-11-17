@@ -191,15 +191,15 @@ tbody tr:hover { background:#FFF4E1; transition: background .2s; }
 
         {{-- Tabs --}}
 <div style="display:flex; gap:12px; justify-content:center; margin-bottom:16px;">
-    <button type="button" class="tab-btn active" data-tab="unpaid">Receivables</button>
+    <button type="button" class="tab-btn active" data-tab="unpaid">Expected Revenue</button>
     <button type="button" class="tab-btn" data-tab="paid">Earnings</button>
 </div>
 
 {{-- Receivables tab (was Unpaid) --}}
 <div class="tab-content" id="tab-unpaid">
-    <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Total Receivables: ₱{{ number_format($totalOutstanding,2) }}</p>
+    <p class="total-unpaid"><i class="fa-solid fa-money-bill-wave"></i> Expected Revenue: ₱{{ number_format($totalOutstanding,2) }}</p>
 
-    <h3 style="margin-top:12px;"><i class="fa-solid fa-list-check"></i> Receivables Summary </h3>
+    <h3 style="margin-top:12px;"><i class="fa-solid fa-list-check"></i> Expected Revenue Summary </h3>
     <div class="table-wrapper">
         <table>
             <thead><tr><th>Category</th><th>Amount (₱)</th><th>Percentage</th></tr></thead>
