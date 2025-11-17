@@ -10,6 +10,7 @@ use App\Models\PaymentItem;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class BillController extends Controller
 {
@@ -177,6 +178,10 @@ class BillController extends Controller
         $exists = \App\Models\Bill::where('agreement_id', $agreement->agreement_id)
             ->where('period_start', $periodStartStr)
             ->where('period_end', $periodEndStr)
+            ->where(function($q) {
+                // Only treat as existing if status is NOT refunded.
+                $q->whereNull('status')->orWhere('status', '!=', 'refunded');
+            })
             ->exists();
 
         if ($exists) {
@@ -213,13 +218,63 @@ class BillController extends Controller
         }
 
         try {
+            // First attempt to create normally
             $this->createBillAndConsumeUnallocated($billData, $agreement);
             $created++;
         } catch (\Illuminate\Database\QueryException $e) {
             $code = $e->errorInfo[1] ?? null;
+
+            // MySQL duplicate entry error code
             if ($code == 1062) {
+                // There's a unique-key collision. See if the row blocking us is a REFUNDED bill.
+                // We search for a bill with the same agreement & exact datetime period that is refunded.
+                $conflicting = \App\Models\Bill::where('agreement_id', $agreement->agreement_id)
+                    ->where('period_start', $billData['period_start'])
+                    ->where('period_end', $billData['period_end'])
+                    ->whereRaw("LOWER(COALESCE(status, '')) = 'refunded'")
+                    ->first();
+
+                if ($conflicting) {
+                    // Try to nudge the refunded bill datetimes so it no longer conflicts, then retry creation once.
+                    try {
+                        // Nudge by 1 second (small, conservative)
+                        $conflictingStart = \Carbon\Carbon::parse($conflicting->period_start)->addSecond();
+                        $conflictingEnd   = \Carbon\Carbon::parse($conflicting->period_end)->addSecond();
+
+                        $conflicting->period_start = $conflictingStart->toDateTimeString();
+                        $conflicting->period_end   = $conflictingEnd->toDateTimeString();
+
+                        // Append note about nudge for traceability
+                        $conflicting->notes = trim(($conflicting->notes ?? '') . "\n[Period nudged to allow new bill creation on ".now()->toDateTimeString()." by user_id: ".(auth()->id() ?? 'system')."]");
+
+                        $conflicting->save();
+
+                        // Retry create once
+                        $this->createBillAndConsumeUnallocated($billData, $agreement);
+                        $created++;
+
+                        // Optionally log success
+                        \Log::info("createBillForAgreement: nudged refunded bill id {$conflicting->id} and created new bill for agreement {$agreement->agreement_id} period {$billData['period_start']} - {$billData['period_end']}");
+
+                    } catch (\Illuminate\Database\QueryException $e2) {
+                        // If we still get duplicate, give up and count as skipped
+                        $code2 = $e2->errorInfo[1] ?? null;
+                        \Log::warning("createBillForAgreement: retry after nudging refunded bill failed (code {$code2}). Agreement {$agreement->agreement_id}, period {$billData['period_start']} - {$billData['period_end']}");
+                        $skipped++;
+                    } catch (\Throwable $e2) {
+                        // Any other error during the fix: rethrow so it can be diagnosed
+                        \Log::error("createBillForAgreement: unexpected error while handling refunded conflict: ".$e2->getMessage());
+                        throw $e2;
+                    }
+
+                    return;
+                }
+
+                // Otherwise not a refunded conflict; treat as normal duplicate/skip
+                \Log::warning("createBillForAgreement: duplicate bill prevented creation for agreement {$agreement->agreement_id} period {$billData['period_start']} - {$billData['period_end']}");
                 $skipped++;
             } else {
+                // rethrow other DB errors
                 throw $e;
             }
         }
@@ -260,26 +315,63 @@ class BillController extends Controller
 
     public function refund(\App\Models\Bill $bill)
     {
-        if (!auth()->user() || !auth()->user()->is_admin) {
+        // only admin
+        if (! auth()->user() || ! auth()->user()->is_admin) {
             abort(403, 'Unauthorized');
         }
 
-        if (strtolower($bill->status) === 'refunded') {
-            return redirect()->back()->with('error', 'This bill has already been refunded.');
+        $currentStatus = strtolower(trim($bill->status ?? ''));
+
+        if ($currentStatus === 'refunded') {
+            return back()->with('error', 'This bill has already been refunded.');
         }
 
-        if (strtolower($bill->status) !== 'paid') {
-            return redirect()->back()->with('warning', 'Only fully paid bills can be marked refunded.');
+        if ($currentStatus !== 'paid') {
+            return back()->with('warning', 'Only fully paid bills can be marked refunded.');
         }
 
-        $note = trim(($bill->notes ?? '') . "\n[Refunded by user_id: ".auth()->id()." on ".now()->toDateTimeString()."]");
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            // Append trace note
+            $note = trim(($bill->notes ?? '') . "\n[Refunded by user_id: ".auth()->id()." on ".now()->toDateTimeString()."]");
 
-        $bill->update([
-            'status' => 'refunded',
-            'notes'  => $note,
-        ]);
+            // Parse original datetimes (Carbon)
+            $origStart = \Carbon\Carbon::parse($bill->period_start);
+            $origEnd   = \Carbon\Carbon::parse($bill->period_end);
 
-        return redirect()->back()->with('success', 'Bill marked as refunded.');
+            /*
+            * NUDGE the refunded bill's period datetimes so they won't conflict
+            * with the unique index. We add 1 day to both start and end (not seconds),
+            * because in your DB the uniqueness is effectively by-date.
+            *
+            * This avoids needing a migration while keeping the refunded row alive
+            * and traceable. If you prefer a different shift (e.g. addMonth), change here.
+            */
+            $bill->period_start = $origStart->copy()->addDay()->toDateTimeString();
+            $bill->period_end   = $origEnd->copy()->addDay()->toDateTimeString();
+
+            // mark refunded, set balance to 0 (since we consider money returned)
+            $bill->status = 'refunded';
+            $bill->balance = 0;
+            $bill->notes = $note;
+
+            $bill->save();
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return back()->with('success', 'Bill marked as refunded. You can now create a new bill for the same period.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            $code = $e->errorInfo[1] ?? null;
+            if ($code == 1062) {
+                // unique constraint still blocking
+                return back()->with('error', 'Refund failed due to duplicate-period constraint. Consider a DB migration to adjust the unique index (preferred long-term).');
+            }
+            throw $e;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            throw $e;
+        }
     }
 
     public function destroy(Bill $bill)
@@ -289,70 +381,56 @@ class BillController extends Controller
     }
 
 
-
-
-
-
-
-
-
    public function reports(Request $request)
-{
-    $periodType = $request->input('period_type', 'monthly');
-    $month = $request->input('month');
-    $year = $request->input('year', now()->year);
+    {
+        $periodType = $request->input('period_type', 'monthly');
+        $month = $request->input('month');
+        $year = $request->input('year', now()->year);
 
-    // Base query for bills in the selected period
-    $billsQuery = Bill::with('renter', 'room', 'agreement');
+        // Base query for bills in the selected period
+        $billsQuery = Bill::with('renter', 'room', 'agreement');
 
-    if ($periodType === 'monthly' && $month && $year) {
-        $billsQuery->whereYear('period_start', $year)
-                   ->whereMonth('period_start', $month);
-    } elseif ($periodType === 'annual' && $year) {
-        $billsQuery->whereYear('period_start', $year);
+        if ($periodType === 'monthly' && $month && $year) {
+            $billsQuery->whereYear('period_start', $year)
+                    ->whereMonth('period_start', $month);
+        } elseif ($periodType === 'annual' && $year) {
+            $billsQuery->whereYear('period_start', $year);
+        }
+
+        // ❗ Exclude refunded bills entirely
+        $allBills = $billsQuery->where('status', '!=', 'refunded')->get();
+
+        // Receivables (unpaid portion)
+        $transientOutstanding = $allBills
+            ->filter(fn($b) => optional($b->room->roomType)->is_transient 
+                            || ($b->agreement->rate_unit ?? '') === 'daily')
+            ->sum('balance');
+
+        $monthlyOutstanding = $allBills
+            ->filter(fn($b) => !optional($b->room->roomType)->is_transient 
+                            && ($b->agreement->rate_unit ?? '') !== 'daily')
+            ->sum('balance');
+
+        $totalOutstanding = $transientOutstanding + $monthlyOutstanding;
+
+        // Earnings (paid portion)
+        $transientPaid = $allBills
+            ->filter(fn($b) => optional($b->room->roomType)->is_transient 
+                            || ($b->agreement->rate_unit ?? '') === 'daily')
+            ->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
+
+        $monthlyPaid = $allBills
+            ->filter(fn($b) => !optional($b->room->roomType)->is_transient 
+                            && ($b->agreement->rate_unit ?? '') !== 'daily')
+            ->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
+
+        $totalPaid = $transientPaid + $monthlyPaid;
+
+        return view('bills.reports', compact(
+            'allBills', 'totalOutstanding', 'transientOutstanding', 'monthlyOutstanding',
+            'totalPaid', 'transientPaid', 'monthlyPaid',
+            'periodType', 'month', 'year'
+        ));
     }
-
-    // ❗ Exclude refunded bills entirely
-    $allBills = $billsQuery->where('status', '!=', 'refunded')->get();
-
-    // Receivables (unpaid portion)
-    $transientOutstanding = $allBills
-        ->filter(fn($b) => optional($b->room->roomType)->is_transient 
-                        || ($b->agreement->rate_unit ?? '') === 'daily')
-        ->sum('balance');
-
-    $monthlyOutstanding = $allBills
-        ->filter(fn($b) => !optional($b->room->roomType)->is_transient 
-                        && ($b->agreement->rate_unit ?? '') !== 'daily')
-        ->sum('balance');
-
-    $totalOutstanding = $transientOutstanding + $monthlyOutstanding;
-
-    // Earnings (paid portion)
-    $transientPaid = $allBills
-        ->filter(fn($b) => optional($b->room->roomType)->is_transient 
-                        || ($b->agreement->rate_unit ?? '') === 'daily')
-        ->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
-
-    $monthlyPaid = $allBills
-        ->filter(fn($b) => !optional($b->room->roomType)->is_transient 
-                        && ($b->agreement->rate_unit ?? '') !== 'daily')
-        ->sum(fn($b) => (float)$b->amount_due - (float)$b->balance);
-
-    $totalPaid = $transientPaid + $monthlyPaid;
-
-    return view('bills.reports', compact(
-        'allBills', 'totalOutstanding', 'transientOutstanding', 'monthlyOutstanding',
-        'totalPaid', 'transientPaid', 'monthlyPaid',
-        'periodType', 'month', 'year'
-    ));
-}
-
-
-
-
-
-
-
 
 }
